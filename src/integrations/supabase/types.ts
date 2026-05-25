@@ -139,6 +139,14 @@ export type Database = {
           total: number
           updated_at: string
           user_id: string | null
+          payment_status: string
+          payment_screenshot: string | null
+          notes: string | null
+          nail_shape: string | null
+          nail_length: string | null
+          color_preference: string | null
+          nail_photos: string[] | null
+          tracking_number: string | null
         }
         Insert: {
           created_at?: string
@@ -151,6 +159,14 @@ export type Database = {
           total: number
           updated_at?: string
           user_id?: string | null
+          payment_status?: string
+          payment_screenshot?: string | null
+          notes?: string | null
+          nail_shape?: string | null
+          nail_length?: string | null
+          color_preference?: string | null
+          nail_photos?: string[] | null
+          tracking_number?: string | null
         }
         Update: {
           created_at?: string
@@ -163,6 +179,14 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          payment_status?: string
+          payment_screenshot?: string | null
+          notes?: string | null
+          nail_shape?: string | null
+          nail_length?: string | null
+          color_preference?: string | null
+          nail_photos?: string[] | null
+          tracking_number?: string | null
         }
         Relationships: []
       }
