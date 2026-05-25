@@ -5,6 +5,10 @@ import { Providers } from './providers';
 export const metadata: Metadata = {
   title: 'Nail Shingaar by Reet | Handcrafted Custom Press-On Nails',
   description: 'Nail Shingaar by Reet — handcrafted custom press-on nails sized perfectly for your fingers.',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
