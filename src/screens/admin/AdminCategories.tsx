@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -33,7 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Category } from '@/types';
 
@@ -41,7 +41,6 @@ const categorySchema = z.object({
   name: z.string().min(1, 'Name is required').max(50),
   slug: z.string().min(1, 'Slug is required').max(50),
   description: z.string().max(500).optional(),
-  image_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -53,6 +52,9 @@ export const AdminCategories = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
   const [saving, setSaving] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageFileRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -74,15 +76,11 @@ export const AdminCategories = () => {
         name: editingCategory.name,
         slug: editingCategory.slug,
         description: editingCategory.description || '',
-        image_url: editingCategory.image_url || '',
       });
+      setImageUrl(editingCategory.image_url || '');
     } else {
-      reset({
-        name: '',
-        slug: '',
-        description: '',
-        image_url: '',
-      });
+      reset({ name: '', slug: '', description: '' });
+      setImageUrl('');
     }
   }, [editingCategory, reset]);
 
@@ -102,6 +100,31 @@ export const AdminCategories = () => {
     setLoading(false);
   };
 
+  const uploadCategoryImage = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `categories/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from('product-images')
+      .upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadCategoryImage(file);
+      setImageUrl(url);
+    } catch (err: any) {
+      toast.error(err.message || 'Image upload failed');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -115,7 +138,7 @@ export const AdminCategories = () => {
       const categoryData = {
         name: data.name,
         slug: data.slug,
-        image_url: data.image_url || null,
+        image_url: imageUrl || null,
         description: data.description || null,
       };
 
@@ -254,7 +277,7 @@ export const AdminCategories = () => {
 
         <Dialog open={isFormOpen} onOpenChange={(open) => {
           setIsFormOpen(open);
-          if (!open) setEditingCategory(null);
+          if (!open) { setEditingCategory(null); setImageUrl(''); }
         }}>
           <DialogContent>
             <DialogHeader>
@@ -286,9 +309,37 @@ export const AdminCategories = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
-                <Input id="image_url" {...register('image_url')} placeholder="https://..." />
-                {errors.image_url && <p className="text-sm text-destructive">{errors.image_url.message}</p>}
+                <Label>Category Image</Label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={imageFileRef}
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+                {imageUrl ? (
+                  <div className="relative w-32 h-32">
+                    <img src={imageUrl} alt="Category" className="w-32 h-32 object-cover rounded-xl border" />
+                    <button
+                      type="button"
+                      onClick={() => { setImageUrl(''); if (imageFileRef.current) imageFileRef.current.value = ''; }}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => imageFileRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    {uploadingImage
+                      ? <Loader2 className="w-6 h-6 animate-spin" />
+                      : <><Upload className="w-6 h-6 mb-1" /><span className="text-xs">Upload Image</span></>}
+                  </button>
+                )}
               </div>
 
               <div className="space-y-2">
