@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Nail Shingaar — Rose Gold · Beige · Nude Pink */
+
+    --background: 30 40% 97%;
+    --foreground: 15 25% 18%;
+
+    --card: 28 50% 99%;
+    --card-foreground: 15 25% 18%;
+
+    --popover: 28 50% 99%;
+    --popover-foreground: 15 25% 18%;
+
+    /* Primary — Rose Gold */
+    --primary: 15 42% 57%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary — Nude Pink */
+    --secondary: 18 50% 88%;
+    --secondary-foreground: 15 25% 25%;
+
+    /* Muted — Light Beige */
+    --muted: 25 30% 93%;
+    --muted-foreground: 15 15% 48%;
+
+    /* Accent — Champagne Gold */
+    --accent: 38 45% 75%;
+    --accent-foreground: 38 30% 22%;
+
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 25 25% 87%;
+    --input: 25 25% 87%;
+    --ring: 15 42% 57%;
+
+    --radius: 0.75rem;
+
+    /* Custom Brand Tokens */
+    --rose-gold: 15 42% 57%;
+    --rose-gold-light: 15 38% 92%;
+    --rose-gold-dark: 15 38% 44%;
+    --nude: 18 50% 88%;
+    --nude-light: 18 45% 95%;
+    --beige: 25 35% 84%;
+    --beige-light: 25 30% 96%;
+    --champagne: 38 45% 75%;
+    --champagne-light: 38 40% 92%;
+    --cream: 35 50% 97%;
+    --warm-white: 30 40% 97%;
+
+    --sidebar-background: 30 40% 97%;
+    --sidebar-foreground: 15 25% 25%;
+    --sidebar-primary: 15 42% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 18 50% 92%;
+    --sidebar-accent-foreground: 15 25% 25%;
+    --sidebar-border: 25 25% 87%;
+    --sidebar-ring: 15 42% 57%;
+  }
+
+  .dark {
+    --background: 15 20% 8%;
+    --foreground: 25 25% 92%;
+
+    --card: 15 20% 11%;
+    --card-foreground: 25 25% 92%;
+
+    --popover: 15 20% 11%;
+    --popover-foreground: 25 25% 92%;
+
+    --primary: 15 42% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 18 25% 20%;
+    --secondary-foreground: 18 30% 85%;
+
+    --muted: 15 20% 16%;
+    --muted-foreground: 15 15% 60%;
+
+    --accent: 38 35% 35%;
+    --accent-foreground: 38 40% 90%;
+
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 15 20% 20%;
+    --input: 15 20% 20%;
+    --ring: 15 42% 60%;
+
+    --rose-gold: 15 42% 60%;
+    --rose-gold-light: 15 30% 22%;
+    --rose-gold-dark: 15 38% 50%;
+    --nude: 18 30% 30%;
+    --nude-light: 18 25% 18%;
+    --beige: 25 25% 35%;
+    --beige-light: 25 20% 16%;
+    --champagne: 38 35% 55%;
+    --champagne-light: 38 25% 22%;
+    --cream: 35 25% 14%;
+    --warm-white: 15 20% 8%;
+
+    --sidebar-background: 15 20% 8%;
+    --sidebar-foreground: 25 25% 92%;
+    --sidebar-primary: 15 42% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 18 25% 20%;
+    --sidebar-accent-foreground: 18 30% 85%;
+    --sidebar-border: 15 20% 20%;
+    --sidebar-ring: 15 42% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Quicksand', sans-serif;
+  }
+}
+
+@layer utilities {
+  /* Brand gradient text */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--rose-gold)), hsl(var(--champagne)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Script display font */
+  .font-script {
+    font-family: 'Great Vibes', cursive;
+  }
+
+  /* Hero gradient background */
+  .bg-gradient-hero {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--cream)) 0%,
+      hsl(var(--nude-light)) 40%,
+      hsl(var(--rose-gold-light)) 100%
+    );
+  }
+
+  /* Card gradient */
+  .bg-gradient-card {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--nude-light)) 0%,
+      hsl(var(--champagne-light)) 100%
+    );
+  }
+
+  /* Rose gradient */
+  .bg-gradient-rose {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--rose-gold-light)) 0%,
+      hsl(var(--nude-light)) 100%
+    );
+  }
+
+  /* Champagne gradient */
+  .bg-gradient-champagne {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--champagne-light)) 0%,
+      hsl(var(--cream)) 100%
+    );
+  }
+
+  /* Shadows */
+  .shadow-soft {
+    box-shadow: 0 4px 20px -4px hsl(var(--foreground) / 0.08);
+  }
+
+  .shadow-card {
+    box-shadow: 0 10px 40px -10px hsl(var(--rose-gold) / 0.22);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 28px hsl(var(--rose-gold) / 0.35);
+  }
+
+  /* Step indicator */
+  .step-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .step-done {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .step-idle {
+    @apply bg-muted text-muted-foreground;
+  }
+}

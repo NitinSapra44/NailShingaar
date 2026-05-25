@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Nail Shingaar — #F5E4E8 · #EAB9C7 · #B3557D · #494346 */
+    --background: 30 18% 91%;
+    --foreground: 340 12% 27%;
+    --card: 30 16% 95%;
+    --card-foreground: 340 12% 27%;
+    --popover: 30 16% 95%;
+    --popover-foreground: 340 12% 27%;
+    --primary: 335 42% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 344 45% 82%;
+    --secondary-foreground: 340 20% 22%;
+    --muted: 30 14% 87%;
+    --muted-foreground: 340 8% 50%;
+    --accent: 344 40% 75%;
+    --accent-foreground: 335 30% 18%;
+    --destructive: 0 65% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 344 28% 84%;
+    --input: 344 28% 84%;
+    --ring: 335 42% 52%;
+    --radius: 0.75rem;
+    --rose-gold: 335 42% 52%;
+    --rose-gold-light: 348 38% 90%;
+    --rose-gold-dark: 335 42% 36%;
+    --nude: 344 45% 82%;
+    --nude-light: 30 16% 95%;
+    --beige: 30 16% 85%;
+    --beige-light: 30 14% 93%;
+    --champagne: 344 38% 76%;
+    --champagne-light: 30 14% 91%;
+    --cream: 30 18% 91%;
+    --warm-white: 30 18% 91%;
+    --sidebar-background: 30 18% 91%;
+    --sidebar-foreground: 340 15% 25%;
+    --sidebar-primary: 335 42% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 344 38% 86%;
+    --sidebar-accent-foreground: 340 15% 25%;
+    --sidebar-border: 344 28% 84%;
+    --sidebar-ring: 335 42% 52%;
+  }
+
+  .dark {
+    --background: 340 28% 10%;
+    --foreground: 348 30% 92%;
+    --card: 340 28% 13%;
+    --card-foreground: 348 30% 92%;
+    --popover: 340 28% 13%;
+    --popover-foreground: 348 30% 92%;
+    --primary: 335 45% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 340 22% 20%;
+    --secondary-foreground: 344 30% 85%;
+    --muted: 340 24% 16%;
+    --muted-foreground: 340 10% 58%;
+    --accent: 344 30% 40%;
+    --accent-foreground: 344 35% 92%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 340 22% 20%;
+    --input: 340 22% 20%;
+    --ring: 335 45% 60%;
+    --rose-gold: 335 45% 60%;
+    --rose-gold-light: 340 25% 20%;
+    --rose-gold-dark: 335 42% 46%;
+    --nude: 340 22% 20%;
+    --nude-light: 340 20% 14%;
+    --beige: 342 18% 24%;
+    --beige-light: 342 16% 15%;
+    --champagne: 344 35% 50%;
+    --champagne-light: 344 22% 20%;
+    --cream: 340 28% 10%;
+    --warm-white: 340 28% 10%;
+    --sidebar-background: 340 28% 10%;
+    --sidebar-foreground: 344 28% 85%;
+    --sidebar-primary: 335 45% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 22% 20%;
+    --sidebar-accent-foreground: 344 28% 85%;
+    --sidebar-border: 340 22% 20%;
+    --sidebar-ring: 335 45% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Quicksand', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--rose-gold)), hsl(var(--champagne)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .font-script {
+    font-family: 'Great Vibes', cursive;
+  }
+  .bg-gradient-hero {
+    background: linear-gradient(145deg, hsl(30 22% 89%) 0%, hsl(30 18% 92%) 55%, hsl(344 28% 87%) 100%);
+  }
+  .bg-gradient-card {
+    background: linear-gradient(135deg, hsl(30 16% 94%) 0%, hsl(344 25% 91%) 100%);
+  }
+  .bg-gradient-rose {
+    background: linear-gradient(135deg, hsl(var(--rose-gold-light)) 0%, hsl(var(--nude-light)) 100%);
+  }
+  .bg-gradient-champagne {
+    background: linear-gradient(135deg, hsl(var(--champagne-light)) 0%, hsl(var(--cream)) 100%);
+  }
+  .shadow-soft {
+    box-shadow: 0 4px 20px -4px hsl(var(--foreground) / 0.08);
+  }
+  .shadow-card {
+    box-shadow: 0 10px 40px -10px hsl(var(--rose-gold) / 0.25);
+  }
+  .shadow-glow {
+    box-shadow: 0 0 28px hsl(var(--rose-gold) / 0.40);
+  }
+  .step-active { @apply bg-primary text-primary-foreground; }
+  .step-done { @apply bg-accent text-accent-foreground; }
+  .step-idle { @apply bg-muted text-muted-foreground; }
+}
