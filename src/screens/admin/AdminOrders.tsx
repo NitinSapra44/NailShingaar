@@ -193,90 +193,128 @@ export const AdminOrders = () => {
               <div className="text-center py-12 text-muted-foreground">No orders yet.</div>
             )}
             {!loading && orders.length > 0 && (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Nail Specs</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Payment</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => {
-                      const enquiry = isCustomEnquiry(order);
-                      return (
-                      <TableRow
-                        key={order.id}
-                        className={enquiry ? 'bg-rose-50/60' : order.payment_status === 'screenshot_uploaded' ? 'bg-orange-50/60' : ''}
-                      >
-                        <TableCell className="font-mono text-sm text-muted-foreground">
-                          <div className="flex flex-col gap-1">
-                            {order.id.slice(0, 8).toUpperCase()}
-                            {enquiry && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-rose-100 px-1.5 py-0.5 rounded-full w-fit">
-                                <Sparkles className="h-2.5 w-2.5" /> Custom
-                              </span>
-                            )}
+              <>
+                {/* Mobile cards */}
+                <div className="md:hidden divide-y divide-border">
+                  {orders.map((order) => {
+                    const enquiry = isCustomEnquiry(order);
+                    return (
+                      <div key={order.id}
+                        className={`p-4 space-y-3 ${enquiry ? 'bg-rose-50/50' : order.payment_status === 'screenshot_uploaded' ? 'bg-orange-50/50' : ''}`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono text-xs text-muted-foreground">{order.id.slice(0, 8).toUpperCase()}</span>
+                              {enquiry && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-rose-100 px-1.5 py-0.5 rounded-full">
+                                  <Sparkles className="h-2.5 w-2.5" /> Custom
+                                </span>
+                              )}
+                            </div>
+                            <p className="font-semibold text-sm mt-1">{order.shipping_name}</p>
+                            <p className="text-xs text-muted-foreground">{order.shipping_phone} · {order.shipping_city}</p>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="font-medium text-sm">{order.shipping_name}</p>
-                          <p className="text-xs text-muted-foreground">{order.shipping_phone}</p>
-                          <p className="text-xs text-muted-foreground">{order.shipping_city}</p>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-xs">{order.nail_length ?? '—'} · {order.nail_shape ?? '—'}</p>
-                          {order.color_preference && (
-                            <p className="text-xs text-muted-foreground truncate max-w-[120px]">{order.color_preference}</p>
-                          )}
-                        </TableCell>
-                        <TableCell className="font-semibold">
-                          {enquiry ? <span className="text-primary text-xs font-medium">Price TBD</span> : `₹${order.total}`}
-                        </TableCell>
-                        <TableCell>
+                          <div className="text-right shrink-0">
+                            <p className="font-semibold text-sm">{enquiry ? 'Price TBD' : `₹${order.total}`}</p>
+                            <p className="text-xs text-muted-foreground">{format(new Date(order.created_at), 'dd MMM yyyy')}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
                           {enquiry
                             ? <Badge className="text-xs bg-rose-100 text-rose-800">Awaiting quote</Badge>
                             : <Badge className={`text-xs ${paymentBadge[order.payment_status as PaymentStatus] ?? paymentBadge.pending}`}>
                                 {paymentLabel[order.payment_status as PaymentStatus] ?? order.payment_status}
                               </Badge>
                           }
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={order.status}
-                            onValueChange={(v) => updateOrderStatus(order.id, v as OrderStatus)}
-                            disabled={updatingId === order.id}
-                          >
-                            <SelectTrigger className="h-8 text-xs w-32">
-                              <SelectValue />
-                            </SelectTrigger>
+                          <Select value={order.status} onValueChange={(v) => updateOrderStatus(order.id, v as OrderStatus)} disabled={updatingId === order.id}>
+                            <SelectTrigger className="h-7 text-xs w-28"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              {ORDER_STATUSES.map((s) => (
-                                <SelectItem key={s} value={s} className="text-xs capitalize">{s}</SelectItem>
-                              ))}
+                              {ORDER_STATUSES.map((s) => <SelectItem key={s} value={s} className="text-xs capitalize">{s}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
-                          {format(new Date(order.created_at), 'dd MMM yyyy')}
-                        </TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="h-8 rounded-lg" onClick={() => openDetail(order)}>
+                          <Button size="sm" variant="outline" className="h-7 rounded-lg ml-auto" onClick={() => openDetail(order)}>
                             <Eye className="h-3.5 w-3.5 mr-1" /> View
                           </Button>
-                        </TableCell>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Nail Specs</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead>Payment</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead />
                       </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {orders.map((order) => {
+                        const enquiry = isCustomEnquiry(order);
+                        return (
+                          <TableRow key={order.id}
+                            className={enquiry ? 'bg-rose-50/60' : order.payment_status === 'screenshot_uploaded' ? 'bg-orange-50/60' : ''}>
+                            <TableCell className="font-mono text-sm text-muted-foreground">
+                              <div className="flex flex-col gap-1">
+                                {order.id.slice(0, 8).toUpperCase()}
+                                {enquiry && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-rose-100 px-1.5 py-0.5 rounded-full w-fit">
+                                    <Sparkles className="h-2.5 w-2.5" /> Custom
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <p className="font-medium text-sm">{order.shipping_name}</p>
+                              <p className="text-xs text-muted-foreground">{order.shipping_phone}</p>
+                              <p className="text-xs text-muted-foreground">{order.shipping_city}</p>
+                            </TableCell>
+                            <TableCell>
+                              <p className="text-xs">{order.nail_length ?? '—'} · {order.nail_shape ?? '—'}</p>
+                              {order.color_preference && <p className="text-xs text-muted-foreground truncate max-w-[120px]">{order.color_preference}</p>}
+                            </TableCell>
+                            <TableCell className="font-semibold">
+                              {enquiry ? <span className="text-primary text-xs font-medium">Price TBD</span> : `₹${order.total}`}
+                            </TableCell>
+                            <TableCell>
+                              {enquiry
+                                ? <Badge className="text-xs bg-rose-100 text-rose-800">Awaiting quote</Badge>
+                                : <Badge className={`text-xs ${paymentBadge[order.payment_status as PaymentStatus] ?? paymentBadge.pending}`}>
+                                    {paymentLabel[order.payment_status as PaymentStatus] ?? order.payment_status}
+                                  </Badge>
+                              }
+                            </TableCell>
+                            <TableCell>
+                              <Select value={order.status} onValueChange={(v) => updateOrderStatus(order.id, v as OrderStatus)} disabled={updatingId === order.id}>
+                                <SelectTrigger className="h-8 text-xs w-32"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {ORDER_STATUSES.map((s) => <SelectItem key={s} value={s} className="text-xs capitalize">{s}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
+                              {format(new Date(order.created_at), 'dd MMM yyyy')}
+                            </TableCell>
+                            <TableCell>
+                              <Button size="sm" variant="outline" className="h-8 rounded-lg" onClick={() => openDetail(order)}>
+                                <Eye className="h-3.5 w-3.5 mr-1" /> View
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

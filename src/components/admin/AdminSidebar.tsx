@@ -15,7 +15,11 @@ const menuItems = [
   { title: 'Categories', url: '/admin/categories',    icon: FolderOpen },
 ];
 
-export const AdminSidebar = () => {
+interface AdminSidebarProps {
+  onClose?: () => void;
+}
+
+export const AdminSidebar = ({ onClose }: AdminSidebarProps) => {
   const pathname = usePathname();
   const { signOut } = useAuth();
   const [pendingEnquiries, setPendingEnquiries] = useState(0);
@@ -29,12 +33,19 @@ export const AdminSidebar = () => {
     });
   }, []);
 
+  const linkCls = (url: string) => cn(
+    'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium',
+    pathname === url
+      ? 'bg-primary text-primary-foreground shadow-soft'
+      : 'text-muted-foreground hover:bg-rose-gold-light hover:text-primary'
+  );
+
   return (
     <aside className="w-64 min-h-screen bg-card border-r border-border flex flex-col">
       <div className="p-6 flex flex-col flex-1">
         {/* Logo */}
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/" onClick={onClose}>
             <img src="/logo.png" alt="Nail Shingaar by Reet" className="h-14 w-auto object-contain" />
           </Link>
           <p className="text-xs text-muted-foreground mt-2 font-medium uppercase tracking-widest">Admin Panel</p>
@@ -42,35 +53,14 @@ export const AdminSidebar = () => {
 
         {/* Nav */}
         <nav className="space-y-1 flex-1">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.url;
-            return (
-              <Link
-                key={item.url}
-                href={item.url}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium',
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-soft'
-                    : 'text-muted-foreground hover:bg-rose-gold-light hover:text-primary'
-                )}
-              >
-                <item.icon className="w-4 h-4 shrink-0" />
-                {item.title}
-              </Link>
-            );
-          })}
+          {menuItems.map((item) => (
+            <Link key={item.url} href={item.url} className={linkCls(item.url)} onClick={onClose}>
+              <item.icon className="w-4 h-4 shrink-0" />
+              {item.title}
+            </Link>
+          ))}
 
-          {/* Enquiries link with badge */}
-          <Link
-            href="/admin/enquiries"
-            className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium',
-              pathname === '/admin/enquiries'
-                ? 'bg-primary text-primary-foreground shadow-soft'
-                : 'text-muted-foreground hover:bg-rose-gold-light hover:text-primary'
-            )}
-          >
+          <Link href="/admin/enquiries" className={linkCls('/admin/enquiries')} onClick={onClose}>
             <Sparkles className="w-4 h-4 shrink-0" />
             Enquiries
             {pendingEnquiries > 0 && (
@@ -88,17 +78,14 @@ export const AdminSidebar = () => {
 
         {/* Bottom links */}
         <div className="space-y-1 pt-6 border-t border-border">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-          >
+          <Link href="/" onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
             <ArrowLeft className="w-4 h-4" />
             Back to Store
           </Link>
           <button
-            onClick={signOut}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-all"
-          >
+            onClick={() => { signOut(); onClose?.(); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-all">
             <LogOut className="w-4 h-4" />
             Sign Out
           </button>

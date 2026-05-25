@@ -192,61 +192,62 @@ export const AdminCategories = () => {
                 No categories found. Add your first category!
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Image</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Slug</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile cards */}
+                <div className="md:hidden divide-y divide-border">
                   {categories.map((category) => (
-                    <TableRow key={category.id}>
-                      <TableCell>
-                        {category.image_url ? (
-                          <img
-                            src={category.image_url}
-                            alt={category.name}
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-muted rounded-lg" />
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium">{category.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {category.description || '-'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setEditingCategory(category);
-                              setIsFormOpen(true);
-                            }}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setDeleteCategory(category)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                    <div key={category.id} className="flex items-center gap-3 p-4">
+                      {category.image_url
+                        ? <img src={category.image_url} alt={category.name} className="w-14 h-14 object-cover rounded-xl shrink-0" />
+                        : <div className="w-14 h-14 bg-muted rounded-xl shrink-0" />}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm">{category.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{category.slug}</p>
+                        {category.description && <p className="text-xs text-muted-foreground truncate mt-0.5">{category.description}</p>}
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" onClick={() => { setEditingCategory(category); setIsFormOpen(true); }}><Pencil className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteCategory(category)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Slug</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {categories.map((category) => (
+                        <TableRow key={category.id}>
+                          <TableCell>
+                            {category.image_url
+                              ? <img src={category.image_url} alt={category.name} className="w-12 h-12 object-cover rounded-lg" />
+                              : <div className="w-12 h-12 bg-muted rounded-lg" />}
+                          </TableCell>
+                          <TableCell className="font-medium">{category.name}</TableCell>
+                          <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                          <TableCell className="max-w-xs truncate">{category.description || '-'}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                              <Button variant="ghost" size="icon" onClick={() => { setEditingCategory(category); setIsFormOpen(true); }}><Pencil className="w-4 h-4" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteCategory(category)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

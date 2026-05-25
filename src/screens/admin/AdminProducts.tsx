@@ -116,68 +116,72 @@ export const AdminProducts = () => {
                 No products found. Add your first product!
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Image</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile cards */}
+                <div className="md:hidden divide-y divide-border">
                   {products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>
-                        <img
-                          src={product.image_url}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-lg"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>
-                        ₹{product.price}
-                        {product.original_price && (
-                          <span className="text-muted-foreground line-through ml-2">
-                            ₹{product.original_price}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          {product.is_featured && (
-                            <Badge variant="secondary">Featured</Badge>
-                          )}
-                          {product.is_new && (
-                            <Badge className="bg-rose text-primary-foreground">New</Badge>
-                          )}
+                    <div key={product.id} className="flex items-center gap-3 p-4">
+                      <img src={product.image_url} alt={product.name} className="w-14 h-14 object-cover rounded-xl shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{product.name}</p>
+                        <p className="text-sm text-primary font-medium">
+                          ₹{product.price}
+                          {product.original_price && <span className="text-muted-foreground line-through ml-1.5 text-xs">₹{product.original_price}</span>}
+                        </p>
+                        <div className="flex gap-1 mt-1">
+                          {product.is_featured && <Badge variant="secondary" className="text-xs">Featured</Badge>}
+                          {product.is_new && <Badge className="bg-rose text-primary-foreground text-xs">New</Badge>}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(product)}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setDeleteProduct(product)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}><Pencil className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteProduct(product)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {products.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell>
+                            <img src={product.image_url} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
+                          </TableCell>
+                          <TableCell className="font-medium">{product.name}</TableCell>
+                          <TableCell>
+                            ₹{product.price}
+                            {product.original_price && <span className="text-muted-foreground line-through ml-2">₹{product.original_price}</span>}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              {product.is_featured && <Badge variant="secondary">Featured</Badge>}
+                              {product.is_new && <Badge className="bg-rose text-primary-foreground">New</Badge>}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                              <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}><Pencil className="w-4 h-4" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteProduct(product)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
