@@ -1,93 +1,95 @@
-import { Sparkles, Ruler, Heart, Truck } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
-const features = [
+const steps = [
   {
-    icon: Sparkles,
-    title: '100% Handcrafted',
-    description: 'Every set is made by hand with precision and care — no mass production, ever.',
+    num: '01',
+    title: 'CHOOSE YOUR DESIGN',
+    desc: 'Browse 50+ styles or upload your own inspo. From bridal to everyday — there\'s a set for every version of you.',
   },
   {
-    icon: Ruler,
-    title: 'Custom Sized',
-    description: 'We size each nail to your fingers using the coin method for a perfect fit.',
+    num: '02',
+    title: 'SEND YOUR MEASUREMENTS',
+    desc: 'Use our easy coin method to measure all 10 nails. Takes 2 minutes — we handle everything else.',
   },
   {
-    icon: Heart,
-    title: 'Made with Love',
-    description: 'Designed by Reet with attention to detail that salons simply cannot replicate.',
-  },
-  {
-    icon: Truck,
-    title: 'Pan India Delivery',
-    description: 'Shipped safely across India. Free delivery on orders above ₹999.',
+    num: '03',
+    title: 'PRESS ON & SLAY',
+    desc: 'Your custom set arrives ready to wear. Apply in 10 minutes. Salon finish from your bedroom.',
   },
 ];
 
-// A curated strip of nail images shown as a visual gallery
 const GALLERY = [
   'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300&h=300&fit=crop',
   'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=300&h=300&fit=crop',
   'https://images.unsplash.com/photo-1604655333-a4f000e8d9c0?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300&h=300&fit=crop&crop=right',
-  'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=300&h=300&fit=crop&crop=left',
-  'https://images.unsplash.com/photo-1604655333-a4f000e8d9c0?w=300&h=300&fit=crop&crop=top',
+  'https://images.unsplash.com/photo-1696341980130-4bdff3322802?w=300&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=300&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1610992015762-45dca7fa3a85?w=300&h=300&fit=crop',
 ];
 
 const WhyChooseUs = () => {
   return (
     <>
-      {/* ── Nail image gallery strip ─────────────────────────────── */}
-      <section className="py-12 bg-muted/40 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <p className="font-script text-center text-2xl text-primary mb-6">our work</p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {GALLERY.map((src, i) => (
-              <div
-                key={src}
-                className="aspect-square rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-shadow duration-300 group"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <img
-                  src={src}
-                  alt="Nail Shingaar handcrafted nail design"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+      {/* Dark "How It Works" */}
+      <section className="py-24 bg-[#120710] relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-primary/15 blur-[100px]" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-8 md:px-16">
+          <div className="mb-16">
+            <p className="text-[11px] font-bold tracking-[0.3em] text-primary uppercase mb-4">Your Path</p>
+            <h2 className="font-display text-5xl md:text-7xl lg:text-8xl text-white leading-[0.9] tracking-tight">
+              PERFECT<br />
+              PRESS-ON<br />
+              <span className="text-primary">NAILS.</span>
+            </h2>
+            <p className="mt-6 text-white/40 italic max-w-xs">
+              Three simple steps to flawless, salon-quality nails at home.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0 md:divide-x divide-white/10">
+            {steps.map((step) => (
+              <div key={step.num} className="md:px-10 first:pl-0 last:pr-0">
+                <p className="font-display text-7xl text-white/8 mb-4 leading-none">{step.num}</p>
+                <h3 className="font-display text-lg md:text-xl text-white mb-3 leading-tight">{step.title}</h3>
+                <p className="text-sm text-white/45 leading-relaxed">{step.desc}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-14 pt-8 border-t border-white/10 flex items-center justify-between flex-wrap gap-4">
+            <p className="text-white/30 text-sm">No prior experience needed. We guide you every step of the way.</p>
+            <Link
+              href="/how-to-order"
+              className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all"
+            >
+              See Full Guide <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Why choose us ───────────────────────────────────────── */}
-      <section className="py-20 bg-background relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-30">
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-rose-gold-light rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-champagne-light rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-14">
-            <span className="font-script text-2xl text-primary">the difference</span>
-            <h2 className="font-display text-3xl md:text-4xl font-semibold mt-1">
-              Why <span className="text-gradient">Nail Shingaar</span>?
-            </h2>
-            <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-              Every set is crafted individually — because your hands deserve nothing less.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
+      {/* Gallery strip */}
+      <section className="py-14 bg-background overflow-hidden">
+        <div className="container mx-auto px-4">
+          <p className="text-[10px] font-bold tracking-[0.3em] text-muted-foreground uppercase text-center mb-8">
+            Our Work
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {GALLERY.map((src, i) => (
               <div
-                key={feature.title}
-                className="group p-7 rounded-2xl bg-gradient-card shadow-soft hover:shadow-card transition-all duration-300 animate-fade-up"
-                style={{ animationDelay: `${index * 100}ms` }}
+                key={src + i}
+                className="aspect-square rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 group"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-display text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                <img
+                  src={src}
+                  alt="Nail Shingaar handcrafted design"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
             ))}
           </div>

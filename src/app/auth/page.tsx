@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,8 @@ function AuthContent() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [resending, setResending] = useState(false);
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
@@ -52,6 +54,17 @@ function AuthContent() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleResendEmail = async () => {
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: 'signup', email: formData.email });
+    setResending(false);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Email sent!', description: 'Check your inbox again for the confirmation link.' });
+    }
+  };
+
   const handleSignUp = async () => {
     const { error } = await signUp(formData.email, formData.password, formData.fullName);
     if (error) {
@@ -60,19 +73,20 @@ function AuthContent() {
         : error.message;
       toast({ title: 'Error', description, variant: 'destructive' });
     } else {
-      toast({ title: 'Welcome to Nail Shingaar!', description: 'Your account has been created.' });
+      setEmailSent(true);
     }
   };
 
   const handleSignIn = async () => {
     const { error } = await signIn(formData.email, formData.password);
     if (error) {
-      let description = error.message;
-      if (error.message.includes('Invalid login credentials')) {
-        description = 'Incorrect email or password. If you just signed up, please confirm your email first.';
-      } else if (error.message.includes('Email not confirmed')) {
-        description = 'Please check your inbox and confirm your email before signing in.';
+      if (error.message.includes('Email not confirmed')) {
+        setEmailSent(true);
+        return;
       }
+      const description = error.message.includes('Invalid login credentials')
+        ? 'Incorrect email or password. If you just signed up, please confirm your email first.'
+        : error.message;
       toast({ title: 'Sign in failed', description, variant: 'destructive' });
     } else {
       toast({ title: 'Welcome back!', description: 'You have been signed in successfully.' });
@@ -107,11 +121,53 @@ function AuthContent() {
     );
   }
 
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-pink-light rounded-full blur-3xl opacity-50" />
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-pink-light rounded-full blur-3xl opacity-40" />
+        </div>
+        <div className="w-full max-w-md relative z-10 text-center">
+          <Link href="/" className="block text-center mb-8">
+            <span className="font-display text-3xl font-semibold text-gradient">Nail Shingaar</span>
+            <span className="block font-script text-xl text-muted-foreground -mt-1">by Reet</span>
+          </Link>
+          <div className="p-8 rounded-3xl bg-card/90 backdrop-blur-lg shadow-card border border-border space-y-5">
+            <div className="h-16 w-16 rounded-full bg-pink-light flex items-center justify-center mx-auto">
+              <Mail className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="font-display text-2xl font-semibold">Check your email</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              We sent a confirmation link to <span className="font-semibold text-foreground">{formData.email}</span>.
+              Click the link in that email to activate your account, then come back and sign in.
+            </p>
+            <Button
+              variant="outline"
+              className="rounded-full w-full"
+              onClick={handleResendEmail}
+              disabled={resending}
+            >
+              {resending ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+              Resend confirmation email
+            </Button>
+            <button
+              onClick={() => { setEmailSent(false); setIsSignUp(false); }}
+              className="text-sm text-primary font-semibold hover:underline"
+            >
+              Back to sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-rose-gold-light rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-champagne-light rounded-full blur-3xl opacity-40" />
+        <div className="absolute top-20 left-10 w-64 h-64 bg-pink-light rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-pink-light rounded-full blur-3xl opacity-40" />
       </div>
 
       <div className="w-full max-w-md relative z-10">

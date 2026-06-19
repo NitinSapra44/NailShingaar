@@ -33,3 +33,4 @@ out/
 .env
 .env.local
 .env*.local
+branch_structure.json

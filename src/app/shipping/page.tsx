@@ -12,14 +12,14 @@ const shippingOptions = [
   {
     icon: Package,
     title: 'Standard Shipping',
-    time: '5–7 working days',
+    time: '3–5 working days',
     cost: 'Free above ₹999 · ₹60 below',
     note: 'For all shop orders across India',
   },
   {
     icon: Truck,
     title: 'Custom Order Shipping',
-    time: '7–10 working days after payment',
+    time: '5–7 working days after payment',
     cost: 'Free above ₹999 · ₹60 below',
     note: 'Crafting time included in timeline',
   },
@@ -29,14 +29,14 @@ const timeline = [
   { label: 'Order Placed', desc: 'Payment screenshot uploaded and verified by Reet.', day: 'Day 0' },
   { label: 'Crafting Begins', desc: 'Reet starts hand-crafting your nail set to your specs.', day: 'Day 1–2' },
   { label: 'Quality Check', desc: 'Every nail is checked for fit, finish, and durability.', day: 'Day 4–5' },
-  { label: 'Packaged & Dispatched', desc: 'Your set is carefully packaged and handed to the courier.', day: 'Day 5–7' },
-  { label: 'Delivered to You', desc: 'Arrives at your door. Tracking number shared via WhatsApp.', day: 'Day 7–10' },
+  { label: 'Packaged & Dispatched', desc: 'Your set is carefully packaged and handed to the courier.', day: 'Day 3–5' },
+  { label: 'Delivered to You', desc: 'Arrives at your door. Tracking number shared via WhatsApp.', day: 'Day 5–7' },
 ];
 
 const policies = [
   {
     title: 'Domestic Shipping',
-    body: 'We ship across India through trusted courier partners. Most metro cities receive orders within 5–7 working days. Remote areas or Tier-3 cities may take 7–10 working days.',
+    body: 'We ship across India through trusted courier partners. Most metro cities receive orders within 3–5 working days. Remote areas or Tier-3 cities may take 5–7 working days.',
   },
   {
     title: 'International Shipping',
@@ -60,9 +60,9 @@ export default function ShippingPage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="bg-nude-light border-b border-border">
+      <section className="bg-ink-light border-b border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             <Truck className="h-3.5 w-3.5" /> Shipping Info
           </div>
           <h1 className="font-display text-4xl font-semibold mb-3">Shipping & Delivery</h1>
@@ -81,7 +81,7 @@ export default function ShippingPage() {
             const Icon = opt.icon;
             return (
               <div key={opt.title} className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-3">
-                <div className="h-10 w-10 rounded-full bg-rose-gold-light flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-pink-light flex items-center justify-center">
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-semibold text-base">{opt.title}</h3>
@@ -102,14 +102,14 @@ export default function ShippingPage() {
         </div>
 
         {/* Free shipping banner */}
-        <div className="mt-6 p-4 rounded-2xl bg-rose-gold-light border border-primary/20 flex items-center gap-3">
+        <div className="mt-6 p-4 rounded-2xl bg-pink-light border border-primary/20 flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
           <p className="text-sm font-medium text-primary">Free shipping on all orders above ₹999!</p>
         </div>
       </section>
 
       {/* Timeline */}
-      <section className="bg-nude-light border-y border-border">
+      <section className="bg-ink-light border-y border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl">
           <h2 className="font-display text-2xl font-semibold mb-8">Order Timeline</h2>
           <div className="space-y-1">
@@ -124,7 +124,7 @@ export default function ShippingPage() {
                 <div className="pb-5">
                   <div className="flex items-center gap-3 mb-1">
                     <p className="font-semibold text-sm">{step.label}</p>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-gold-light text-primary">{step.day}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-light text-primary">{step.day}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{step.desc}</p>
                 </div>
@@ -161,7 +161,7 @@ export default function ShippingPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-nude-light border-t border-border">
+      <section className="bg-ink-light border-t border-border">
         <div className="container mx-auto px-4 py-12 max-w-xl text-center space-y-4">
           <h2 className="font-display text-2xl font-semibold">Have shipping questions?</h2>
           <p className="text-muted-foreground text-sm">We're here to help — reach out any time.</p>

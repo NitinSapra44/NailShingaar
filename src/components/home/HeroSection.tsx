@@ -1,204 +1,110 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Star, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-const slides = [
-  {
-    src: 'https://images.unsplash.com/photo-1696341980130-4bdff3322802?w=1200&auto=format&fit=crop&q=85',
-    alt: 'Press-on nail sets collection',
-    label: 'New Collection',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=1200&auto=format&fit=crop&q=85',
-    alt: 'Pink press-on nails on white textile',
-    label: 'Everyday Glam',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=1200&auto=format&fit=crop&q=85',
-    alt: 'Close-up pink manicure',
-    label: 'Custom Sets',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1610992015762-45dca7fa3a85?w=1200&auto=format&fit=crop&q=85',
-    alt: 'Polished nails lifestyle shot',
-    label: 'Bridal & Festive',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1610992015836-7c249d75782d?w=1200&auto=format&fit=crop&q=85',
-    alt: 'Elegant manicured hands',
-    label: 'Western Collection',
-  },
-];
+import { ArrowRight } from 'lucide-react';
 
 const HeroSection = () => {
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), []);
-
-  useEffect(() => {
-    if (paused) return;
-    const t = setInterval(next, 3800);
-    return () => clearInterval(t);
-  }, [paused, next]);
-
   return (
-    <section className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden">
+    <section className="relative min-h-screen bg-primary overflow-hidden flex items-center">
+      {/* Decorative circles */}
+      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-white/10 pointer-events-none" />
+      <div className="absolute -bottom-52 -left-52 w-[700px] h-[700px] rounded-full bg-white/8 pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
 
-      {/* ── LEFT: Content ── */}
-      <div className="flex-1 flex items-center justify-center px-8 md:px-14 py-24 lg:py-0 bg-background order-2 lg:order-1 z-10">
-        <div className="max-w-lg w-full">
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-8">
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-[11px] font-semibold tracking-[0.18em] uppercase">
-              Custom Press-On Nails · Handcrafted
+      <div className="relative z-10 w-full px-8 md:px-16 lg:px-24 py-28 grid grid-cols-1 lg:grid-cols-[58%_42%] gap-12 items-center">
+        {/* Left: Text */}
+        <div>
+          <div className="mb-8">
+            <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/20 text-white text-[11px] font-bold tracking-[0.25em] uppercase border border-white/25">
+              ✦ HANDMADE IN INDIA
             </span>
           </div>
 
-          {/* Heading */}
-          <h1 className="font-display text-5xl md:text-6xl lg:text-[4.5rem] font-semibold text-foreground leading-[1.05] mb-3">
-            Your Nails,
-          </h1>
-          <h1
-            className="font-script text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.15] mb-6"
-            style={{ color: '#B3557D' }}
-          >
-            Your Story
-          </h1>
+          <div className="mb-8 space-y-0">
+            <h1 className="font-display text-[4rem] sm:text-[5.5rem] md:text-[7rem] lg:text-[8rem] xl:text-[9.5rem] text-white leading-[0.87] tracking-[-0.03em]">
+              MADE FOR
+            </h1>
+            <h1 className="font-display text-[4rem] sm:text-[5.5rem] md:text-[7rem] lg:text-[8rem] xl:text-[9.5rem] text-white/75 leading-[0.87] tracking-[-0.03em]">
+              YOUR
+            </h1>
+            <h1 className="font-display text-[4rem] sm:text-[5.5rem] md:text-[7rem] lg:text-[8rem] xl:text-[9.5rem] text-white leading-[0.87] tracking-[-0.03em]">
+              HANDS.
+            </h1>
+          </div>
 
-          <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-10 max-w-sm">
-            Handcrafted press-on nails sized to fit YOUR fingers — no salon, no wait. Shop ready-made sets or order a custom design.
+          <p className="text-white/70 text-base md:text-lg max-w-md leading-relaxed mb-10">
+            Custom-sized press-on nails crafted just for your fingers.
+            No salon. No glue fumes. No waiting.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4 mb-12">
-            <Button asChild size="lg" className="rounded-full px-8 shadow-md text-sm font-semibold">
-              <Link href="/shop">
-                Shop Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-full px-8 border-primary/30 text-sm font-semibold hover:bg-primary/8"
+          <div className="flex flex-wrap gap-4 mb-14">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2.5 bg-white text-primary font-bold text-sm px-8 py-4 rounded-full shadow-lg hover:bg-white/90 transition-colors"
             >
-              <Link href="/categories">View Collections</Link>
-            </Button>
+              Shop Now
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/custom-order"
+              className="inline-flex items-center gap-2.5 text-white font-semibold text-sm px-8 py-4 rounded-full border-2 border-white/35 hover:bg-white/10 transition-colors"
+            >
+              Custom Order
+            </Link>
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center gap-6 pt-6 border-t border-border">
+          <div className="flex items-center gap-6 pt-6 border-t border-white/20">
             <div>
-              <p className="font-display text-2xl font-semibold text-foreground">100%</p>
-              <p className="text-[11px] text-muted-foreground tracking-widest uppercase mt-0.5">Handmade</p>
+              <p className="font-display text-2xl md:text-3xl text-white">1000+</p>
+              <p className="text-[10px] text-white/55 tracking-widest uppercase mt-0.5">Happy Clients</p>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-white/20" />
             <div>
-              <p className="font-display text-2xl font-semibold text-foreground">Custom</p>
-              <p className="text-[11px] text-muted-foreground tracking-widest uppercase mt-0.5">Sizing</p>
+              <p className="font-display text-2xl md:text-3xl text-white">Custom</p>
+              <p className="text-[10px] text-white/55 tracking-widest uppercase mt-0.5">Sizing</p>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-white/20" />
             <div>
-              <div className="flex gap-0.5 mb-1">
-                {[1, 2, 3, 4, 5].map((k) => (
-                  <Star key={k} className="h-3.5 w-3.5" style={{ fill: '#B3557D', color: '#B3557D' }} />
-                ))}
-              </div>
-              <p className="text-[11px] text-muted-foreground tracking-widest uppercase">5-Star Rated</p>
+              <p className="font-display text-2xl md:text-3xl text-white">50+</p>
+              <p className="text-[10px] text-white/55 tracking-widest uppercase mt-0.5">Designs</p>
             </div>
           </div>
+        </div>
 
+        {/* Right: Image with floating labels */}
+        <div className="relative hidden lg:flex justify-center">
+          <div className="relative w-[340px] xl:w-[390px]">
+            <img
+              src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=800&h=960&fit=crop&q=80"
+              alt="Handcrafted custom press-on nails by Nail Shingaar"
+              className="w-full rounded-[2rem] shadow-2xl"
+            />
+
+            {/* Floating chips */}
+            <div className="absolute -top-3 -left-10 bg-white rounded-full px-4 py-2 shadow-lg">
+              <span className="text-[11px] font-bold text-primary tracking-wider">HANDMADE ✦</span>
+            </div>
+            <div className="absolute top-1/3 -right-12 bg-white rounded-full px-4 py-2 shadow-lg">
+              <span className="text-[11px] font-bold text-foreground tracking-wider">CUSTOM FIT</span>
+            </div>
+            <div className="absolute -bottom-3 left-1/3 bg-[#1A0A10] text-white rounded-full px-4 py-2 shadow-lg">
+              <span className="text-[11px] font-bold tracking-wider">REUSABLE ✦</span>
+            </div>
+            <div className="absolute bottom-1/3 -left-12 bg-white rounded-full px-4 py-2 shadow-lg">
+              <span className="text-[11px] font-bold text-foreground tracking-wider">SALON QUALITY</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── RIGHT: Image Carousel ── */}
-      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-      <section
-        aria-label="Product image carousel"
-        aria-roledescription="carousel"
-        className="relative w-full lg:w-[52%] h-[60vh] lg:h-auto order-1 lg:order-2 overflow-hidden"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
-        {/* Slides */}
-        {slides.map((slide, i) => (
-          <div
-            key={slide.label}
-            aria-label={slide.alt}
-            className="absolute inset-0 transition-opacity duration-700"
-            style={{ opacity: i === current ? 1 : 0 }}
-          >
-            <img
-              src={slide.src}
-              alt={slide.alt}
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
-        ))}
-
-        {/* Left blend edge */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to right, hsl(30 22% 89% / 0.55) 0%, transparent 22%)',
-          }}
+      {/* Mobile image accent */}
+      <div className="lg:hidden absolute bottom-0 right-0 w-32 h-44 overflow-hidden rounded-tl-2xl opacity-25 pointer-events-none">
+        <img
+          src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=400&h=500&fit=crop"
+          alt=""
+          className="w-full h-full object-cover"
         />
-
-        {/* Slide label */}
-        <div className="absolute top-6 left-6 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold tracking-widest uppercase shadow-lg transition-all duration-500">
-          ✦ {slides[current].label}
-        </div>
-
-        {/* Prev / Next arrows */}
-        <button
-          onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white/90 transition-all"
-          aria-label="Previous"
-        >
-          <ChevronLeft className="h-5 w-5 text-foreground" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white/90 transition-all"
-          aria-label="Next"
-        >
-          <ChevronRight className="h-5 w-5 text-foreground" />
-        </button>
-
-        {/* Dot indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-          {slides.map((slide, i) => (
-            <button
-              key={slide.label}
-              onClick={() => setCurrent(i)}
-              className="transition-all duration-300 rounded-full"
-              style={{
-                width: i === current ? '24px' : '8px',
-                height: '8px',
-                background: i === current ? '#B3557D' : 'rgba(255,255,255,0.65)',
-              }}
-              aria-label={`Go to slide ${i + 1}: ${slide.label}`}
-              aria-current={i === current ? 'true' : undefined}
-            />
-          ))}
-        </div>
-
-        {/* Bottom info card */}
-        <div className="absolute bottom-16 right-6 px-5 py-4 rounded-2xl bg-white/80 backdrop-blur-md border border-white/60 shadow-xl hidden lg:block">
-          <p className="font-display text-sm font-semibold text-foreground">50+ Designs</p>
-          <p className="text-xs text-muted-foreground mt-0.5">New sets added weekly ✦</p>
-        </div>
-
-      </section>
-
+      </div>
     </section>
   );
 };

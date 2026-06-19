@@ -92,7 +92,7 @@ export default function PayPage() {
     <Layout>
       <div className="container mx-auto px-4 py-12 max-w-lg">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-3">
+          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-3">
             <Sparkles className="h-3.5 w-3.5" /> Custom Design Order
           </div>
           <h1 className="font-display text-3xl font-semibold mb-2">Complete Your Payment</h1>
@@ -117,21 +117,24 @@ export default function PayPage() {
         </div>
 
         {/* UPI payment box */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center mb-6">
+        <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-5 text-center mb-6">
           <p className="font-semibold text-lg">Scan & Pay ₹{order.total.toFixed(0)}</p>
+
+          {/* QR Code */}
           <div className="flex justify-center">
-            <div className="w-52 h-52 rounded-2xl bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground">
-              <div className="grid grid-cols-3 gap-1 opacity-30">
-                {[1,2,3,4,5,6,7,8,9].map((n) => (
-                  <div key={n} className={`w-5 h-5 rounded-sm ${n % 2 === 0 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                ))}
-              </div>
-              <p className="text-xs text-center px-4 mt-2">UPI QR — configured by admin</p>
+            <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
+              <img
+                src="/qr-reet.png"
+                alt="UPI QR Code — Nail Shingaar by Reet"
+                className="w-48 h-48 object-contain rounded-xl"
+              />
             </div>
           </div>
+
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Or pay via UPI ID:</p>
-            <p className="font-mono font-semibold text-primary text-lg">reetrajpal02@okaxis</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Or pay via UPI ID</p>
+            <p className="font-mono font-bold text-primary text-base select-all">reetrajpal02@okaxis</p>
+            <p className="text-[11px] text-muted-foreground">Tap to copy · Accepted on PhonePe, GPay, Paytm & all UPI apps</p>
           </div>
         </div>
 
@@ -150,7 +153,7 @@ export default function PayPage() {
             </div>
           ) : (
             <button type="button" onClick={() => fileRef.current?.click()}
-              className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+              className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
               <Upload className="h-8 w-8 text-muted-foreground" />
               <span className="text-sm font-medium">Click to upload screenshot</span>
               <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>

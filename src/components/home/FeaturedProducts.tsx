@@ -57,10 +57,11 @@ const FeaturedProducts = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <div>
-            <h2 className="font-display text-3xl md:text-4xl font-semibold">
+            <p className="text-xs font-semibold tracking-[0.25em] text-muted-foreground uppercase mb-2">Most Loved</p>
+            <h2 className="font-display text-4xl md:text-6xl">
               Featured <span className="text-gradient">Collection</span>
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-3 text-muted-foreground italic">
               Our most loved designs, handpicked for you
             </p>
           </div>

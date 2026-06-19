@@ -15,8 +15,8 @@ import type { NailQuestionnaire, ShippingDetails } from '@/types';
 
 const NAIL_SHAPES: { id: NailQuestionnaire['nail_shape']; label: string; desc: string; image: string }[] = [
   { id: 'Square',  label: 'Square',  desc: 'Straight sides & flat top',    image: '/nail-shapes/nail-square.jpg' },
-  { id: 'Squoval', label: 'Squoval', desc: 'Square with soft corners',      image: '/nail-shapes/nail-squoval.jpg' },
-  { id: 'Round',   label: 'Round',   desc: 'Curved tip, natural feel',      image: '/nail-shapes/nail-round.jpg' },
+  { id: 'Round',   label: 'Round',   desc: 'Curved tip, natural feel',      image: '/nail-shapes/nail-squoval.jpg' },
+  { id: 'Squoval', label: 'Squoval', desc: 'Square with soft corners',      image: '/nail-shapes/nail-round.jpg' },
   { id: 'Oval',    label: 'Oval',    desc: 'Elegant tapered oval',          image: '/nail-shapes/nail-oval.jpg' },
   { id: 'Almond',  label: 'Almond',  desc: 'Pointed tip, slender sides',    image: '/nail-shapes/nail-almond.jpg' },
   { id: 'Coffin',  label: 'Coffin',  desc: 'Tapered sides, flat top',       image: '/nail-shapes/nail-coffin.jpg' },
@@ -35,7 +35,7 @@ function StepBar({ current }: Readonly<{ current: number }>) {
     <div className="flex items-center gap-0 mb-10">
       {STEPS.map((label, i) => {
         let stepCls = 'bg-muted text-muted-foreground';
-        if (i < current) stepCls = 'bg-champagne text-accent-foreground';
+        if (i < current) stepCls = 'bg-accent text-accent-foreground';
         if (i === current) stepCls = 'bg-primary text-primary-foreground shadow-glow';
         return (
           <div key={label} className="flex items-center flex-1 last:flex-none">
@@ -46,7 +46,7 @@ function StepBar({ current }: Readonly<{ current: number }>) {
               <span className="text-xs mt-1.5 font-medium text-muted-foreground hidden sm:block">{label}</span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${i < current ? 'bg-champagne' : 'bg-border'}`} />
+              <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${i < current ? 'bg-accent' : 'bg-border'}`} />
             )}
           </div>
         );
@@ -216,7 +216,7 @@ export default function CustomOrderPage() {
     <Layout>
       <div className="container mx-auto px-4 py-10 max-w-4xl">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-3">
+          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-3">
             <Sparkles className="h-3.5 w-3.5" /> Custom Design Enquiry
           </div>
           <h1 className="font-display text-3xl font-semibold mb-2">Bring Your Vision to Life</h1>
@@ -247,7 +247,7 @@ export default function CustomOrderPage() {
                       </div>
                     ))}
                     <button type="button" onClick={() => designRef.current?.click()}
-                      className="w-24 h-24 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                      className="w-24 h-24 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                       <Upload className="h-5 w-5 text-muted-foreground" />
                       <span className="text-[10px] text-muted-foreground text-center leading-tight">Add photo</span>
                     </button>
@@ -271,7 +271,7 @@ export default function CustomOrderPage() {
                   <div className="grid grid-cols-3 gap-3">
                     {NAIL_SHAPES.map((shape) => (
                       <button key={shape.id} type="button" onClick={() => setQuestionnaire({ ...questionnaire, nail_shape: shape.id })}
-                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${questionnaire.nail_shape === shape.id ? 'border-primary bg-rose-gold-light shadow-soft' : 'border-border bg-card hover:border-primary/40'}`}>
+                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${questionnaire.nail_shape === shape.id ? 'border-primary bg-pink-light shadow-soft' : 'border-border bg-card hover:border-primary/40'}`}>
                         <img src={shape.image} alt={shape.label} className="w-12 h-14 object-cover rounded-lg" />
                         <div className="text-center">
                           <p className="text-xs font-semibold leading-tight">{shape.label}</p>
@@ -287,7 +287,7 @@ export default function CustomOrderPage() {
                   <div className="flex gap-3 flex-wrap">
                     {NAIL_LENGTHS.map((len) => (
                       <button key={len} type="button" onClick={() => setQuestionnaire({ ...questionnaire, nail_length: len })}
-                        className={`flex-1 min-w-[90px] py-3 px-4 rounded-xl border-2 font-medium text-sm transition-all ${questionnaire.nail_length === len ? 'border-primary bg-rose-gold-light text-primary shadow-soft' : 'border-border bg-card hover:border-primary/40'}`}>
+                        className={`flex-1 min-w-[90px] py-3 px-4 rounded-xl border-2 font-medium text-sm transition-all ${questionnaire.nail_length === len ? 'border-primary bg-pink-light text-primary shadow-soft' : 'border-border bg-card hover:border-primary/40'}`}>
                         {len}
                       </button>
                     ))}
@@ -307,7 +307,7 @@ export default function CustomOrderPage() {
                 <h2 className="font-display text-xl font-semibold">Nail Sizing Photos</h2>
 
                 <div className="space-y-3">
-                  <div className="flex items-start gap-2 px-4 py-3 bg-nude-light rounded-xl border border-nude text-sm">
+                  <div className="flex items-start gap-2 px-4 py-3 bg-ink-light rounded-xl border border-border text-sm">
                     <Info className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
                     <div>
                       <p className="font-medium text-foreground">Coin Method</p>
@@ -329,7 +329,7 @@ export default function CustomOrderPage() {
                           </div>
                         ) : (
                           <button type="button" onClick={() => photoRefs.current[slot.key]?.click()}
-                            className="aspect-square w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                            className="aspect-square w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                             <Camera className="h-6 w-6 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">Upload photo</span>
                           </button>
@@ -355,7 +355,7 @@ export default function CustomOrderPage() {
                       </div>
                     ))}
                     <button type="button" onClick={() => extraPhotoRef.current?.click()}
-                      className="w-20 h-20 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                      className="w-20 h-20 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                       <Camera className="h-5 w-5 text-muted-foreground" />
                       <span className="text-[10px] text-muted-foreground">Add more</span>
                     </button>
@@ -382,7 +382,7 @@ export default function CustomOrderPage() {
                   <p className="text-sm text-muted-foreground mt-1">Reet will use these to reach out with your personalised price quote and to ship your order once confirmed.</p>
                 </div>
 
-                <div className="flex items-start gap-2 px-4 py-3 bg-nude-light rounded-xl border border-nude text-sm">
+                <div className="flex items-start gap-2 px-4 py-3 bg-ink-light rounded-xl border border-border text-sm">
                   <Sparkles className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
                   <p className="text-muted-foreground">No payment now — you'll only pay once Reet confirms the price with you directly.</p>
                 </div>
@@ -436,7 +436,7 @@ export default function CustomOrderPage() {
                 {designPreviews[0] ? (
                   <img src={designPreviews[0]} alt="Your design" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border" />
                 ) : (
-                  <div className="w-16 h-16 rounded-xl bg-rose-gold-light shrink-0 border border-border flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-xl bg-pink-light shrink-0 border border-border flex items-center justify-center">
                     <Sparkles className="h-6 w-6 text-primary" />
                   </div>
                 )}
@@ -447,7 +447,7 @@ export default function CustomOrderPage() {
                 </div>
               </div>
 
-              <div className="text-xs bg-nude-light rounded-xl p-3 space-y-1 text-muted-foreground">
+              <div className="text-xs bg-ink-light rounded-xl p-3 space-y-1 text-muted-foreground">
                 <p className="font-semibold text-foreground">How it works</p>
                 <p>1. Submit your enquiry</p>
                 <p>2. Reet reviews your design & photos</p>

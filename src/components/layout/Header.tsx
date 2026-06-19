@@ -54,13 +54,13 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-lg border-b border-border">
+    <header className="sticky top-0 z-50 w-full bg-background">
       <div className="bg-primary text-primary-foreground text-center text-xs py-1.5 tracking-wide font-medium">
         Handcrafted with love · Custom sizing for every hand · Free shipping above ₹999
       </div>
 
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="mx-4 md:mx-8 mt-2 mb-2 bg-card/98 backdrop-blur-md rounded-2xl shadow-soft border border-border/40 px-4 md:px-6">
+        <div className="flex h-14 items-center justify-between">
 
           {/* Mobile menu */}
           <Sheet>
@@ -72,11 +72,11 @@ const Header = () => {
                 <Link href="/"><img src="/logo.png" alt="Nail Shingaar by Reet" className="h-12 w-auto object-contain" /></Link>
               </div>
               <nav className="flex flex-col gap-1">
-                <Link href="/" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors">Home</Link>
-                <Link href="/shop" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors">Shop</Link>
+                <Link href="/" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">Home</Link>
+                <Link href="/shop" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">Shop</Link>
                 <button
                   onClick={() => setMobileCollectionsOpen(!mobileCollectionsOpen)}
-                  className="flex items-center justify-between px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors w-full text-left">
+                  className="flex items-center justify-between px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors w-full text-left">
                   Collections
                   <ChevronDown className={`h-4 w-4 transition-transform ${mobileCollectionsOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -93,13 +93,13 @@ const Header = () => {
                     ))}
                   </div>
                 )}
-                <Link href="/about" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors">About</Link>
-                <Link href="/custom-order" className="flex items-center gap-2 px-3 py-2.5 text-base font-medium text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors">
+                <Link href="/about" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">About</Link>
+                <Link href="/custom-order" className="flex items-center gap-2 px-3 py-2.5 text-base font-medium text-primary hover:bg-pink-light/40 rounded-lg transition-colors">
                   <Sparkles className="h-4 w-4" /> Custom Order
                 </Link>
               </nav>
               <div className="mt-8 pt-8 border-t border-border">
-                <Link href={accountHref} className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-rose-gold-light/40 rounded-lg transition-colors">
+                <Link href={accountHref} className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">
                   <User className="h-5 w-5" />
                   {!user && 'Sign In'}
                   {user && isAdmin && 'Admin Panel'}
@@ -132,14 +132,14 @@ const Header = () => {
               {collectionsOpen && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 rounded-2xl bg-card border border-border shadow-card p-2 z-50">
                   <Link href="/categories" onClick={() => setCollectionsOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-rose-gold-light transition-colors mb-1">
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-pink-light transition-colors mb-1">
                     <Grid3X3 className="h-4 w-4" /> All Collections
                   </Link>
                   <div className="h-px bg-border mb-1" />
                   {categories.map((cat) => (
                     <Link key={cat.id} href={`/categories/${cat.slug}`}
                       onClick={() => setCollectionsOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-primary hover:bg-rose-gold-light/50 transition-colors">
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-primary hover:bg-pink-light/50 transition-colors">
                       {cat.name}
                     </Link>
                   ))}
@@ -151,7 +151,7 @@ const Header = () => {
               {"About"}<span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full rounded-full" />
             </Link>
             <Link href="/custom-order"
-              className="flex items-center gap-1.5 text-sm font-semibold text-primary bg-rose-gold-light hover:bg-rose-gold-light/80 px-3.5 py-1.5 rounded-full transition-colors">
+              className="flex items-center gap-1.5 text-sm font-semibold text-primary bg-pink-light hover:bg-pink-light/80 px-3.5 py-1.5 rounded-full transition-colors">
               <Sparkles className="h-3.5 w-3.5" /> Custom Order
             </Link>
           </nav>

@@ -14,10 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Cormorant Garamond", "serif"],
-        serif: ["Cormorant Garamond", "serif"],
-        sans: ["Quicksand", "sans-serif"],
-        script: ["Great Vibes", "cursive"],
+        display: ["Bricolage Grotesque", "sans-serif"],
+        serif: ["Bricolage Grotesque", "sans-serif"],
+        sans: ["DM Sans", "sans-serif"],
+        script: ["Fraunces", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -64,38 +64,14 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         // Brand palette
-        "rose-gold": {
-          DEFAULT: "hsl(var(--rose-gold))",
-          light: "hsl(var(--rose-gold-light))",
-          dark: "hsl(var(--rose-gold-dark))",
+        pink: {
+          DEFAULT: "hsl(var(--pink))",
+          light: "hsl(var(--pink-light))",
+          dark: "hsl(var(--pink-dark))",
         },
-        nude: {
-          DEFAULT: "hsl(var(--nude))",
-          light: "hsl(var(--nude-light))",
-        },
-        beige: {
-          DEFAULT: "hsl(var(--beige))",
-          light: "hsl(var(--beige-light))",
-        },
-        champagne: {
-          DEFAULT: "hsl(var(--champagne))",
-          light: "hsl(var(--champagne-light))",
-        },
-        cream: "hsl(var(--cream))",
-        // Keep old names for backwards compat with remaining references
-        rose: {
-          DEFAULT: "hsl(var(--rose-gold))",
-          light: "hsl(var(--rose-gold-light))",
-          dark: "hsl(var(--rose-gold-dark))",
-        },
-        lavender: {
-          DEFAULT: "hsl(var(--champagne))",
-          light: "hsl(var(--champagne-light))",
-          dark: "hsl(var(--rose-gold-dark))",
-        },
-        peach: {
-          DEFAULT: "hsl(var(--nude))",
-          light: "hsl(var(--nude-light))",
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          light: "hsl(var(--ink-light))",
         },
       },
       borderRadius: {
@@ -132,6 +108,10 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -141,18 +121,17 @@ export default {
         "scale-in": "scale-in 0.3s ease-out",
         float: "float 4s ease-in-out infinite",
         shimmer: "shimmer 2s linear infinite",
+        marquee: "marquee 30s linear infinite",
       },
       backgroundImage: {
-        "gradient-rose": "linear-gradient(135deg, hsl(var(--rose-gold-light)) 0%, hsl(var(--nude-light)) 100%)",
-        "gradient-champagne": "linear-gradient(135deg, hsl(var(--champagne-light)) 0%, hsl(var(--cream)) 100%)",
-        "gradient-nude": "linear-gradient(180deg, hsl(var(--nude-light)) 0%, hsl(var(--cream)) 100%)",
+        "gradient-rose": "linear-gradient(135deg, hsl(var(--pink-light)) 0%, hsl(var(--ink-light)) 100%)",
+        "gradient-champagne": "linear-gradient(135deg, hsl(var(--ink-light)) 0%, hsl(0 0% 100%) 100%)",
+        "gradient-nude": "linear-gradient(180deg, hsl(var(--ink-light)) 0%, hsl(0 0% 100%) 100%)",
       },
       boxShadow: {
-        "rose-gold": "0 10px 40px -10px hsl(var(--rose-gold) / 0.35)",
-        champagne: "0 10px 40px -10px hsl(var(--champagne) / 0.35)",
         soft: "0 4px 20px -4px hsl(var(--foreground) / 0.08)",
-        card: "0 10px 40px -10px hsl(var(--rose-gold) / 0.25)",
-        glow: "0 0 28px hsl(var(--rose-gold) / 0.45)",
+        card: "0 10px 40px -10px hsl(var(--pink) / 0.25)",
+        glow: "0 0 28px hsl(var(--pink) / 0.45)",
       },
     },
   },

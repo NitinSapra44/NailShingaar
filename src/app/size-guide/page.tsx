@@ -50,9 +50,9 @@ export default function SizeGuidePage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="bg-nude-light border-b border-border">
+      <section className="bg-ink-light border-b border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             <Ruler className="h-3.5 w-3.5" /> Size Guide
           </div>
           <h1 className="font-display text-4xl font-semibold mb-3">The Coin Method</h1>
@@ -69,7 +69,7 @@ export default function SizeGuidePage() {
         <div className="space-y-6">
           {steps.map((step) => (
             <div key={step.number} className="flex gap-5 p-6 rounded-2xl bg-card border border-border shadow-soft">
-              <div className="h-12 w-12 rounded-full bg-rose-gold-light text-primary flex items-center justify-center font-display font-bold text-lg shrink-0">
+              <div className="h-12 w-12 rounded-full bg-pink-light text-primary flex items-center justify-center font-display font-bold text-lg shrink-0">
                 {step.number}
               </div>
               <div>
@@ -82,12 +82,38 @@ export default function SizeGuidePage() {
       </section>
 
       {/* 4 photos needed */}
-      <section className="bg-nude-light border-y border-border">
+      <section className="bg-ink-light border-y border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl">
           <div className="flex items-center gap-2 mb-6">
             <Camera className="h-5 w-5 text-primary" />
             <h2 className="font-display text-2xl font-semibold">4 Photos We Need</h2>
           </div>
+
+          {/* Reference picture */}
+          <div className="mb-6 rounded-2xl overflow-hidden border border-primary/20 shadow-soft">
+            <div className="bg-pink-light px-5 py-3 flex items-center gap-2">
+              <Camera className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold text-primary">Reference Picture — How Your Photo Should Look</p>
+            </div>
+            <div className="bg-card p-5 flex flex-col sm:flex-row items-center gap-5">
+              <img
+                src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300&h=220&fit=crop&q=80"
+                alt="Example nail measurement photo with coin for scale"
+                className="w-full sm:w-48 rounded-xl object-cover"
+              />
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p className="font-semibold text-foreground">Good example photo checklist:</p>
+                <ul className="space-y-1.5">
+                  <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Coin clearly visible beside the nail</li>
+                  <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Camera directly above (not at an angle)</li>
+                  <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Full nail visible from cuticle to tip</li>
+                  <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Good lighting — no shadows on nails</li>
+                  <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Hand flat and relaxed on a surface</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-4">
             {photos.map((p, i) => (
               <div key={p.label} className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4">
@@ -136,7 +162,7 @@ export default function SizeGuidePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-nude-light border-t border-border">
+      <section className="bg-ink-light border-t border-border">
         <div className="container mx-auto px-4 py-12 max-w-xl text-center space-y-4">
           <h2 className="font-display text-2xl font-semibold">Ready to order?</h2>
           <p className="text-muted-foreground text-sm">Now that you know how to measure, place your custom order and upload your nail photos.</p>
