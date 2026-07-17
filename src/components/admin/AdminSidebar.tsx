@@ -37,7 +37,7 @@ export const AdminSidebar = ({ onClose }: AdminSidebarProps) => {
     'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium',
     pathname === url
       ? 'bg-primary text-primary-foreground shadow-soft'
-      : 'text-muted-foreground hover:bg-rose-gold-light hover:text-primary'
+      : 'text-muted-foreground hover:bg-pink-light hover:text-primary'
   );
 
   return (

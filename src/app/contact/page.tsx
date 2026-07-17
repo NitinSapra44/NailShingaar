@@ -67,7 +67,7 @@ export default function ContactPage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="bg-nude-light border-b border-border">
+      <section className="bg-ink-light border-b border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
           <h1 className="font-display text-4xl font-semibold mb-3">Contact Us</h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
@@ -107,7 +107,7 @@ export default function ContactPage() {
             })}
 
             {/* Response time */}
-            <div className="p-4 rounded-2xl bg-rose-gold-light border border-primary/20 flex items-center gap-3">
+            <div className="p-4 rounded-2xl bg-pink-light border border-primary/20 flex items-center gap-3">
               <Clock className="h-4 w-4 text-primary shrink-0" />
               <p className="text-sm text-primary font-medium">Usually responds within a few hours on working days.</p>
             </div>

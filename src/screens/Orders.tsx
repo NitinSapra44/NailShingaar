@@ -91,7 +91,7 @@ function OrderCard({ order }: { order: Order }) {
 
           {/* Nail specs */}
           {(order.nail_length || order.nail_shape) && (
-            <div className="p-3 rounded-xl bg-nude-light space-y-1 text-sm">
+            <div className="p-3 rounded-xl bg-ink-light space-y-1 text-sm">
               <p className="font-semibold text-xs text-muted-foreground uppercase tracking-wide mb-2">Your Nail Specs</p>
               {order.nail_length && <p><span className="text-muted-foreground">Length:</span> {order.nail_length}</p>}
               {order.nail_shape && <p><span className="text-muted-foreground">Shape:</span> {order.nail_shape}</p>}
@@ -168,7 +168,7 @@ const Orders = () => {
 
           {orders.length === 0 ? (
             <div className="text-center py-20 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-rose-gold-light flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-pink-light flex items-center justify-center mx-auto">
                 <Package className="w-8 h-8 text-primary" />
               </div>
               <h2 className="font-display text-xl font-semibold">No orders yet</h2>

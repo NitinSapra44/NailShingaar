@@ -40,19 +40,19 @@ const Footer = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-9 w-9 rounded-full bg-rose-gold-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <InstagramIcon />
               </a>
               <a
                 href="mailto:nailshingaar@gmail.com"
-                className="h-9 w-9 rounded-full bg-rose-gold-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Mail className="h-4 w-4" />
               </a>
               <a
                 href="tel:+919569570825"
-                className="h-9 w-9 rounded-full bg-rose-gold-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Phone className="h-4 w-4" />
               </a>
@@ -111,7 +111,7 @@ const Footer = () => {
               />
               <button
                 type="submit"
-                className="px-6 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:bg-rose-gold-dark transition-colors shadow-soft"
+                className="px-6 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:bg-pink-dark transition-colors shadow-soft"
               >
                 Subscribe
               </button>

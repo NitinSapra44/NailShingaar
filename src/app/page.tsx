@@ -2,7 +2,6 @@
 
 import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/home/HeroSection';
-import MarqueeStrip from '@/components/home/MarqueeStrip';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import OccasionCategories from '@/components/home/OccasionCategories';
 import CategoriesSection from '@/components/home/CategoriesSection';
@@ -15,7 +14,6 @@ export default function Home() {
   return (
     <Layout>
       <HeroSection />
-      <MarqueeStrip />
       <FeaturedProducts />
       <OccasionCategories />
       <CategoriesSection />

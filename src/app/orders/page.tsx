@@ -51,7 +51,7 @@ function OrderCard({ order }: { order: Order }) {
     <div className={`rounded-2xl bg-card border shadow-soft overflow-hidden ${borderCls}`}>
       <button className="w-full flex items-center justify-between p-5 text-left" onClick={() => setOpen(!open)}>
         <div className="flex items-center gap-3">
-          <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${custom ? 'bg-rose-gold-light' : 'bg-rose-gold-light'}`}>
+          <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${custom ? 'bg-pink-light' : 'bg-pink-light'}`}>
             <StatusIcon className="h-5 w-5 text-primary" />
           </div>
           <div>
@@ -73,7 +73,7 @@ function OrderCard({ order }: { order: Order }) {
 
       {/* Pay Now CTA — always visible when ready */}
       {readyToPay && (
-        <div className="px-5 pb-4 flex items-center justify-between gap-4 bg-rose-gold-light/40 border-t border-primary/20 pt-3">
+        <div className="px-5 pb-4 flex items-center justify-between gap-4 bg-pink-light/40 border-t border-primary/20 pt-3">
           <div>
             <p className="text-sm font-semibold text-foreground">Price confirmed: ₹{order.total.toFixed(0)}</p>
             <p className="text-xs text-muted-foreground mt-0.5">Reet has reviewed your design and set a price. Pay to start crafting!</p>
@@ -92,7 +92,7 @@ function OrderCard({ order }: { order: Order }) {
       )}
 
       {awaitingQuote && (
-        <div className="px-5 pb-4 flex items-center gap-3 bg-nude-light border-t border-border pt-3">
+        <div className="px-5 pb-4 flex items-center gap-3 bg-ink-light border-t border-border pt-3">
           <Sparkles className="h-4 w-4 text-primary shrink-0" />
           <p className="text-xs text-muted-foreground">Reet is reviewing your design. You'll receive a WhatsApp/call with your price quote soon.</p>
         </div>
@@ -112,7 +112,7 @@ function OrderCard({ order }: { order: Order }) {
           )}
           <Badge className={`text-xs ${pmtCfg.color} border-0`}>{pmtCfg.label}</Badge>
           {order.nail_length && (
-            <div className="text-xs bg-nude-light rounded-xl p-3 space-y-0.5">
+            <div className="text-xs bg-ink-light rounded-xl p-3 space-y-0.5">
               <p className="font-semibold text-foreground">Nail Specs</p>
               <p>Length: {order.nail_length} · Shape: {order.nail_shape}</p>
               {order.color_preference && <p>Colour: {order.color_preference}</p>}
@@ -175,7 +175,7 @@ export default function OrdersPage() {
 
         {orders.length === 0 ? (
           <div className="text-center py-20 space-y-4">
-            <div className="w-16 h-16 rounded-full bg-rose-gold-light flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-full bg-pink-light flex items-center justify-center mx-auto">
               <Package className="w-8 h-8 text-primary" />
             </div>
             <h2 className="font-display text-xl font-semibold">No orders yet</h2>

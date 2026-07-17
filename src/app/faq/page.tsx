@@ -130,9 +130,9 @@ export default function FAQPage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="bg-nude-light border-b border-border">
+      <section className="bg-ink-light border-b border-border">
         <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             <HelpCircle className="h-3.5 w-3.5" /> Help Centre
           </div>
           <h1 className="font-display text-4xl font-semibold mb-3">Frequently Asked Questions</h1>
@@ -157,7 +157,7 @@ export default function FAQPage() {
       </section>
 
       {/* Still stuck */}
-      <section className="bg-nude-light border-t border-border">
+      <section className="bg-ink-light border-t border-border">
         <div className="container mx-auto px-4 py-12 max-w-xl text-center space-y-4">
           <h2 className="font-display text-2xl font-semibold">Didn't find your answer?</h2>
           <p className="text-muted-foreground text-sm">Reach out to Reet directly — she replies personally to every message.</p>

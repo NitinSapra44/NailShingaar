@@ -74,7 +74,7 @@ export default function OrderConfirmationPage() {
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         <div className="text-center space-y-3 mb-10">
           <div className="flex justify-center">
-            <div className="h-20 w-20 rounded-full bg-rose-gold-light flex items-center justify-center shadow-card">
+            <div className="h-20 w-20 rounded-full bg-pink-light flex items-center justify-center shadow-card">
               {isCustomEnquiry
                 ? <Sparkles className="h-10 w-10 text-primary" />
                 : <CheckCircle2 className="h-10 w-10 text-primary" />}
@@ -95,7 +95,7 @@ export default function OrderConfirmationPage() {
         </div>
 
         {isCustomEnquiry && (
-          <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-gold-light border border-primary/20 mb-8">
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-pink-light border border-primary/20 mb-8">
             <MessageCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
             <div>
               <p className="font-semibold text-sm">What happens next?</p>
@@ -105,7 +105,7 @@ export default function OrderConfirmationPage() {
         )}
 
         {!isCustomEnquiry && order.payment_status === 'screenshot_uploaded' && (
-          <div className="flex items-start gap-3 p-4 rounded-2xl bg-champagne-light border border-champagne mb-8">
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-pink-light border border-accent mb-8">
             <Clock className="h-5 w-5 text-accent-foreground mt-0.5 shrink-0" />
             <div>
               <p className="font-semibold text-sm">Payment screenshot received</p>
@@ -125,10 +125,10 @@ export default function OrderConfirmationPage() {
               return (
                 <div key={i} className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 transition-colors ${done ? (active ? 'bg-primary text-primary-foreground shadow-glow' : 'bg-champagne text-accent-foreground') : 'bg-muted text-muted-foreground'}`}>
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 transition-colors ${done ? (active ? 'bg-primary text-primary-foreground shadow-glow' : 'bg-accent text-accent-foreground') : 'bg-muted text-muted-foreground'}`}>
                       {done && !active ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                     </div>
-                    {i < steps.length - 1 && <div className={`w-0.5 h-10 my-1 rounded-full ${i < currentStep ? 'bg-champagne' : 'bg-border'}`} />}
+                    {i < steps.length - 1 && <div className={`w-0.5 h-10 my-1 rounded-full ${i < currentStep ? 'bg-accent' : 'bg-border'}`} />}
                   </div>
                   <div className="pb-8">
                     <p className={`font-semibold text-sm ${done ? 'text-foreground' : 'text-muted-foreground'}`}>{s.label}</p>

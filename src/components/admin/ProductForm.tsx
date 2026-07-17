@@ -287,7 +287,7 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
             <label key={cat.id}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border cursor-pointer transition-all ${
                 selectedCategories.includes(cat.id)
-                  ? 'border-primary bg-rose-gold-light text-primary'
+                  ? 'border-primary bg-pink-light text-primary'
                   : 'border-border hover:border-primary/40 bg-card'
               }`}>
               <Checkbox

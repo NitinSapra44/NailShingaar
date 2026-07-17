@@ -116,8 +116,8 @@ const Auth = () => {
       </Helmet>
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-rose-gold-light rounded-full blur-3xl opacity-50" />
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-champagne-light rounded-full blur-3xl opacity-40" />
+          <div className="absolute top-20 left-10 w-64 h-64 bg-pink-light rounded-full blur-3xl opacity-50" />
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-pink-light rounded-full blur-3xl opacity-40" />
         </div>
 
         <div className="w-full max-w-md relative z-10">

@@ -28,11 +28,11 @@ export default function AboutPage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-nude-light border-b border-border">
+      <section className="relative overflow-hidden bg-ink-light border-b border-border">
         <div className="container mx-auto px-4 py-16 md:py-24 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 bg-rose-gold-light text-primary px-4 py-1.5 rounded-full text-sm font-medium">
+              <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium">
                 <Sparkles className="h-3.5 w-3.5" /> Meet the Artist
               </div>
               <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight">
@@ -59,7 +59,7 @@ export default function AboutPage() {
             {/* Photo */}
             <div className="flex justify-center md:justify-end">
               <div className="relative">
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-rose-gold-light rotate-3 scale-105" />
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-pink-light rotate-3 scale-105" />
                 <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-3xl overflow-hidden border-4 border-white shadow-card">
                   {/* Replace /reet-photo.jpg with your actual image file name */}
                   <img
@@ -126,7 +126,7 @@ export default function AboutPage() {
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
                   <span key={skill}
-                    className="text-xs font-medium px-3 py-1.5 bg-rose-gold-light text-primary rounded-full">
+                    className="text-xs font-medium px-3 py-1.5 bg-pink-light text-primary rounded-full">
                     {skill}
                   </span>
                 ))}
@@ -148,7 +148,7 @@ export default function AboutPage() {
       </section>
 
       {/* Payment & Contact */}
-      <section className="bg-nude-light border-t border-border">
+      <section className="bg-ink-light border-t border-border">
         <div className="container mx-auto px-4 py-16 max-w-5xl">
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl font-semibold mb-2">Get in Touch</h2>

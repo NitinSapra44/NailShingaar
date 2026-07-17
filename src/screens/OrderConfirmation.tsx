@@ -89,7 +89,7 @@ const OrderConfirmation = () => {
           {/* Hero */}
           <div className="text-center space-y-3 mb-10">
             <div className="flex justify-center">
-              <div className="h-20 w-20 rounded-full bg-rose-gold-light flex items-center justify-center shadow-card">
+              <div className="h-20 w-20 rounded-full bg-pink-light flex items-center justify-center shadow-card">
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
             </div>
@@ -104,7 +104,7 @@ const OrderConfirmation = () => {
 
           {/* Payment status banner */}
           {order.payment_status === 'screenshot_uploaded' && (
-            <div className="flex items-start gap-3 p-4 rounded-2xl bg-champagne-light border border-champagne mb-8">
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-pink-light border border-accent mb-8">
               <Clock className="h-5 w-5 text-accent-foreground mt-0.5 shrink-0" />
               <div>
                 <p className="font-semibold text-sm">Payment screenshot received</p>
@@ -142,14 +142,14 @@ const OrderConfirmation = () => {
                           done
                             ? active
                               ? 'bg-primary text-primary-foreground shadow-glow'
-                              : 'bg-champagne text-accent-foreground'
+                              : 'bg-accent text-accent-foreground'
                             : 'bg-muted text-muted-foreground'
                         }`}
                       >
                         {done && !active ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                       </div>
                       {i < STATUS_STEPS.length - 1 && (
-                        <div className={`w-0.5 h-10 my-1 rounded-full ${i < currentStep ? 'bg-champagne' : 'bg-border'}`} />
+                        <div className={`w-0.5 h-10 my-1 rounded-full ${i < currentStep ? 'bg-accent' : 'bg-border'}`} />
                       )}
                     </div>
                     <div className="pb-8">

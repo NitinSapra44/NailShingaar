@@ -4,114 +4,97 @@
 
 @layer base {
   :root {
-    /* Nail Shingaar — Rose Gold · Beige · Nude Pink */
+    /* Nail Shingaar — Pink #C13B72 · Ink #251A1E */
+    --background: 0 0% 98%;
+    --foreground: 340 10% 16%;
 
-    --background: 30 40% 97%;
-    --foreground: 15 25% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 340 10% 16%;
 
-    --card: 28 50% 99%;
-    --card-foreground: 15 25% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 10% 16%;
 
-    --popover: 28 50% 99%;
-    --popover-foreground: 15 25% 18%;
-
-    /* Primary — Rose Gold */
-    --primary: 15 42% 57%;
+    --primary: 336 68% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary — Nude Pink */
-    --secondary: 18 50% 88%;
-    --secondary-foreground: 15 25% 25%;
+    --secondary: 336 50% 94%;
+    --secondary-foreground: 336 45% 32%;
 
-    /* Muted — Light Beige */
-    --muted: 25 30% 93%;
-    --muted-foreground: 15 15% 48%;
+    --muted: 340 8% 94%;
+    --muted-foreground: 340 6% 50%;
 
-    /* Accent — Champagne Gold */
-    --accent: 38 45% 75%;
-    --accent-foreground: 38 30% 22%;
+    --accent: 336 40% 90%;
+    --accent-foreground: 336 45% 28%;
 
-    --destructive: 0 70% 60%;
+    --destructive: 0 70% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 25 25% 87%;
-    --input: 25 25% 87%;
-    --ring: 15 42% 57%;
+    --border: 340 10% 90%;
+    --input: 340 10% 90%;
+    --ring: 336 68% 50%;
 
     --radius: 0.75rem;
 
-    /* Custom Brand Tokens */
-    --rose-gold: 15 42% 57%;
-    --rose-gold-light: 15 38% 92%;
-    --rose-gold-dark: 15 38% 44%;
-    --nude: 18 50% 88%;
-    --nude-light: 18 45% 95%;
-    --beige: 25 35% 84%;
-    --beige-light: 25 30% 96%;
-    --champagne: 38 45% 75%;
-    --champagne-light: 38 40% 92%;
-    --cream: 35 50% 97%;
-    --warm-white: 30 40% 97%;
+    /* Brand tokens */
+    --pink: 336 68% 50%;
+    --pink-light: 336 60% 94%;
+    --pink-dark: 336 65% 38%;
+    --ink: 340 10% 16%;
+    --ink-light: 340 5% 97%;
 
-    --sidebar-background: 30 40% 97%;
-    --sidebar-foreground: 15 25% 25%;
-    --sidebar-primary: 15 42% 57%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 340 10% 20%;
+    --sidebar-primary: 336 68% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 18 50% 92%;
-    --sidebar-accent-foreground: 15 25% 25%;
-    --sidebar-border: 25 25% 87%;
-    --sidebar-ring: 15 42% 57%;
+    --sidebar-accent: 336 50% 94%;
+    --sidebar-accent-foreground: 336 45% 32%;
+    --sidebar-border: 340 10% 90%;
+    --sidebar-ring: 336 68% 50%;
   }
 
   .dark {
-    --background: 15 20% 8%;
-    --foreground: 25 25% 92%;
+    --background: 340 12% 9%;
+    --foreground: 0 0% 94%;
 
-    --card: 15 20% 11%;
-    --card-foreground: 25 25% 92%;
+    --card: 340 12% 12%;
+    --card-foreground: 0 0% 94%;
 
-    --popover: 15 20% 11%;
-    --popover-foreground: 25 25% 92%;
+    --popover: 340 12% 12%;
+    --popover-foreground: 0 0% 94%;
 
-    --primary: 15 42% 60%;
+    --primary: 336 68% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 18 25% 20%;
-    --secondary-foreground: 18 30% 85%;
+    --secondary: 340 15% 20%;
+    --secondary-foreground: 336 40% 85%;
 
-    --muted: 15 20% 16%;
-    --muted-foreground: 15 15% 60%;
+    --muted: 340 10% 18%;
+    --muted-foreground: 340 6% 58%;
 
-    --accent: 38 35% 35%;
-    --accent-foreground: 38 40% 90%;
+    --accent: 336 25% 25%;
+    --accent-foreground: 336 50% 88%;
 
     --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 15 20% 20%;
-    --input: 15 20% 20%;
-    --ring: 15 42% 60%;
+    --border: 340 10% 22%;
+    --input: 340 10% 22%;
+    --ring: 336 68% 58%;
 
-    --rose-gold: 15 42% 60%;
-    --rose-gold-light: 15 30% 22%;
-    --rose-gold-dark: 15 38% 50%;
-    --nude: 18 30% 30%;
-    --nude-light: 18 25% 18%;
-    --beige: 25 25% 35%;
-    --beige-light: 25 20% 16%;
-    --champagne: 38 35% 55%;
-    --champagne-light: 38 25% 22%;
-    --cream: 35 25% 14%;
-    --warm-white: 15 20% 8%;
+    --pink: 336 68% 58%;
+    --pink-light: 336 30% 22%;
+    --pink-dark: 336 65% 46%;
+    --ink: 0 0% 94%;
+    --ink-light: 340 10% 18%;
 
-    --sidebar-background: 15 20% 8%;
-    --sidebar-foreground: 25 25% 92%;
-    --sidebar-primary: 15 42% 60%;
+    --sidebar-background: 340 12% 9%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 336 68% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 18 25% 20%;
-    --sidebar-accent-foreground: 18 30% 85%;
-    --sidebar-border: 15 20% 20%;
-    --sidebar-ring: 15 42% 60%;
+    --sidebar-accent: 340 15% 20%;
+    --sidebar-accent-foreground: 336 40% 85%;
+    --sidebar-border: 340 10% 22%;
+    --sidebar-ring: 336 68% 58%;
   }
 }
 
@@ -119,78 +102,70 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
 }
 
 @layer utilities {
-  /* Brand gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--rose-gold)), hsl(var(--champagne)));
+    background: linear-gradient(135deg, hsl(var(--pink)), hsl(var(--pink-dark)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Script display font */
   .font-script {
-    font-family: 'Great Vibes', cursive;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
   }
 
-  /* Hero gradient background */
   .bg-gradient-hero {
     background: linear-gradient(
       145deg,
-      hsl(var(--cream)) 0%,
-      hsl(var(--nude-light)) 40%,
-      hsl(var(--rose-gold-light)) 100%
+      hsl(var(--ink-light)) 0%,
+      hsl(0 0% 100%) 55%,
+      hsl(var(--pink-light)) 100%
     );
   }
 
-  /* Card gradient */
   .bg-gradient-card {
     background: linear-gradient(
       135deg,
-      hsl(var(--nude-light)) 0%,
-      hsl(var(--champagne-light)) 100%
+      hsl(0 0% 100%) 0%,
+      hsl(var(--pink-light)) 100%
     );
   }
 
-  /* Rose gradient */
   .bg-gradient-rose {
     background: linear-gradient(
       135deg,
-      hsl(var(--rose-gold-light)) 0%,
-      hsl(var(--nude-light)) 100%
+      hsl(var(--pink-light)) 0%,
+      hsl(var(--ink-light)) 100%
     );
   }
 
-  /* Champagne gradient */
   .bg-gradient-champagne {
     background: linear-gradient(
       135deg,
-      hsl(var(--champagne-light)) 0%,
-      hsl(var(--cream)) 100%
+      hsl(var(--ink-light)) 0%,
+      hsl(0 0% 100%) 100%
     );
   }
 
-  /* Shadows */
   .shadow-soft {
     box-shadow: 0 4px 20px -4px hsl(var(--foreground) / 0.08);
   }
 
   .shadow-card {
-    box-shadow: 0 10px 40px -10px hsl(var(--rose-gold) / 0.22);
+    box-shadow: 0 10px 40px -10px hsl(var(--pink) / 0.22);
   }
 
   .shadow-glow {
-    box-shadow: 0 0 28px hsl(var(--rose-gold) / 0.35);
+    box-shadow: 0 0 28px hsl(var(--pink) / 0.35);
   }
 
-  /* Step indicator */
   .step-active {
     @apply bg-primary text-primary-foreground;
   }

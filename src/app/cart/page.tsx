@@ -109,7 +109,7 @@ export default function CartPage() {
                   <span className="text-primary font-medium">{totalPrice >= 999 ? 'Free' : '₹99'}</span>
                 </div>
                 {totalPrice < 999 && (
-                  <p className="text-xs text-muted-foreground bg-nude-light rounded-lg px-3 py-2">
+                  <p className="text-xs text-muted-foreground bg-ink-light rounded-lg px-3 py-2">
                     Add ₹{(999 - totalPrice).toFixed(0)} more for free shipping!
                   </p>
                 )}

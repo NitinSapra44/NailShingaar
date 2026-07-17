@@ -79,7 +79,7 @@ export default function ProductDetailPage() {
               <img src={allImages[activeImage] ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.is_new && (
-                  <span className="px-3 py-1 text-xs font-semibold rounded-full bg-champagne text-accent-foreground">New Arrival</span>
+                  <span className="px-3 py-1 text-xs font-semibold rounded-full bg-accent text-accent-foreground">New Arrival</span>
                 )}
                 {!!discount && (
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-primary text-primary-foreground">Save {discount}%</span>
@@ -111,7 +111,7 @@ export default function ProductDetailPage() {
             {product.description && (
               <p className="text-muted-foreground leading-relaxed">{product.description}</p>
             )}
-            <div className="p-4 rounded-2xl bg-rose-gold-light border border-primary/20 space-y-2">
+            <div className="p-4 rounded-2xl bg-pink-light border border-primary/20 space-y-2">
               <p className="font-semibold text-sm text-primary flex items-center gap-2">
                 <Sparkles className="h-4 w-4" /> 100% Handcrafted & Made to Order
               </p>

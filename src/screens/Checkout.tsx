@@ -42,7 +42,7 @@ function StepBar({ current }: Readonly<{ current: number }>) {
     <div className="flex items-center gap-0 mb-10">
       {STEPS.map((label, i) => {
         let stepCls = 'bg-muted text-muted-foreground';
-        if (i < current) stepCls = 'bg-champagne text-accent-foreground';
+        if (i < current) stepCls = 'bg-accent text-accent-foreground';
         if (i === current) stepCls = 'bg-primary text-primary-foreground shadow-glow';
         return (
         <div key={label} className="flex items-center flex-1 last:flex-none">
@@ -53,7 +53,7 @@ function StepBar({ current }: Readonly<{ current: number }>) {
             <span className="text-xs mt-1.5 font-medium text-muted-foreground hidden sm:block">{label}</span>
           </div>
           {i < STEPS.length - 1 && (
-            <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${i < current ? 'bg-champagne' : 'bg-border'}`} />
+            <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${i < current ? 'bg-accent' : 'bg-border'}`} />
           )}
         </div>
         );
@@ -254,7 +254,7 @@ const Checkout = () => {
                           onClick={() => setQuestionnaire({ ...questionnaire, nail_length: len })}
                           className={`flex-1 min-w-[90px] py-3 px-4 rounded-xl border-2 font-medium text-sm transition-all ${
                             questionnaire.nail_length === len
-                              ? 'border-primary bg-rose-gold-light text-primary shadow-soft'
+                              ? 'border-primary bg-pink-light text-primary shadow-soft'
                               : 'border-border bg-card hover:border-primary/40'
                           }`}
                         >{len}</button>
@@ -310,7 +310,7 @@ const Checkout = () => {
                   {/* Photo uploads */}
                   <div className="space-y-3">
                     <Label className="text-base font-semibold">4. Nail Size Photos</Label>
-                    <div className="flex items-start gap-2 px-4 py-3 bg-nude-light rounded-xl border border-nude text-sm">
+                    <div className="flex items-start gap-2 px-4 py-3 bg-ink-light rounded-xl border border-border text-sm">
                       <Info className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
                       <div>
                         <p className="font-medium text-foreground">Coin Method</p>
@@ -334,7 +334,7 @@ const Checkout = () => {
                             </div>
                           ) : (
                             <button type="button" onClick={() => photoRefs.current[slot.key]?.click()}
-                              className="aspect-square w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                              className="aspect-square w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                               <Camera className="h-6 w-6 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">Upload photo</span>
                             </button>
@@ -362,7 +362,7 @@ const Checkout = () => {
                         </div>
                       ))}
                       <button type="button" onClick={() => extraPhotoRef.current?.click()}
-                        className="w-20 h-20 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                        className="w-20 h-20 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                         <Camera className="h-5 w-5 text-muted-foreground" />
                         <span className="text-[10px] text-muted-foreground">Add more</span>
                       </button>
@@ -457,7 +457,7 @@ const Checkout = () => {
                       </div>
                     ) : (
                       <button type="button" onClick={() => paymentRef.current?.click()}
-                        className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-rose-gold-light/30 transition-colors">
+                        className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
                         <Upload className="h-8 w-8 text-muted-foreground" />
                         <span className="text-sm font-medium">Click to upload screenshot</span>
                         <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>
@@ -511,7 +511,7 @@ const Checkout = () => {
                 </div>
 
                 {step > 0 && (
-                  <div className="text-xs text-muted-foreground bg-nude-light rounded-xl p-3 space-y-1">
+                  <div className="text-xs text-muted-foreground bg-ink-light rounded-xl p-3 space-y-1">
                     <p className="font-semibold text-foreground">Nail Sizing</p>
                     <p>Length: {questionnaire.nail_length}</p>
                     <p>Shape: {questionnaire.nail_shape}</p>
