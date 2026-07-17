@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 
 const slides = [
   { id: 1, bg: '/hero/slide-1.png' },
@@ -70,12 +71,14 @@ export default function HeroSection() {
           key={s.id}
           className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}
         >
-          <img
-            src={s.bg}
-            alt={`Nail Shingaar slide ${i + 1}`}
-            className="w-full h-full object-cover object-center"
-            draggable={false}
-          />
+          <Link href="/categories" className="block w-full h-full">
+            <img
+              src={s.bg}
+              alt={`Nail Shingaar slide ${i + 1}`}
+              className="w-full h-full object-cover object-center"
+              draggable={false}
+            />
+          </Link>
         </div>
       ))}
 
