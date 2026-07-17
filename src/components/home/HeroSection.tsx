@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
   { id: 1, bg: '/hero/slide-1.png' },
@@ -9,11 +8,15 @@ const slides = [
   { id: 3, bg: '/hero/slide-3.png' },
 ];
 
+const SWIPE_THRESHOLD = 50;
+
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const goTo = useCallback((idx: number) => {
     if (animating) return;
@@ -33,12 +36,33 @@ export default function HeroSection() {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [current, paused, next]);
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    setPaused(true);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    // Only trigger if horizontal swipe is dominant
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+      dx < 0 ? next() : prev();
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+    setPaused(false);
+  };
+
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
       style={{ paddingBottom: 'min(66.67%, 100dvh)' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Background images */}
       {slides.map((s, i) => (
@@ -54,22 +78,6 @@ export default function HeroSection() {
           />
         </div>
       ))}
-
-      {/* Arrow buttons */}
-      <button
-        onClick={prev}
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 h-9 w-9 md:h-11 md:w-11 rounded-full bg-black/25 border border-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/45 transition-colors"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
-      </button>
-      <button
-        onClick={next}
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 h-9 w-9 md:h-11 md:w-11 rounded-full bg-black/25 border border-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/45 transition-colors"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
-      </button>
 
       {/* Dot indicators */}
       <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
