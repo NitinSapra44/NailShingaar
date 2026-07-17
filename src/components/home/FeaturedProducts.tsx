@@ -51,6 +51,8 @@ const FeaturedProducts = () => {
     );
   }
 
+  if (products.length === 0) return null;
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">

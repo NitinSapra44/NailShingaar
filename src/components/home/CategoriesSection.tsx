@@ -63,24 +63,14 @@ const CategoriesSection = () => {
     );
   }
 
-  // If no categories in DB yet, show static fallback cards
-  const displayCategories: { name: string; slug: string; description: string; image: string }[] =
-    categories.length > 0
-      ? categories.map((c) => ({
-          name: c.name,
-          slug: c.slug,
-          description: c.description ?? '',
-          image: getCategoryImage(c),
-        }))
-      : [
-          { name: 'Basics / Everyday Wear', slug: 'basics-everyday', description: 'Simple, elegant, daily-ready', image: CATEGORY_IMAGES['basics-everyday'] },
-          { name: 'Western Wear', slug: 'western-wear', description: 'Bold, chic & fashion-forward', image: CATEGORY_IMAGES['western-wear'] },
-          { name: 'Indian / Bridal & Festive', slug: 'indian-bridal-festive', description: 'Ornate designs for big occasions', image: CATEGORY_IMAGES['indian-bridal-festive'] },
-          { name: 'Summer Edition', slug: 'summer-edition', description: 'Bright, tropical & vibrant', image: CATEGORY_IMAGES['summer-edition'] },
-          { name: 'Winter Edition', slug: 'winter-edition', description: 'Rich, deep & cosy tones', image: CATEGORY_IMAGES['winter-edition'] },
-          { name: 'Holiday Nails', slug: 'holiday-nails', description: 'Festive & celebration-ready', image: CATEGORY_IMAGES['holiday-nails'] },
-          { name: 'Get Your Own Customisation', slug: 'custom', description: 'Your vision, our craft', image: CATEGORY_IMAGES['custom'] },
-        ];
+  if (categories.length === 0) return null;
+
+  const displayCategories = categories.map((c) => ({
+    name: c.name,
+    slug: c.slug,
+    description: c.description ?? '',
+    image: getCategoryImage(c),
+  }));
 
   return (
     <section className="py-20 bg-card">
