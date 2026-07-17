@@ -36,9 +36,7 @@ export default function HeroSection() {
   return (
     <section
       className="relative w-full overflow-hidden"
-      // aspect-ratio keeps the full image visible on every screen size.
-      // max-height caps it so it never exceeds the viewport on very wide monitors.
-      style={{ aspectRatio: '16/9', maxHeight: '100dvh' }}
+      style={{ paddingBottom: 'min(56.25%, 100dvh)' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
