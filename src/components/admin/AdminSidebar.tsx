@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, FolderOpen, ShoppingCart, ArrowLeft, LogOut, Sparkles, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Package, FolderOpen, ShoppingCart, ArrowLeft, LogOut, Sparkles, BookOpen, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +13,8 @@ const menuItems = [
   { title: 'Orders',     url: '/admin/orders',        icon: ShoppingCart },
   { title: 'Products',   url: '/admin/products',      icon: Package },
   { title: 'Categories', url: '/admin/categories',    icon: FolderOpen },
-  { title: 'Blog',       url: '/admin/blog',          icon: BookOpen },
+  { title: 'Blog',        url: '/admin/blog',         icon: BookOpen },
+  { title: 'Subscribers', url: '/admin/subscribers',  icon: Mail },
 ];
 
 interface AdminSidebarProps {

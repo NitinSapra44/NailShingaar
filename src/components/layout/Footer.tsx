@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Mail, Phone } from 'lucide-react';
+import { Mail, Phone, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -14,12 +14,28 @@ const InstagramIcon = () => (
 
 const Footer = () => {
   const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
+  const [footerEmail, setFooterEmail] = useState('');
+  const [footerDone, setFooterDone] = useState(false);
+  const [footerLoading, setFooterLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     supabase.from('categories').select('name, slug').order('name').then(({ data }) => {
       setCategories(data || []);
     });
   }, []);
+
+  const handleFooterSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!footerEmail) return;
+    setFooterLoading(true);
+    await (supabase as any)
+      .from('newsletter_subscribers')
+      .insert([{ email: footerEmail.trim().toLowerCase(), discount_code: 'WELCOME15' }]);
+    setFooterDone(true);
+    setFooterEmail('');
+    setFooterLoading(false);
+  };
 
   return (
     <footer className="bg-card border-t border-border">
@@ -109,19 +125,31 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">
               New collections, seasonal drops & styling inspiration — straight to your inbox.
             </p>
-            <form className="flex flex-col gap-2">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="px-4 py-2.5 text-sm rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:bg-pink-dark transition-colors shadow-soft"
-              >
-                Subscribe
-              </button>
-            </form>
+            {footerDone ? (
+              <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                <Check className="h-4 w-4 shrink-0" />
+                Subscribed! Use code <strong className="tracking-wider">WELCOME15</strong> for 15% off.
+              </div>
+            ) : (
+              <form className="flex flex-col gap-2" onSubmit={handleFooterSubscribe}>
+                <input
+                  ref={inputRef}
+                  type="email"
+                  placeholder="your@email.com"
+                  value={footerEmail}
+                  onChange={(e) => setFooterEmail(e.target.value)}
+                  className="px-4 py-2.5 text-sm rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={footerLoading}
+                  className="px-6 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:bg-pink-dark transition-colors shadow-soft disabled:opacity-70"
+                >
+                  {footerLoading ? 'Subscribing…' : 'Subscribe'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
