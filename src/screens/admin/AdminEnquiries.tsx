@@ -51,6 +51,9 @@ const getDesignPhotos = (order: Order): string[] => {
 const getStyleNotes = (order: Order): string => {
   try { return JSON.parse(order.notes ?? '{}').style_notes ?? ''; } catch { return ''; }
 };
+const getDiscountCode = (order: Order): string => {
+  try { return JSON.parse(order.notes ?? '{}').discount_code ?? ''; } catch { return ''; }
+};
 
 export const AdminEnquiries = () => {
   const [enquiries, setEnquiries] = useState<Order[]>([]);
@@ -260,6 +263,13 @@ export const AdminEnquiries = () => {
 
                     {/* Actions */}
                     <div className="flex flex-col gap-3 justify-center">
+                      {getDiscountCode(enquiry) && (
+                        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-xl border border-primary/20">
+                          <span className="text-xs text-muted-foreground">Discount:</span>
+                          <span className="font-mono font-bold text-primary text-sm tracking-wider">{getDiscountCode(enquiry)}</span>
+                          <span className="text-xs text-primary font-medium">→ apply 15% off</span>
+                        </div>
+                      )}
                       {isPending && (
                         <div className="space-y-2">
                           <p className="text-xs font-semibold text-muted-foreground">Set Quoted Price</p>
@@ -389,6 +399,13 @@ export const AdminEnquiries = () => {
 
                 {/* Quoted price */}
                 <div className="space-y-2">
+                  {getDiscountCode(selected) && (
+                    <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 rounded-xl border border-primary/20 mb-1">
+                      <span className="text-sm text-muted-foreground">Discount code:</span>
+                      <span className="font-mono font-bold text-primary tracking-wider">{getDiscountCode(selected)}</span>
+                      <span className="text-sm text-primary font-semibold">— apply 15% off the price</span>
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground font-medium">
                     {selected.total > 0 ? `Quoted Price: ₹${selected.total}` : 'Set Quoted Price'}
                   </p>

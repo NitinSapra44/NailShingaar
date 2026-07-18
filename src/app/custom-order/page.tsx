@@ -83,6 +83,7 @@ export default function CustomOrderPage() {
 
   // Step 2 — contact & shipping
   const [shipping, setShipping] = useState<ShippingDetails>({ full_name: '', phone: '', address: '', city: '', pincode: '' });
+  const [discountCode, setDiscountCode] = useState('');
 
   const addDesignPhoto = (file: File | null) => {
     if (!file) return;
@@ -207,6 +208,7 @@ export default function CustomOrderPage() {
           type: 'custom_design',
           style_notes: styleNotes || null,
           design_photos: designPhotoUrls,
+          discount_code: discountCode.trim().toUpperCase() || null,
         }),
       }).select().single();
 
@@ -432,6 +434,16 @@ export default function CustomOrderPage() {
                     <Input placeholder="400001" value={shipping.pincode}
                       onChange={(e) => setShipping({ ...shipping, pincode: e.target.value })} className="rounded-xl" />
                   </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Discount Code <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                  <Input
+                    placeholder="e.g. WELCOME15"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                    className="rounded-xl font-mono tracking-widest uppercase"
+                  />
                 </div>
 
                 <div className="flex gap-3">
