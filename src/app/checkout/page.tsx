@@ -382,7 +382,7 @@ export default function CheckoutPage() {
                   <div className="flex justify-center">
                     <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
                       <img
-                        src="/qr-reet.png"
+                        src="/qr-code.jpg"
                         alt="UPI QR Code — Nail Shingaar by Reet"
                         className="w-48 h-48 object-contain rounded-xl"
                       />
