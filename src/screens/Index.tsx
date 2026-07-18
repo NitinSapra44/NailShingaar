@@ -4,8 +4,6 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import CategoriesSection from '@/components/home/CategoriesSection';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
-import Newsletter from '@/components/home/Newsletter';
-
 const Index = () => {
   return (
     <>
@@ -21,7 +19,6 @@ const Index = () => {
         <FeaturedProducts />
         <CategoriesSection />
         <WhyChooseUs />
-        <Newsletter />
       </Layout>
     </>
   );

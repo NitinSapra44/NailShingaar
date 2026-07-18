@@ -8,8 +8,6 @@ import CategoriesSection from '@/components/home/CategoriesSection';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import BlogSection from '@/components/home/BlogSection';
 import GoogleReviews from '@/components/home/GoogleReviews';
-import Newsletter from '@/components/home/Newsletter';
-
 export default function Home() {
   return (
     <Layout>
@@ -19,7 +17,6 @@ export default function Home() {
       <WhyChooseUs />
       <GoogleReviews />
       <BlogSection />
-      <Newsletter />
     </Layout>
   );
 }
