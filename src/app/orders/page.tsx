@@ -47,6 +47,9 @@ function OrderCard({ order }: { order: Order }) {
     ? 'border-primary shadow-glow'
     : custom ? 'border-primary/30' : 'border-border';
 
+  const badgeLabel = readyToPay ? 'Awaiting Payment' : screenshotSent ? 'Screenshot Sent' : cfg.label;
+  const badgeColor = readyToPay ? 'bg-pink-100 text-primary' : screenshotSent ? 'bg-orange-100 text-orange-700' : cfg.color;
+
   return (
     <div className={`rounded-2xl bg-card border shadow-soft overflow-hidden ${borderCls}`}>
       <button className="w-full flex items-center justify-between p-5 text-left" onClick={() => setOpen(!open)}>
@@ -63,7 +66,7 @@ function OrderCard({ order }: { order: Order }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${cfg.color}`}>{cfg.label}</span>
+          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${badgeColor}`}>{badgeLabel}</span>
           <span className="font-semibold text-sm">
             {custom && order.total === 0 ? 'Price TBD' : `₹${order.total.toFixed(0)}`}
           </span>
