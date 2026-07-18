@@ -136,10 +136,29 @@ export default function CheckoutPage() {
     return true;
   };
 
+  const compressImage = (file: File, maxPx = 1200, quality = 0.75): Promise<File> =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          resolve(blob ? new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }) : file);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = URL.createObjectURL(file);
+    });
+
   const uploadFile = async (bucket: string, file: File, path: string): Promise<string> => {
-    const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+    const compressed = file.type.startsWith('image/') ? await compressImage(file) : file;
+    const finalPath = path.replace(/\.\w+$/, '.jpg');
+    const { error } = await supabase.storage.from(bucket).upload(finalPath, compressed, { upsert: true, contentType: 'image/jpeg' });
     if (error) throw new Error(error.message);
-    return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+    return supabase.storage.from(bucket).getPublicUrl(finalPath).data.publicUrl;
   };
 
   const handleSubmitOrder = async () => {
