@@ -109,3 +109,16 @@ export interface ShippingDetails {
   city: string;
   pincode: string;
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_image_url: string | null;
+  published: boolean;
+  meta_description: string | null;
+  created_at: string;
+  updated_at: string;
+}

@@ -1,7 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import type { Category } from '@/types';
 
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -12,15 +15,13 @@ const InstagramIcon = () => (
 );
 
 const Footer = () => {
-  const categories = [
-    { label: 'Basics / Everyday Wear', slug: 'basics-everyday' },
-    { label: 'Western Wear', slug: 'western-wear' },
-    { label: 'Indian / Bridal & Festive', slug: 'indian-bridal-festive' },
-    { label: 'Summer Edition', slug: 'summer-edition' },
-    { label: 'Winter Edition', slug: 'winter-edition' },
-    { label: 'Holiday Nails', slug: 'holiday-nails' },
-    { label: 'Custom Order', slug: 'custom' },
-  ];
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    supabase.from('categories').select('name, slug').order('name').then(({ data }) => {
+      setCategories(data || []);
+    });
+  }, []);
 
   return (
     <footer className="bg-card border-t border-border">
@@ -63,15 +64,19 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display text-lg font-semibold">Collections</h4>
             <nav className="flex flex-col gap-2">
-              {categories.map((cat) => (
+              {categories.length > 0 ? categories.map((cat) => (
                 <Link
                   key={cat.slug}
                   href={`/categories/${cat.slug}`}
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  {cat.label}
+                  {cat.name}
                 </Link>
-              ))}
+              )) : (
+                <Link href="/categories" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  View All Collections
+                </Link>
+              )}
             </nav>
           </div>
 

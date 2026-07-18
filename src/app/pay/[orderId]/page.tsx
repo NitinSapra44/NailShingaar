@@ -117,25 +117,18 @@ export default function PayPage() {
         </div>
 
         {/* UPI payment box */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-5 text-center mb-6">
-          <p className="font-semibold text-lg">Scan & Pay ₹{order.total.toFixed(0)}</p>
-
-          {/* QR Code */}
+        <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center mb-6">
+          <p className="font-semibold text-lg">Pay via UPI</p>
           <div className="flex justify-center">
             <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
               <img
                 src="/qr-reet.png"
                 alt="UPI QR Code — Nail Shingaar by Reet"
-                className="w-48 h-48 object-contain rounded-xl"
+                className="w-52 h-52 object-contain rounded-xl"
               />
             </div>
           </div>
-
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Or pay via UPI ID</p>
-            <p className="font-mono font-bold text-primary text-base select-all">reetrajpal02@okaxis</p>
-            <p className="text-[11px] text-muted-foreground">Tap to copy · Accepted on PhonePe, GPay, Paytm & all UPI apps</p>
-          </div>
+          <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
         </div>
 
         {/* Screenshot upload */}

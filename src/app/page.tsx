@@ -15,7 +15,6 @@ export default function Home() {
     <Layout>
       <HeroSection />
       <FeaturedProducts />
-      <OccasionCategories />
       <CategoriesSection />
       <WhyChooseUs />
       <GoogleReviews />

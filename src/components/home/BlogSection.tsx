@@ -1,37 +1,38 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-const posts = [
-  {
-    title: 'How To Make Press-On Nails Last 2+ Weeks',
-    excerpt:
-      "The secret to long-lasting press-on nails isn't magic — it's prep. Follow these simple steps to keep your set looking salon-fresh for weeks.",
-    image:
-      'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=400&fit=crop&q=80',
-    date: 'May 2025',
-    href: '/how-to-order',
-  },
-  {
-    title: 'The Perfect Nail Shape For Your Hand Type',
-    excerpt:
-      'Round, almond, coffin, square — picking the right shape can make your fingers look longer and your hands more elegant.',
-    image:
-      'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=400&fit=crop&q=80',
-    date: 'Apr 2025',
-    href: '/size-guide',
-  },
-  {
-    title: 'Bridal Nail Trends For 2025 Weddings',
-    excerpt:
-      'From French tips to intricate meenakari-inspired designs — the 2025 bridal nail trends are everything you need for your big day.',
-    image:
-      'https://images.unsplash.com/photo-1610992015762-45dca7fa3a85?w=600&h=400&fit=crop&q=80',
-    date: 'Mar 2025',
-    href: '/categories/indian-bridal-festive',
-  },
-];
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  created_at: string;
+}
 
 const BlogSection = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from('blog_posts')
+      .select('id, title, slug, excerpt, cover_image_url, created_at')
+      .eq('published', true)
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => {
+        setPosts(data || []);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading || posts.length === 0) return null;
+
   return (
     <section className="py-20 bg-card">
       <div className="container mx-auto px-4">
@@ -43,7 +44,7 @@ const BlogSection = () => {
             </h2>
           </div>
           <Link
-            href="/size-guide"
+            href="/blog"
             className="flex items-center gap-1.5 text-sm text-primary font-semibold hover:underline group shrink-0"
           >
             View All
@@ -54,28 +55,34 @@ const BlogSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {posts.map((post, i) => (
             <Link
-              key={post.title}
-              href={post.href}
+              key={post.id}
+              href={`/blog/${post.slug}`}
               className="group rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 bg-background animate-fade-up"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="aspect-[3/2] overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {post.cover_image_url ? (
+                  <img
+                    src={post.cover_image_url}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-pink-light flex items-center justify-center">
+                    <span className="text-primary font-script text-xl">Nail Shingaar</span>
+                  </div>
+                )}
               </div>
               <div className="p-5">
                 <p className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase mb-2">
-                  {post.date}
+                  {new Date(post.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
                 </p>
                 <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors leading-tight mb-2">
                   {post.title}
                 </h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {post.excerpt}
-                </p>
+                {post.excerpt && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{post.excerpt}</p>
+                )}
               </div>
             </Link>
           ))}
