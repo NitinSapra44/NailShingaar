@@ -94,6 +94,7 @@ const Header = () => {
                   </div>
                 )}
                 <Link href="/about" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">About</Link>
+                <Link href="/blog" className="px-3 py-2.5 text-base font-medium text-foreground hover:text-primary hover:bg-pink-light/40 rounded-lg transition-colors">Blog</Link>
                 <Link href="/custom-order" className="flex items-center gap-2 px-3 py-2.5 text-base font-medium text-primary hover:bg-pink-light/40 rounded-lg transition-colors">
                   <Sparkles className="h-4 w-4" /> Custom Order
                 </Link>
@@ -149,6 +150,9 @@ const Header = () => {
 
             <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group">
               {"About"}<span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full rounded-full" />
+            </Link>
+            <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group">
+              {"Blog"}<span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full rounded-full" />
             </Link>
             <Link href="/custom-order"
               className="flex items-center gap-1.5 text-sm font-semibold text-primary bg-pink-light hover:bg-pink-light/80 px-3.5 py-1.5 rounded-full transition-colors">

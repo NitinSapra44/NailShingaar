@@ -84,6 +84,9 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display text-lg font-semibold">Help</h4>
             <nav className="flex flex-col gap-2">
+              <Link href="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Blog
+              </Link>
               <Link href="/size-guide" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Size Guide (Coin Method)
               </Link>
