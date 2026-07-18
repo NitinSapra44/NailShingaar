@@ -42,6 +42,23 @@ export default function PayPage() {
     setPreview(file ? URL.createObjectURL(file) : '');
   };
 
+  const compressImage = (file: File, maxPx = 1200, quality = 0.75): Promise<File> =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          resolve(blob ? new File([blob], 'payment.jpg', { type: 'image/jpeg' }) : file);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = URL.createObjectURL(file);
+    });
+
   const handleSubmit = async () => {
     if (!screenshot) {
       toast({ title: 'Screenshot required', description: 'Please upload your payment screenshot.', variant: 'destructive' });
@@ -51,11 +68,11 @@ export default function PayPage() {
     setSubmitting(true);
     try {
       const ts = Date.now();
-      const ext = screenshot.name.split('.').pop();
-      const path = `${user.id}/${ts}_payment.${ext}`;
+      const compressed = await compressImage(screenshot);
+      const path = `${user.id}/${ts}_payment.jpg`;
       const { error: uploadError } = await supabase.storage
         .from('payment-screenshots')
-        .upload(path, screenshot, { upsert: true });
+        .upload(path, compressed, { upsert: true, contentType: 'image/jpeg' });
       if (uploadError) throw new Error(uploadError.message);
 
       const screenshotUrl = supabase.storage.from('payment-screenshots').getPublicUrl(path).data.publicUrl;
