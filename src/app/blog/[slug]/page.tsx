@@ -10,11 +10,12 @@ const serverClient = () => createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const { data } = await serverClient()
     .from('blog_posts')
     .select('title, meta_description, cover_image_url')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .eq('published', true)
     .single();
 
@@ -31,11 +32,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const { data: post } = await serverClient()
     .from('blog_posts')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .eq('published', true)
     .single();
 
