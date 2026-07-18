@@ -361,19 +361,15 @@ export default function CheckoutPage() {
                 <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center">
                   <p className="font-semibold text-lg">Scan & Pay ₹{orderTotal.toFixed(0)}</p>
                   <div className="flex justify-center">
-                    <div className="w-52 h-52 rounded-2xl bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                      <div className="grid grid-cols-3 gap-1 opacity-30">
-                        {[1,2,3,4,5,6,7,8,9].map((n) => (
-                          <div key={n} className={`w-5 h-5 rounded-sm ${n % 2 === 0 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                        ))}
-                      </div>
-                      <p className="text-xs text-center px-4 mt-2">UPI QR — configured by admin</p>
+                    <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
+                      <img
+                        src="/qr-reet.png"
+                        alt="UPI QR Code — Nail Shingaar by Reet"
+                        className="w-48 h-48 object-contain rounded-xl"
+                      />
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Or pay via UPI ID:</p>
-                    <p className="font-mono font-semibold text-primary text-lg">reetrajpal02@okaxis</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
                 </div>
 
                 <div className="space-y-3">
