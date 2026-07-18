@@ -19,13 +19,14 @@ const BlogSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
       .from('blog_posts')
       .select('id, title, slug, excerpt, cover_image_url, created_at')
       .eq('published', true)
       .order('created_at', { ascending: false })
       .limit(3)
-      .then(({ data }) => {
+      .then(({ data }: { data: Post[] | null }) => {
         setPosts(data || []);
         setLoading(false);
       });

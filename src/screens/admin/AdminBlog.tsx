@@ -62,9 +62,10 @@ export const AdminBlog = () => {
 
   const fetchPosts = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).from('blog_posts').select('*').order('created_at', { ascending: false });
     if (error) toast.error('Failed to load posts');
-    else setPosts(data || []);
+    else setPosts((data as BlogPost[]) || []);
     setLoading(false);
   };
 
@@ -118,11 +119,13 @@ export const AdminBlog = () => {
       };
 
       if (editing) {
-        const { error } = await supabase.from('blog_posts').update(payload).eq('id', editing.id);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('blog_posts').update(payload).eq('id', editing.id);
         if (error) throw error;
         toast.success('Post updated!');
       } else {
-        const { error } = await supabase.from('blog_posts').insert([payload]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('blog_posts').insert([payload]);
         if (error) throw error;
         toast.success('Post created!');
       }
@@ -138,14 +141,16 @@ export const AdminBlog = () => {
 
   const handleDelete = async () => {
     if (!deletePost) return;
-    const { error } = await supabase.from('blog_posts').delete().eq('id', deletePost.id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from('blog_posts').delete().eq('id', deletePost.id);
     if (error) toast.error('Failed to delete post');
     else { toast.success('Post deleted'); fetchPosts(); }
     setDeletePost(null);
   };
 
   const togglePublish = async (post: BlogPost) => {
-    const { error } = await supabase.from('blog_posts').update({ published: !post.published }).eq('id', post.id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from('blog_posts').update({ published: !post.published }).eq('id', post.id);
     if (error) toast.error('Failed to update');
     else fetchPosts();
   };
