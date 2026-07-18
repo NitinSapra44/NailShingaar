@@ -20,12 +20,12 @@ const steps = [
 ];
 
 const GALLERY = [
-  'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1604655333-a4f000e8d9c0?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1696341980130-4bdff3322802?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=300&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1610992015762-45dca7fa3a85?w=300&h=300&fit=crop',
+  '/Work/W-1.jpg',
+  '/Work/W-2.jpg',
+  '/Work/W-3.jpg',
+  '/Work/W-4.jpg',
+  '/Work/W-5.jpg',
+  '/Work/W-6.jpg',
 ];
 
 const WhyChooseUs = () => {
