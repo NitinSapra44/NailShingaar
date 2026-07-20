@@ -68,11 +68,22 @@ export default function ProductDetailPage() {
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
 
-  type MediaItem = { src: string; type: 'image' | 'video' };
+  // Extract YouTube video ID from any YouTube URL format
+  const getYouTubeId = (url: string): string | null => {
+    const m = url.match(
+      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+    return m ? m[1] : null;
+  };
+
+  const classifyVideo = (src: string): 'youtube' | 'video' =>
+    getYouTubeId(src) ? 'youtube' : 'video';
+
+  type MediaItem = { src: string; type: 'image' | 'video' | 'youtube' };
   const allMedia: MediaItem[] = [
     { src: product.image_url, type: 'image' as const },
     ...(product.images ?? []).map((src): MediaItem => ({ src, type: 'image' })),
-    ...(product.videos ?? []).filter(Boolean).map((src): MediaItem => ({ src, type: 'video' })),
+    ...(product.videos ?? []).filter(Boolean).map((src): MediaItem => ({ src, type: classifyVideo(src) })),
   ].filter((m) => Boolean(m.src));
 
   const active = allMedia[activeImage] ?? allMedia[0];
@@ -83,7 +94,14 @@ export default function ProductDetailPage() {
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-3">
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-card shadow-card">
-              {active?.type === 'video' ? (
+              {active?.type === 'youtube' ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${getYouTubeId(active.src)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeId(active.src)}&rel=0`}
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                />
+              ) : active?.type === 'video' ? (
                 <video
                   src={active.src}
                   controls
@@ -96,7 +114,7 @@ export default function ProductDetailPage() {
               ) : (
                 <img src={active?.src ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
               )}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
+              <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
                 {product.is_new && (
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-accent text-accent-foreground">New Arrival</span>
                 )}
@@ -110,7 +128,18 @@ export default function ProductDetailPage() {
                 {allMedia.map((item, i) => (
                   <button key={item.src + i} onClick={() => setActiveImage(i)}
                     className={`relative aspect-square w-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImage ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                    {item.type === 'video' ? (
+                    {item.type === 'youtube' ? (
+                      <>
+                        <img
+                          src={`https://img.youtube.com/vi/${getYouTubeId(item.src)}/mqdefault.jpg`}
+                          alt="video thumbnail"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Play className="h-5 w-5 text-white drop-shadow" />
+                        </div>
+                      </>
+                    ) : item.type === 'video' ? (
                       <>
                         <video src={item.src} className="w-full h-full object-cover" muted />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
