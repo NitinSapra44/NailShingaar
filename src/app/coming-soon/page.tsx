@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 
+const BYPASS_PASSWORD = 'reet2026';
+
 // 7:00 PM IST on July 22, 2026 = 13:30 UTC
 const LAUNCH_TIME = new Date('2026-07-22T13:30:00.000Z').getTime();
 
@@ -25,6 +27,20 @@ function getTimeLeft() {
 export default function ComingSoonPage() {
   const router = useRouter();
   const [time, setTime] = useState(getTimeLeft);
+  const [pwd, setPwd] = useState('');
+  const [shake, setShake] = useState(false);
+
+  const handleBypass = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwd === BYPASS_PASSWORD) {
+      document.cookie = `ns_preview=reet2026; path=/; max-age=${60 * 60 * 24 * 30}`;
+      router.replace('/');
+    } else {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      setPwd('');
+    }
+  };
 
   useEffect(() => {
     // If already past launch, send to homepage
@@ -80,6 +96,17 @@ export default function ComingSoonPage() {
       <p className="text-xs text-muted-foreground mt-16">
         © {new Date().getFullYear()} Nail Shingaar by Reet
       </p>
+
+      {/* Hidden admin bypass */}
+      <form onSubmit={handleBypass} className="mt-6">
+        <input
+          type="password"
+          value={pwd}
+          onChange={(e) => setPwd(e.target.value)}
+          placeholder="·····"
+          className={`w-24 text-center text-xs px-3 py-1.5 rounded-full border border-transparent bg-transparent text-muted-foreground/30 placeholder:text-muted-foreground/20 focus:border-primary/30 focus:text-foreground focus:bg-white focus:outline-none transition-all ${shake ? 'animate-bounce border-red-300' : ''}`}
+        />
+      </form>
     </div>
   );
 }
