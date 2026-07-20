@@ -18,7 +18,7 @@ export interface Product {
   category_ids?: string[];
   image_url: string;
   images: string[];
-  videos: string[];
+  videos?: string[];
   sizes: string[];
   stock: number;
   is_featured: boolean;

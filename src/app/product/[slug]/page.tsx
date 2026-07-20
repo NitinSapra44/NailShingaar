@@ -72,7 +72,7 @@ export default function ProductDetailPage() {
   const allMedia: MediaItem[] = [
     { src: product.image_url, type: 'image' as const },
     ...(product.images ?? []).map((src): MediaItem => ({ src, type: 'image' })),
-    ...(product.videos ?? []).map((src): MediaItem => ({ src, type: 'video' })),
+    ...(product.videos ?? []).filter(Boolean).map((src): MediaItem => ({ src, type: 'video' })),
   ].filter((m) => Boolean(m.src));
 
   const active = allMedia[activeImage] ?? allMedia[0];
