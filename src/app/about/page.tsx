@@ -10,7 +10,7 @@ export const metadata = {
 
 const stats = [
   { value: '7+',    label: 'Years of Experience' },
-  { value: '500+',  label: 'Happy Clients' },
+  { value: '1000+', label: 'Happy Clients' },
   { value: '100%',  label: 'Handcrafted Sets' },
   { value: '∞',     label: 'Passion for Nails' },
 ];
@@ -74,7 +74,7 @@ export default function AboutPage() {
                       <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <span className="text-xs font-semibold text-foreground">500+ happy clients</span>
+                  <span className="text-xs font-semibold text-foreground">1000+ happy clients</span>
                 </div>
               </div>
             </div>
