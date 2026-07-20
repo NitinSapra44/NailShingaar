@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Loader2, Plus, X, Upload } from 'lucide-react';
+import { Loader2, Plus, X, Upload, Play } from 'lucide-react';
 import type { Product, Category } from '@/types';
 
 interface ProductFormProps {
@@ -31,6 +31,8 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
   const [loading, setLoading] = useState(false);
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingExtra, setUploadingExtra] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videos, setVideos] = useState<string[]>(product?.videos ?? []);
 
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
@@ -45,6 +47,7 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
 
   const mainFileRef = useRef<HTMLInputElement>(null);
   const extraFileRef = useRef<HTMLInputElement>(null);
+  const videoFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     supabase.from('categories').select('*').order('name').then(({ data }) => {
@@ -97,6 +100,27 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
     }
   };
 
+  const handleVideoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploadingVideo(true);
+    try {
+      const urls = await Promise.all(files.map(async (file) => {
+        const ext = file.name.split('.').pop() ?? 'mp4';
+        const path = `products/videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: false });
+        if (error) throw error;
+        return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+      }));
+      setVideos((prev) => [...prev, ...urls]);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Video upload failed');
+    } finally {
+      setUploadingVideo(false);
+      e.target.value = '';
+    }
+  };
+
   const handleExtraFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
@@ -129,6 +153,7 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
         original_price: originalPrice ? Number.parseFloat(originalPrice) : null,
         image_url: imageUrl.trim(),
         images: extraImages,
+        videos,
         is_featured: isFeatured,
         is_new: isNew,
         category_id: selectedCategories[0] ?? null,
@@ -277,6 +302,33 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
               : <><Upload className="h-4 w-4 mr-1" /> Upload</>}
           </Button>
         </div>
+      </div>
+
+      {/* Videos */}
+      <div className="space-y-2">
+        <Label>Product Videos <span className="text-muted-foreground font-normal">(optional — shown in carousel)</span></Label>
+        <div className="flex gap-2 flex-wrap">
+          {videos.map((url, i) => (
+            <div key={url + i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center">
+              <Play className="h-6 w-6 text-primary" />
+              <span className="absolute bottom-0.5 left-0 right-0 text-[9px] text-center text-muted-foreground truncate px-1">
+                {url.split('/').pop()}
+              </span>
+              <button type="button" onClick={() => setVideos((prev) => prev.filter((_, idx) => idx !== i))}
+                className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white flex items-center justify-center shadow">
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <input ref={videoFileRef} type="file" accept="video/*" multiple className="hidden" onChange={handleVideoFileChange} />
+        <Button type="button" variant="outline" className="rounded-xl"
+          disabled={uploadingVideo}
+          onClick={() => videoFileRef.current?.click()}>
+          {uploadingVideo
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Uploading…</>
+            : <><Upload className="h-4 w-4 mr-1" /> Upload Videos</>}
+        </Button>
       </div>
 
       {/* Categories (multi-select) */}

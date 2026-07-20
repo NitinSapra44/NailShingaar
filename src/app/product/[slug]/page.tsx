@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Truck, Sparkles, Ruler } from 'lucide-react';
+import { ArrowRight, Truck, Sparkles, Ruler, Play } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -68,7 +68,14 @@ export default function ProductDetailPage() {
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
 
-  const allImages = [product.image_url, ...(product.images ?? [])].filter(Boolean);
+  type MediaItem = { src: string; type: 'image' | 'video' };
+  const allMedia: MediaItem[] = [
+    { src: product.image_url, type: 'image' as const },
+    ...(product.images ?? []).map((src): MediaItem => ({ src, type: 'image' })),
+    ...(product.videos ?? []).map((src): MediaItem => ({ src, type: 'video' })),
+  ].filter((m) => Boolean(m.src));
+
+  const active = allMedia[activeImage] ?? allMedia[0];
 
   return (
     <Layout>
@@ -76,7 +83,19 @@ export default function ProductDetailPage() {
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-3">
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-card shadow-card">
-              <img src={allImages[activeImage] ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
+              {active?.type === 'video' ? (
+                <video
+                  src={active.src}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img src={active?.src ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
+              )}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.is_new && (
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-accent text-accent-foreground">New Arrival</span>
@@ -86,12 +105,21 @@ export default function ProductDetailPage() {
                 )}
               </div>
             </div>
-            {allImages.length > 1 && (
-              <div className="flex gap-2">
-                {allImages.map((src, i) => (
-                  <button key={src} onClick={() => setActiveImage(i)}
-                    className={`aspect-square w-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImage ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                    <img src={src} alt="" className="w-full h-full object-cover" />
+            {allMedia.length > 1 && (
+              <div className="flex gap-2 flex-wrap">
+                {allMedia.map((item, i) => (
+                  <button key={item.src + i} onClick={() => setActiveImage(i)}
+                    className={`relative aspect-square w-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImage ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}>
+                    {item.type === 'video' ? (
+                      <>
+                        <video src={item.src} className="w-full h-full object-cover" muted />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <Play className="h-5 w-5 text-white drop-shadow" />
+                        </div>
+                      </>
+                    ) : (
+                      <img src={item.src} alt="" className="w-full h-full object-cover" />
+                    )}
                   </button>
                 ))}
               </div>
