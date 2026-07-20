@@ -63,7 +63,7 @@ export default function AboutPage() {
                 <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-3xl overflow-hidden border-4 border-white shadow-card">
                   {/* Replace /reet-photo.jpg with your actual image file name */}
                   <img
-                    src="/reet-photo.jpg"
+                    src="/reet-photo-2.jpg"
                     alt="Reet Rajpal — Nail Artist"
                     className="w-full h-full object-cover object-top"
                   />
