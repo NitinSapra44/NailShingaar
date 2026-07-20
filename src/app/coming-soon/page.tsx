@@ -67,27 +67,29 @@ export default function ComingSoonPage() {
       <h1 className="font-display text-4xl md:text-6xl font-semibold text-foreground leading-tight mb-4">
         Launching Soon
       </h1>
-      <p className="text-muted-foreground text-base md:text-lg max-w-sm mb-12">
+      <p className="text-muted-foreground text-sm md:text-lg max-w-xs md:max-w-sm mb-10 px-2">
         Handcrafted custom press-on nails, made perfectly for your fingers. We open at <strong>7 PM on July 22nd</strong> — stay tuned!
       </p>
 
       {/* Countdown */}
-      <div className="flex items-end gap-4 md:gap-8">
+      <div className="flex items-center justify-center gap-2 md:gap-6 w-full max-w-xs md:max-w-none">
         {[
           { label: 'Days',    value: time.days },
           { label: 'Hours',   value: time.hours },
-          { label: 'Minutes', value: time.minutes },
-          { label: 'Seconds', value: time.seconds },
+          { label: 'Mins',    value: time.minutes },
+          { label: 'Secs',    value: time.seconds },
         ].map(({ label, value }, i) => (
-          <div key={label} className="flex items-end gap-4 md:gap-8">
-            {i > 0 && <span className="text-3xl md:text-5xl font-display text-primary/40 mb-3">:</span>}
+          <div key={label} className="flex items-center gap-2 md:gap-6">
+            {i > 0 && (
+              <span className="text-xl md:text-4xl font-bold text-primary/40 leading-none mb-4">:</span>
+            )}
             <div className="flex flex-col items-center">
-              <div className="w-20 md:w-28 h-20 md:h-28 rounded-2xl bg-white shadow-soft border border-primary/20 flex items-center justify-center">
-                <span className="font-display text-3xl md:text-5xl font-semibold text-foreground tabular-nums">
+              <div className="w-16 h-16 md:w-28 md:h-28 rounded-2xl bg-white shadow-soft border border-primary/20 flex items-center justify-center">
+                <span className="font-display text-2xl md:text-5xl font-semibold text-foreground tabular-nums">
                   {pad(value)}
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground mt-2 font-medium uppercase tracking-widest">{label}</span>
+              <span className="text-[10px] md:text-xs text-muted-foreground mt-2 font-medium uppercase tracking-widest">{label}</span>
             </div>
           </div>
         ))}
