@@ -193,6 +193,36 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* How-To Video Section */}
+        <div className="mt-16 pt-12 border-t border-border">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-2xl md:text-3xl font-semibold mb-2">Everything You Need to Know</h2>
+            <p className="text-muted-foreground text-sm">Watch how it works — from unboxing to removal</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { id: 'hjmxaDijAzg', title: 'What\'s in Your Order', desc: 'See exactly what you\'ll receive when your nails arrive' },
+              { id: '9ZjlCZdHL2Y', title: 'How to Apply', desc: 'Step-by-step guide to applying your press-on nails perfectly' },
+              { id: '9ZjlCZdHL2Y', title: 'How to Remove', desc: 'Safe and easy removal without damaging your natural nails' },
+            ].map((video, i) => (
+              <div key={i} className="space-y-3">
+                <div className="relative rounded-2xl overflow-hidden shadow-soft border border-border bg-black" style={{ aspectRatio: '9/16', maxHeight: '480px' }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${video.id}?rel=0&modestbranding=1`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
+                <div className="text-center px-2">
+                  <p className="font-semibold text-sm">{video.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{video.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Layout>
   );
