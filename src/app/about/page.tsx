@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 const stats = [
-  { value: '6+',    label: 'Years of Experience' },
+  { value: '7+',    label: 'Years of Experience' },
   { value: '500+',  label: 'Happy Clients' },
   { value: '100%',  label: 'Handcrafted Sets' },
   { value: '∞',     label: 'Passion for Nails' },
@@ -39,8 +39,8 @@ export default function AboutPage() {
                 Hi, I'm <span className="text-primary">Reet Rajpal</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                A renowned nail technician, educator, and industry expert with a passion for
-                empowering beauty professionals and transforming nail artistry — one set at a time.
+                The creator behind Nail Shingaar by Reet ✨ — welcome to the ultimate nail experience.
+                Handmade press-on nails for every mood &amp; occasion, made with love, detail, and a little bit of shingaar 💅🏻
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button asChild className="rounded-full shadow-soft hover:shadow-glow">
@@ -102,18 +102,17 @@ export default function AboutPage() {
           <div className="space-y-5">
             <h2 className="font-display text-3xl font-semibold">My Story</h2>
             <p className="text-muted-foreground leading-relaxed">
-              With more than 6 years of experience and a portfolio that showcases my mastery of
-              cutting-edge techniques, I've established myself as a well-known and respected nail
-              technician in the nail industry.
+              With more than 7 years of experience and a portfolio that showcases my mastery of
+              cutting-edge techniques, I&apos;ve established myself as a well known and a
+              respectful nail technician in the nail industry.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              My expertise spans from classic manicures to intricate nail art, acrylic extensions,
-              and classy, luxurious press-on sets — crafted to fit your hands perfectly.
+              I also make handmade press-on nails for every mood &amp; occasion. From soft everyday
+              looks to bold glam designs, each set is made with love, detail, and a little bit of
+              shingaar 💅🏻
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              As a dedicated educator, I share my knowledge and skills through comprehensive
-              offline training programmes. My mission is to inspire and mentor the next generation
-              of nail artists, providing them with the tools and confidence to succeed.
+              Thank you for supporting my small business ♡
             </p>
           </div>
 
