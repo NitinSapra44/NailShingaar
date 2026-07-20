@@ -41,7 +41,7 @@ export default function ProductDetailPage() {
       <Layout>
         <div className="container mx-auto px-4 py-12">
           <div className="grid md:grid-cols-2 gap-12 animate-pulse">
-            <div className="aspect-square rounded-3xl bg-muted" />
+            <div className="aspect-video rounded-3xl bg-muted" />
             <div className="space-y-6">
               <div className="h-8 w-3/4 bg-muted rounded" />
               <div className="h-6 w-1/4 bg-muted rounded" />
@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-3">
-            <div className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-card shadow-card">
+            <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-card shadow-card">
               <img src={allImages[activeImage] ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.is_new && (
