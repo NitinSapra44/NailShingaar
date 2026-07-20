@@ -104,7 +104,7 @@ export default function ComingSoonPage() {
           value={pwd}
           onChange={(e) => setPwd(e.target.value)}
           placeholder="·····"
-          className={`w-24 text-center text-xs px-3 py-1.5 rounded-full border border-transparent bg-transparent text-muted-foreground/30 placeholder:text-muted-foreground/20 focus:border-primary/30 focus:text-foreground focus:bg-white focus:outline-none transition-all ${shake ? 'animate-bounce border-red-300' : ''}`}
+          className={`w-36 text-center text-sm px-4 py-2 rounded-full border border-transparent bg-transparent text-muted-foreground/40 placeholder:text-muted-foreground/30 focus:border-primary/40 focus:text-foreground focus:bg-white focus:outline-none transition-all ${shake ? 'animate-bounce border-red-300' : ''}`}
         />
       </form>
     </div>
