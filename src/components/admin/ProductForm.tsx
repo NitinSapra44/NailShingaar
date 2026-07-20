@@ -33,6 +33,7 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
   const [uploadingExtra, setUploadingExtra] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [videos, setVideos] = useState<string[]>(product?.videos ?? []);
+  const [newVideoUrl, setNewVideoUrl] = useState('');
 
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
@@ -321,14 +322,37 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
             </div>
           ))}
         </div>
-        <input ref={videoFileRef} type="file" accept="video/*" multiple className="hidden" onChange={handleVideoFileChange} />
-        <Button type="button" variant="outline" className="rounded-xl"
-          disabled={uploadingVideo}
-          onClick={() => videoFileRef.current?.click()}>
-          {uploadingVideo
-            ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Uploading…</>
-            : <><Upload className="h-4 w-4 mr-1" /> Upload Videos</>}
-        </Button>
+        <div className="flex gap-2">
+          <Input
+            value={newVideoUrl}
+            placeholder="Paste direct video URL (.mp4, YouTube, etc.) and click Add"
+            onChange={(e) => setNewVideoUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const url = newVideoUrl.trim();
+                if (url) { setVideos((prev) => [...prev, url]); setNewVideoUrl(''); }
+              }
+            }}
+            className="rounded-xl flex-1"
+          />
+          <Button type="button" variant="outline" className="rounded-xl shrink-0"
+            onClick={() => {
+              const url = newVideoUrl.trim();
+              if (url) { setVideos((prev) => [...prev, url]); setNewVideoUrl(''); }
+            }}>
+            <Plus className="h-4 w-4 mr-1" /> Add
+          </Button>
+          <input ref={videoFileRef} type="file" accept="video/*" multiple className="hidden" onChange={handleVideoFileChange} />
+          <Button type="button" variant="outline" className="rounded-xl shrink-0"
+            disabled={uploadingVideo}
+            onClick={() => videoFileRef.current?.click()}>
+            {uploadingVideo
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Uploading…</>
+              : <><Upload className="h-4 w-4 mr-1" /> Upload</>}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">Paste a URL or upload a file. For large videos, paste a direct link to avoid upload limits.</p>
       </div>
 
       {/* Categories (multi-select) */}
