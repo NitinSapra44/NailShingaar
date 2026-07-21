@@ -1,14 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { cn } from '@/lib/utils';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 
 interface ProductCardProps {
   product: Product;
   className?: string;
   style?: React.CSSProperties;
+  priority?: boolean;
 }
 
 const StarIcon = () => (
@@ -17,45 +21,104 @@ const StarIcon = () => (
   </svg>
 );
 
-const ProductCard = ({ product, className, style }: ProductCardProps) => {
+const ProductCard = ({ product, className, style, priority }: ProductCardProps) => {
   const discount = product.original_price
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
+
+  const images = [product.image_url, ...(product.images ?? [])].filter(Boolean);
+  const hasMultiple = images.length > 1;
+
+  const [api, setApi] = useState<CarouselApi>();
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setActiveIndex(api.selectedScrollSnap());
+    onSelect();
+    api.on('select', onSelect);
+    return () => {
+      api.off('select', onSelect);
+    };
+  }, [api]);
+
+  const sizes = '(max-width: 768px) 50vw, 25vw';
+
+  const badges = (
+    <>
+      <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none z-10">
+        {product.is_new && (
+          <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-primary text-primary-foreground tracking-widest">
+            JUST IN ♥
+          </span>
+        )}
+        {!!discount && !product.is_new && (
+          <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-foreground text-background tracking-wider">
+            -{discount}%
+          </span>
+        )}
+      </div>
+
+      {/* Heart - always visible */}
+      <button
+        className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 shadow-soft flex items-center justify-center hover:bg-pink-light transition-colors z-10"
+        onClick={(e) => e.preventDefault()}
+        aria-label="Add to wishlist"
+      >
+        <Heart className="h-4 w-4 text-primary" />
+      </button>
+    </>
+  );
 
   return (
     <div className={cn('group', className)} style={style}>
       <div className="bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-300">
         {/* Image */}
-        <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden">
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {product.is_new && (
-              <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-primary text-primary-foreground tracking-widest">
-                JUST IN ♥
-              </span>
-            )}
-            {!!discount && !product.is_new && (
-              <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-foreground text-background tracking-wider">
-                -{discount}%
-              </span>
-            )}
-          </div>
-
-          {/* Heart - always visible */}
-          <button
-            className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 shadow-soft flex items-center justify-center hover:bg-pink-light transition-colors"
-            onClick={(e) => e.preventDefault()}
-            aria-label="Add to wishlist"
-          >
-            <Heart className="h-4 w-4 text-primary" />
-          </button>
-        </Link>
+        <div className="relative aspect-square overflow-hidden">
+          {hasMultiple ? (
+            <Carousel setApi={setApi} className="absolute inset-0">
+              <CarouselContent className="ml-0">
+                {images.map((src, i) => (
+                  <CarouselItem key={src + i} className="pl-0 h-full">
+                    <Link href={`/product/${product.slug}`} className="block relative w-full h-full">
+                      <Image
+                        src={src}
+                        alt={product.name}
+                        fill
+                        sizes={sizes}
+                        priority={priority && i === 0}
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </Link>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                {images.map((_, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'h-1.5 rounded-full transition-all',
+                      i === activeIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/60'
+                    )}
+                  />
+                ))}
+              </div>
+            </Carousel>
+          ) : (
+            <Link href={`/product/${product.slug}`} className="block relative w-full h-full">
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                sizes={sizes}
+                priority={priority}
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
+          )}
+          {badges}
+        </div>
 
         {/* Info */}
         <div className="p-3 pt-2.5">

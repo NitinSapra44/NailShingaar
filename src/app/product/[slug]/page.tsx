@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Truck, Sparkles, Ruler, Play } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from '@/components/ui/carousel';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 
@@ -15,6 +17,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
 
   useEffect(() => {
     if (!slug) return;
@@ -28,6 +31,16 @@ export default function ProductDetailPage() {
         setLoading(false);
       });
   }, [slug]);
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setActiveImage(api.selectedScrollSnap());
+    onSelect();
+    api.on('select', onSelect);
+    return () => {
+      api.off('select', onSelect);
+    };
+  }, [api]);
 
   const handleOrderClick = () => {
     if (product) {
@@ -86,34 +99,77 @@ export default function ProductDetailPage() {
     ...(product.videos ?? []).filter(Boolean).map((src): MediaItem => ({ src, type: classifyVideo(src) })),
   ].filter((m) => Boolean(m.src));
 
-  const active = allMedia[activeImage] ?? allMedia[0];
-
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-3">
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-card shadow-card">
-              {active?.type === 'youtube' ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${getYouTubeId(active.src)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeId(active.src)}&rel=0`}
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  className="w-full h-full border-0"
-                />
-              ) : active?.type === 'video' ? (
-                <video
-                  src={active.src}
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <img src={active?.src ?? product.image_url} alt={product.name} className="w-full h-full object-cover" />
-              )}
+              <Carousel setApi={setApi} className="absolute inset-0">
+                <CarouselContent className="ml-0 h-full">
+                  {allMedia.map((item, i) => (
+                    <CarouselItem key={item.src + i} className="pl-0 h-full">
+                      {item.type === 'youtube' ? (
+                        i === activeImage ? (
+                          <iframe
+                            src={`https://www.youtube.com/embed/${getYouTubeId(item.src)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeId(item.src)}&rel=0`}
+                            allow="autoplay; encrypted-media"
+                            allowFullScreen
+                            className="w-full h-full border-0"
+                          />
+                        ) : (
+                          <div className="relative w-full h-full">
+                            <img
+                              src={`https://img.youtube.com/vi/${getYouTubeId(item.src)}/mqdefault.jpg`}
+                              alt="video thumbnail"
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="h-10 w-10 text-white drop-shadow" />
+                            </div>
+                          </div>
+                        )
+                      ) : item.type === 'video' ? (
+                        i === activeImage ? (
+                          <video
+                            src={item.src}
+                            controls
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="relative w-full h-full">
+                            <video src={item.src} className="w-full h-full object-cover" muted />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                              <Play className="h-10 w-10 text-white drop-shadow" />
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={item.src}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            priority={i === 0}
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {allMedia.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-3 hidden md:flex" />
+                    <CarouselNext className="right-3 hidden md:flex" />
+                  </>
+                )}
+              </Carousel>
               <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
                 {product.is_new && (
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-accent text-accent-foreground">New Arrival</span>
@@ -126,7 +182,7 @@ export default function ProductDetailPage() {
             {allMedia.length > 1 && (
               <div className="flex gap-2 flex-wrap">
                 {allMedia.map((item, i) => (
-                  <button key={item.src + i} onClick={() => setActiveImage(i)}
+                  <button key={item.src + i} onClick={() => api?.scrollTo(i)}
                     className={`relative aspect-square w-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImage ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}>
                     {item.type === 'youtube' ? (
                       <>
@@ -147,7 +203,7 @@ export default function ProductDetailPage() {
                         </div>
                       </>
                     ) : (
-                      <img src={item.src} alt="" className="w-full h-full object-cover" />
+                      <Image src={item.src} alt="" fill sizes="64px" className="object-cover" />
                     )}
                   </button>
                 ))}
@@ -207,7 +263,7 @@ export default function ProductDetailPage() {
               { id: '9ZjlCZdHL2Y', title: 'How to Remove', desc: 'Safe and easy removal without damaging your natural nails' },
             ].map((video, i) => (
               <div key={i} className="space-y-3">
-                <div className="relative rounded-2xl overflow-hidden shadow-soft border border-border bg-black" style={{ aspectRatio: '9/16', maxHeight: '480px' }}>
+                <div className="relative mx-auto rounded-2xl overflow-hidden shadow-soft border border-border bg-black" style={{ aspectRatio: '9/16', maxHeight: '480px' }}>
                   <iframe
                     src={`https://www.youtube.com/embed/${video.id}?rel=0&modestbranding=1`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

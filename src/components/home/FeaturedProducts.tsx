@@ -83,6 +83,7 @@ const FeaturedProducts = () => {
               product={product}
               className="animate-fade-up"
               style={{ animationDelay: `${index * 100}ms` } as any}
+              priority={index === 0}
             />
           ))}
         </div>

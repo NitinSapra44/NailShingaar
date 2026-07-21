@@ -16,10 +16,56 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
+const MAX_IMAGE_DIMENSION = 2000;
+const JPEG_QUALITY = 0.85;
+const SKIP_COMPRESSION_UNDER_BYTES = 800 * 1024;
+
+// Resize oversized product photos and re-encode as JPEG (PNGs keep their format,
+// for transparency) before upload — phone photos routinely arrive at 4000px+/5MB+,
+// which is far more than a product card or gallery image ever needs.
+async function compressImage(file: File): Promise<File> {
+  if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size < SKIP_COMPRESSION_UNDER_BYTES) {
+      bitmap.close();
+      return file;
+    }
+
+    const width = Math.round(bitmap.width * scale);
+    const height = Math.round(bitmap.height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const keepPng = file.type === 'image/png';
+    const outputType = keepPng ? 'image/png' : 'image/jpeg';
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, outputType, keepPng ? undefined : JPEG_QUALITY)
+    );
+    if (!blob || blob.size >= file.size) return file;
+
+    const newName = file.name.replace(/\.[^.]+$/, '') + (keepPng ? '.png' : '.jpg');
+    return new File([blob], newName, { type: outputType });
+  } catch {
+    return file;
+  }
+}
+
 async function uploadToStorage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() ?? 'jpg';
+  const compressed = await compressImage(file);
+  const ext = compressed.name.split('.').pop() ?? 'jpg';
   const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: false });
+  const { error } = await supabase.storage.from('product-images').upload(path, compressed, { upsert: false });
   if (error) throw error;
   const { data } = supabase.storage.from('product-images').getPublicUrl(path);
   return data.publicUrl;
