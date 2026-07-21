@@ -27,6 +27,7 @@ const REQUIRED_SLOTS = [
   { key: 'left_thumb',    label: 'Left Thumb',            hint: 'Place a coin beside nail for scale' },
   { key: 'right_fingers', label: 'Right Hand — 4 Fingers',hint: 'Index, middle, ring & pinky' },
   { key: 'right_thumb',   label: 'Right Thumb',           hint: 'Place a coin beside nail for scale' },
+  { key: 'full_hand',     label: 'Full Hand Overview',    hint: 'Relaxed shot of your whole hand, no coin needed' },
 ];
 const STEPS = ['Nail Sizing', 'Shipping', 'Payment'];
 
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
     nail_length: 'Medium', nail_shape: 'Oval', color_preference: '',
   });
   const [nailPhotos, setNailPhotos] = useState<Record<string, File | null>>({
-    left_fingers: null, left_thumb: null, right_fingers: null, right_thumb: null,
+    left_fingers: null, left_thumb: null, right_fingers: null, right_thumb: null, full_hand: null,
   });
   const [photoPreviews, setPhotoPreviews] = useState<Record<string, string>>({});
   const photoRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -116,8 +117,8 @@ export default function CheckoutPage() {
 
   const validateQuestionnaire = () => {
     const uploaded = Object.values(nailPhotos).filter(Boolean);
-    if (uploaded.length < 4) {
-      toast({ title: 'Photos required', description: 'Please upload all 4 nail photos using the coin method.', variant: 'destructive' });
+    if (uploaded.length < REQUIRED_SLOTS.length) {
+      toast({ title: 'Photos required', description: `Please upload all ${REQUIRED_SLOTS.length} nail photos.`, variant: 'destructive' });
       return false;
     }
     return true;
@@ -277,13 +278,25 @@ export default function CheckoutPage() {
                       <p className="text-muted-foreground text-xs mt-0.5">Place a ₹5 or ₹10 coin flat beside your nails in each photo. Lay your hand flat, ensure good lighting, and capture all fingers clearly.</p>
                     </div>
                   </div>
+                  <img
+                    src="/Reference-Pic.jpeg"
+                    alt="Coin method reference — place an Indian coin beside your fingers and thumb, photographed directly from above with fingers closed"
+                    className="w-full max-w-sm mx-auto rounded-xl border border-border"
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     {REQUIRED_SLOTS.map((slot) => (
-                      <div key={slot.key}>
+                      <div key={slot.key} className={slot.key === 'full_hand' ? 'col-span-2' : undefined}>
                         <p className="text-xs font-semibold mb-0.5">{slot.label}</p>
                         <p className="text-xs text-muted-foreground mb-2">{slot.hint}</p>
+                        {slot.key === 'full_hand' && (
+                          <img
+                            src="/Img5.jpeg"
+                            alt="Full hand overview reference — a relaxed, natural shot of the whole hand"
+                            className="w-full max-w-sm mx-auto rounded-xl border border-border mb-2"
+                          />
+                        )}
                         {photoPreviews[slot.key] ? (
-                          <div className="relative aspect-square rounded-xl overflow-hidden border border-border">
+                          <div className={`relative rounded-xl overflow-hidden border border-border ${slot.key === 'full_hand' ? 'aspect-video max-w-sm mx-auto' : 'aspect-square'}`}>
                             <img src={photoPreviews[slot.key]} alt={slot.label} className="w-full h-full object-cover" />
                             <button type="button" onClick={() => handlePhotoChange(slot.key, null)}
                               className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-foreground/70 text-background flex items-center justify-center">
@@ -292,7 +305,7 @@ export default function CheckoutPage() {
                           </div>
                         ) : (
                           <button type="button" onClick={() => photoRefs.current[slot.key]?.click()}
-                            className="aspect-square w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
+                            className={`w-full rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-pink-light/30 transition-colors ${slot.key === 'full_hand' ? 'aspect-video max-w-sm mx-auto' : 'aspect-square'}`}>
                             <Camera className="h-6 w-6 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">Upload photo</span>
                           </button>
@@ -452,7 +465,7 @@ export default function CheckoutPage() {
                   <p>Length: {questionnaire.nail_length}</p>
                   <p>Shape: {questionnaire.nail_shape}</p>
                   {questionnaire.color_preference && <p>Colour: {questionnaire.color_preference}</p>}
-                  <p>Photos: {Object.values(nailPhotos).filter(Boolean).length}/4 uploaded</p>
+                  <p>Photos: {Object.values(nailPhotos).filter(Boolean).length}/{REQUIRED_SLOTS.length} uploaded</p>
                 </div>
               )}
             </div>

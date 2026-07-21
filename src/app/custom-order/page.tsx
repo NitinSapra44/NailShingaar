@@ -333,6 +333,11 @@ export default function CustomOrderPage() {
                       <p className="text-muted-foreground text-xs mt-0.5">Place a ₹5 or ₹10 coin flat beside your nails in each photo. Lay your hand flat, ensure good lighting, and capture all fingers clearly.</p>
                     </div>
                   </div>
+                  <img
+                    src="/Reference-Pic.jpeg"
+                    alt="Coin method reference — place an Indian coin beside your fingers and thumb, photographed directly from above with fingers closed"
+                    className="w-full max-w-sm mx-auto rounded-xl border border-border"
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     {REQUIRED_SLOTS.map((slot) => (
                       <div key={slot.key}>
