@@ -9,11 +9,13 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from '@/components/ui/carousel';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Product } from '@/types';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
+  const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -43,10 +45,9 @@ export default function ProductDetailPage() {
   }, [api]);
 
   const handleOrderClick = () => {
-    if (product) {
-      sessionStorage.setItem('checkout_product', JSON.stringify(product));
-      router.push('/checkout');
-    }
+    if (!product) return;
+    sessionStorage.setItem('checkout_product', JSON.stringify(product));
+    router.push(user ? '/checkout' : '/auth?redirect=/checkout');
   };
 
   if (loading) {

@@ -58,7 +58,7 @@ function StepBar({ current }: Readonly<{ current: number }>) {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -66,13 +66,15 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) { router.replace('/auth?redirect=/checkout'); return; }
     const stored = sessionStorage.getItem('checkout_product');
     if (stored) {
       setProduct(JSON.parse(stored));
     } else {
       router.replace('/shop');
     }
-  }, [router]);
+  }, [router, user, authLoading]);
 
   const [questionnaire, setQuestionnaire] = useState<Omit<NailQuestionnaire, 'nail_photos'>>({
     nail_length: 'Medium', nail_shape: 'Oval', color_preference: '',
