@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 
 const slides = [
+  { id: 4, bg: '/hero/slide-4.png' },
   { id: 1, bg: '/hero/slide-1.png' },
   { id: 2, bg: '/hero/slide-2.png' },
   { id: 3, bg: '/hero/slide-3.png' },

@@ -258,9 +258,9 @@ export default function ProductDetailPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { id: 'hjmxaDijAzg', title: 'What\'s in Your Order', desc: 'See exactly what you\'ll receive when your nails arrive' },
-              { id: '9ZjlCZdHL2Y', title: 'How to Apply', desc: 'Step-by-step guide to applying your press-on nails perfectly' },
-              { id: '9ZjlCZdHL2Y', title: 'How to Remove', desc: 'Safe and easy removal without damaging your natural nails' },
+              { id: 'ILw9ybGgfG8', title: 'What\'s in Your Order', desc: 'See exactly what you\'ll receive when your nails arrive' },
+              { id: 'JO_TlkkN8Ss', title: 'How to Apply', desc: 'Step-by-step guide to applying your press-on nails perfectly' },
+              { id: 'f5xDbG4KwmY', title: 'How to Remove', desc: 'Safe and easy removal without damaging your natural nails' },
             ].map((video, i) => (
               <div key={i} className="space-y-3">
                 <div className="relative mx-auto rounded-2xl overflow-hidden shadow-soft border border-border bg-black" style={{ aspectRatio: '9/16', maxHeight: '480px' }}>
