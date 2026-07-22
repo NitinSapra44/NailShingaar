@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 
 const slides = [
-  { id: 4, bg: '/hero/slide-4.png' },
-  { id: 1, bg: '/hero/slide-1.png' },
-  { id: 2, bg: '/hero/slide-2.png' },
-  { id: 3, bg: '/hero/slide-3.png' },
+  { id: 4, bg: '/hero/slide-4.png', position: 'object-left' },
+  { id: 1, bg: '/hero/slide-1.png', position: 'object-center' },
+  { id: 2, bg: '/hero/slide-2.png', position: 'object-center' },
+  { id: 3, bg: '/hero/slide-3.png', position: 'object-center' },
 ];
 
 const SWIPE_THRESHOLD = 50;
@@ -76,7 +76,7 @@ export default function HeroSection() {
             <img
               src={s.bg}
               alt={`Nail Shingaar slide ${i + 1}`}
-              className="w-full h-full object-cover object-center"
+              className={`w-full h-full object-cover ${s.position}`}
               draggable={false}
             />
           </Link>
