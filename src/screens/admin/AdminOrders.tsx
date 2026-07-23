@@ -82,7 +82,7 @@ export const AdminOrders = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, items:order_items(*)')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -359,6 +359,30 @@ export const AdminOrders = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Ordered products */}
+                {selectedOrder.items && selectedOrder.items.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2 font-medium">Products Ordered</p>
+                    <div className="space-y-2">
+                      {selectedOrder.items.map((item) => (
+                        <div key={item.id} className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2">
+                          {item.product_image ? (
+                            <img src={item.product_image} alt={item.product_name}
+                              className="h-14 w-14 object-cover rounded-lg border border-border shrink-0" />
+                          ) : (
+                            <div className="h-14 w-14 rounded-lg border border-border bg-muted shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{item.product_name}</p>
+                            <p className="text-xs text-muted-foreground">Size: {item.size} · Qty: {item.quantity}</p>
+                          </div>
+                          <p className="text-sm font-semibold shrink-0">₹{item.price}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Design reference photos (custom enquiries only) */}
                 {isCustomEnquiry(selectedOrder) && getDesignPhotos(selectedOrder).length > 0 && (
