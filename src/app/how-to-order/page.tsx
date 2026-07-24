@@ -75,7 +75,7 @@ export default function HowToOrderPage() {
             </div>
             <div className="rounded-2xl overflow-hidden shadow-card">
               <img
-                src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=380&fit=crop&q=80"
+                src="/IMG_8434.JPG"
                 alt="Custom press-on nails by Nail Shingaar"
                 className="w-full h-52 md:h-60 object-cover"
               />
@@ -207,7 +207,7 @@ export default function HowToOrderPage() {
           </div>
           <div className="rounded-2xl overflow-hidden shadow-card sticky top-24">
             <img
-              src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=560&fit=crop&q=80"
+              src="/IMG_8435.JPG"
               alt="Applying press-on nails"
               className="w-full h-full object-cover"
             />
