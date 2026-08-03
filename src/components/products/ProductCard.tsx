@@ -7,6 +7,7 @@ import { Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { cn } from '@/lib/utils';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
+import { useWishlist } from '@/hooks/useWishlist';
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +23,8 @@ const StarIcon = () => (
 );
 
 const ProductCard = ({ product, className, style, priority }: ProductCardProps) => {
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
   const discount = product.original_price
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
@@ -62,10 +65,14 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
       {/* Heart - always visible */}
       <button
         className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 shadow-soft flex items-center justify-center hover:bg-pink-light transition-colors z-10"
-        onClick={(e) => e.preventDefault()}
-        aria-label="Add to wishlist"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleWishlist(product.id);
+        }}
+        aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
       >
-        <Heart className="h-4 w-4 text-primary" />
+        <Heart className={cn('h-4 w-4 text-primary transition-colors', inWishlist && 'fill-primary')} />
       </button>
     </>
   );

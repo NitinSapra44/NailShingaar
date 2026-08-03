@@ -9,9 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { NailQuestionnaire, ShippingDetails, Product } from '@/types';
+
+interface CheckoutLineItem {
+  productId: string;
+  product: Product;
+  quantity: number;
+}
 
 const NAIL_SHAPES: { id: NailQuestionnaire['nail_shape']; label: string; desc: string; image: string }[] = [
   { id: 'Square',  label: 'Square',  desc: 'Straight sides & flat top',    image: '/nail-shapes/nail-square.jpg' },
@@ -59,22 +66,43 @@ function StepBar({ current }: Readonly<{ current: number }>) {
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { items: cartItems, loading: cartLoading, clearCart } = useCart();
   const { toast } = useToast();
 
-  const [product, setProduct] = useState<Product | null>(null);
+  const [lineItems, setLineItems] = useState<CheckoutLineItem[] | null>(null);
+  const [fromCart, setFromCart] = useState(false);
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) { router.replace('/auth?redirect=/checkout'); return; }
+
     const stored = sessionStorage.getItem('checkout_product');
     if (stored) {
-      setProduct(JSON.parse(stored));
+      const { product, quantity } = JSON.parse(stored) as { product: Product; quantity: number };
+      setLineItems([{ productId: product.id, product, quantity: quantity || 1 }]);
+      setFromCart(false);
+      return;
+    }
+
+    if (cartLoading) return;
+    const itemsFromCart = cartItems
+      .map((item) => {
+        const productId = 'product_id' in item ? item.product_id : (item as { productId: string }).productId;
+        const product = 'product' in item ? item.product : undefined;
+        if (!product) return null;
+        return { productId, product, quantity: item.quantity };
+      })
+      .filter((item): item is CheckoutLineItem => item !== null);
+
+    if (itemsFromCart.length > 0) {
+      setLineItems(itemsFromCart);
+      setFromCart(true);
     } else {
       router.replace('/shop');
     }
-  }, [router, user, authLoading]);
+  }, [router, user, authLoading, cartItems, cartLoading]);
 
   const [questionnaire, setQuestionnaire] = useState<Omit<NailQuestionnaire, 'nail_photos'>>({
     nail_length: 'Medium', nail_shape: 'Oval', color_preference: '',
@@ -92,8 +120,9 @@ export default function CheckoutPage() {
   const [paymentPreview, setPaymentPreview] = useState('');
   const paymentRef = useRef<HTMLInputElement | null>(null);
 
-  const shippingCost = (product?.price ?? 0) >= 999 ? 0 : 99;
-  const orderTotal = (product?.price ?? 0) + shippingCost;
+  const subtotal = (lineItems ?? []).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const shippingCost = subtotal >= 999 ? 0 : 99;
+  const orderTotal = subtotal + shippingCost;
 
   const handlePhotoChange = (key: string, file: File | null) => {
     setNailPhotos((prev) => ({ ...prev, [key]: file }));
@@ -170,7 +199,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!user) { router.push('/auth?redirect=/checkout'); return; }
-    if (!product) return;
+    if (!lineItems || lineItems.length === 0) return;
     setSubmitting(true);
     try {
       const ts = Date.now();
@@ -196,12 +225,20 @@ export default function CheckoutPage() {
 
       if (orderError) throw new Error(orderError.message);
 
-      await supabase.from('order_items').insert({
-        order_id: order.id, product_id: product.id, product_name: product.name,
-        product_image: product.image_url, size: questionnaire.nail_shape, quantity: 1, price: product.price,
-      });
+      const { error: itemsError } = await supabase.from('order_items').insert(
+        lineItems.map((item) => ({
+          order_id: order.id, product_id: item.product.id, product_name: item.product.name,
+          product_image: item.product.image_url, size: questionnaire.nail_shape,
+          quantity: item.quantity, price: item.product.price,
+        }))
+      );
+      if (itemsError) throw new Error(itemsError.message);
 
-      sessionStorage.removeItem('checkout_product');
+      if (fromCart) {
+        await clearCart();
+      } else {
+        sessionStorage.removeItem('checkout_product');
+      }
       router.push(`/order-confirmation/${order.id}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to place order. Please try again.';
@@ -211,7 +248,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (!product) {
+  if (!lineItems || lineItems.length === 0) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-32 flex items-center justify-center">
@@ -443,16 +480,20 @@ export default function CheckoutPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-24 p-5 rounded-2xl bg-card border border-border shadow-card space-y-4">
               <h3 className="font-display text-lg font-semibold">Your Order</h3>
-              <div className="flex gap-3">
-                <img src={product.image_url} alt={product.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold leading-snug">{product.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Handcrafted · Custom Sized</p>
-                  <p className="text-sm font-semibold mt-1">₹{product.price.toFixed(0)}</p>
-                </div>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {lineItems.map((item) => (
+                  <div key={item.productId} className="flex gap-3">
+                    <img src={item.product.image_url} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold leading-snug line-clamp-2">{item.product.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity} · Handcrafted</p>
+                      <p className="text-sm font-semibold mt-1">₹{(item.product.price * item.quantity).toFixed(0)}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="border-t border-border pt-3 space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>₹{product.price.toFixed(0)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>₹{subtotal.toFixed(0)}</span></div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className={shippingCost === 0 ? 'text-primary font-medium' : ''}>{shippingCost === 0 ? 'Free' : `₹${shippingCost}`}</span>
