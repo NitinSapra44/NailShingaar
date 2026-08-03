@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AuthProvider } from '@/hooks/useAuth';
 import { CartProvider } from '@/hooks/useCart';
+import { WishlistProvider } from '@/hooks/useWishlist';
 import { useState } from 'react';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -15,11 +16,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {children}
-          </TooltipProvider>
+          <WishlistProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              {children}
+            </TooltipProvider>
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>

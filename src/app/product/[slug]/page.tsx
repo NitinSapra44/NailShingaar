@@ -4,22 +4,31 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Truck, Sparkles, Ruler, Play } from 'lucide-react';
+import { ArrowRight, Truck, Sparkles, Ruler, Play, Heart, Minus, Plus } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from '@/components/ui/carousel';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import { cn } from '@/lib/utils';
 import { Product } from '@/types';
+
+const DEFAULT_SIZE = 'Standard';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const { user } = useAuth();
+  const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -46,8 +55,18 @@ export default function ProductDetailPage() {
 
   const handleOrderClick = () => {
     if (!product) return;
-    sessionStorage.setItem('checkout_product', JSON.stringify(product));
+    sessionStorage.setItem('checkout_product', JSON.stringify({ product, quantity }));
     router.push(user ? '/checkout' : '/auth?redirect=/checkout');
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setAddingToCart(true);
+    try {
+      await addToCart(product.id, DEFAULT_SIZE, quantity);
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   if (loading) {
@@ -214,7 +233,17 @@ export default function ProductDetailPage() {
 
           <div className="space-y-6">
             <div>
-              <h1 className="font-display text-3xl md:text-4xl font-semibold">{product.name}</h1>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="font-display text-3xl md:text-4xl font-semibold">{product.name}</h1>
+                <button
+                  type="button"
+                  onClick={() => toggleWishlist(product.id)}
+                  aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                  className="shrink-0 h-11 w-11 rounded-full bg-white shadow-soft border border-border flex items-center justify-center hover:bg-pink-light transition-colors"
+                >
+                  <Heart className={cn('h-5 w-5 text-primary transition-colors', isInWishlist(product.id) && 'fill-primary')} />
+                </button>
+              </div>
               <div className="flex items-baseline gap-3 mt-3">
                 <span className="font-display text-3xl font-semibold text-foreground">₹{product.price.toFixed(0)}</span>
                 {!!product.original_price && (
@@ -233,9 +262,30 @@ export default function ProductDetailPage() {
                 After you order, we&apos;ll collect your nail size photos and preferences so this set is made perfectly for your hands.
               </p>
             </div>
-            <Button size="lg" className="w-full rounded-full shadow-soft hover:shadow-glow transition-shadow text-base" onClick={handleOrderClick}>
-              Order This Set <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-semibold">Quantity</span>
+              <div className="flex items-center rounded-full border border-border">
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+                  <Minus className="h-3.5 w-3.5" />
+                </Button>
+                <span className="w-8 text-center text-sm font-medium">{quantity}</span>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" type="button"
+                  onClick={() => setQuantity((q) => q + 1)}>
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button size="lg" variant="outline" className="w-full rounded-full text-base" onClick={handleAddToCart} disabled={addingToCart}>
+                Add to Cart
+              </Button>
+              <Button size="lg" className="w-full rounded-full shadow-soft hover:shadow-glow transition-shadow text-base" onClick={handleOrderClick}>
+                Order Now <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
             <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
               {[
                 { icon: Ruler, text: 'Custom sized to your fingers' },

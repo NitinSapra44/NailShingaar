@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import { supabase } from '@/integrations/supabase/client';
 import type { Category } from '@/types';
 
@@ -17,6 +18,7 @@ const Header = () => {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const { totalItems } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -176,8 +178,15 @@ const Header = () => {
                 <Search className="h-5 w-5" />
               </Button>
             )}
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/wishlist"><Heart className="h-5 w-5" /></Link>
+            <Button variant="ghost" size="icon" className="relative" asChild>
+              <Link href="/wishlist">
+                <Heart className="h-5 w-5" />
+                {wishlistItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold shadow-soft">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </Link>
             </Button>
             <Button variant="ghost" size="icon" className="relative" asChild>
               <Link href="/cart">
