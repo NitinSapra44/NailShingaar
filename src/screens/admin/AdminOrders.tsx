@@ -83,6 +83,20 @@ const privateBucketPathFromUrl = (url: string): { bucket: string; path: string }
   return null;
 };
 
+// signedUrls[url] is undefined while signing is in flight, 'error' if
+// createSignedUrl failed (see console for why), or the working URL.
+function SignedThumb({ signed, alt, className }: { signed?: string; alt: string; className: string }) {
+  if (signed === 'error') {
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center text-center px-1`}>
+        <span className="text-[9px] text-muted-foreground leading-tight">Failed to load</span>
+      </div>
+    );
+  }
+  if (!signed) return <div className={`${className} bg-muted animate-pulse`} />;
+  return <img src={signed} alt={alt} className={className} />;
+}
+
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,8 +200,12 @@ export const AdminOrders = () => {
       candidateUrls.map(async (url) => {
         const resolved = privateBucketPathFromUrl(url);
         if (!resolved) return null;
-        const { data } = await supabase.storage.from(resolved.bucket).createSignedUrl(resolved.path, 3600);
-        return data?.signedUrl ? ([url, data.signedUrl] as const) : null;
+        const { data, error } = await supabase.storage.from(resolved.bucket).createSignedUrl(resolved.path, 3600);
+        if (error) {
+          console.error(`[order photos] sign failed for ${resolved.bucket}/${resolved.path}:`, error.message, url);
+          return [url, 'error'] as const;
+        }
+        return [url, data.signedUrl] as const;
       })
     ).then((resolved) => {
       setSignedUrls((prev) => {
@@ -408,14 +426,15 @@ export const AdminOrders = () => {
                     <div className="space-y-2">
                       {selectedOrder.items.map((item) => {
                         const isPrivate = item.product_image ? privateBucketPathFromUrl(item.product_image) : null;
-                        const src = item.product_image && (isPrivate ? signedUrls[item.product_image] : item.product_image);
+                        const thumbClass = 'h-14 w-14 object-cover rounded-lg border border-border shrink-0';
                         return (
                         <div key={item.id} className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2">
-                          {src ? (
-                            <img src={src} alt={item.product_name}
-                              className="h-14 w-14 object-cover rounded-lg border border-border shrink-0" />
+                          {!item.product_image ? (
+                            <div className={`${thumbClass} bg-muted`} />
+                          ) : isPrivate ? (
+                            <SignedThumb signed={signedUrls[item.product_image]} alt={item.product_name} className={thumbClass} />
                           ) : (
-                            <div className={`h-14 w-14 rounded-lg border border-border bg-muted shrink-0 ${isPrivate ? 'animate-pulse' : ''}`} />
+                            <img src={item.product_image} alt={item.product_name} className={thumbClass} />
                           )}
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{item.product_name}</p>
@@ -435,13 +454,9 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selectedOrder).map((url) => (
-                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
-                          {signedUrls[url] ? (
-                            <img src={signedUrls[url]} alt="Design reference"
-                              className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
-                          ) : (
-                            <div className="aspect-square w-full rounded-lg border border-border bg-muted animate-pulse" />
-                          )}
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Design reference"
+                            className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
                         </a>
                       ))}
                     </div>
@@ -462,13 +477,9 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selectedOrder.nail_photos.map((url) => (
-                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
-                          {signedUrls[url] ? (
-                            <img src={signedUrls[url]} alt="Customer nail sizing"
-                              className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
-                          ) : (
-                            <div className="aspect-square w-full rounded-lg border border-border bg-muted animate-pulse" />
-                          )}
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Customer nail sizing"
+                            className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
                         </a>
                       ))}
                     </div>
@@ -481,13 +492,9 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Payment Screenshot</p>
                     {selectedOrder.payment_screenshot ? (
                       <div className="space-y-3">
-                        <a href={signedUrls[selectedOrder.payment_screenshot] ?? selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
-                          {signedUrls[selectedOrder.payment_screenshot] ? (
-                            <img src={signedUrls[selectedOrder.payment_screenshot]} alt="Payment screenshot"
-                              className="rounded-xl border border-border max-h-64 object-contain hover:opacity-90 transition-opacity" />
-                          ) : (
-                            <div className="h-40 w-full max-w-xs rounded-xl border border-border bg-muted animate-pulse" />
-                          )}
+                        <a href={signedUrls[selectedOrder.payment_screenshot] && signedUrls[selectedOrder.payment_screenshot] !== 'error' ? signedUrls[selectedOrder.payment_screenshot] : selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[selectedOrder.payment_screenshot]} alt="Payment screenshot"
+                            className="h-40 w-full max-w-xs rounded-xl border border-border object-contain hover:opacity-90 transition-opacity" />
                         </a>
                         {selectedOrder.payment_status !== 'confirmed' && (
                           <Button onClick={() => confirmPayment(selectedOrder.id)}
