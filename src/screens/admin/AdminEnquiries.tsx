@@ -52,6 +52,16 @@ const getStyleNotes = (order: Order): string => {
   try { return JSON.parse(order.notes ?? '{}').style_notes ?? ''; } catch { return ''; }
 };
 
+// nail-photos is a private bucket (customer PII), so the URLs stored on the
+// order — built with getPublicUrl() at upload time — don't actually
+// resolve; they need to be swapped for short-lived signed URLs, generated
+// per-viewer under the admin's own RLS access.
+const pathFromStoredUrl = (url: string, bucket: string): string | null => {
+  const marker = `/object/public/${bucket}/`;
+  const idx = url.indexOf(marker);
+  return idx === -1 ? null : decodeURIComponent(url.slice(idx + marker.length));
+};
+
 export const AdminEnquiries = () => {
   const [enquiries, setEnquiries] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +69,7 @@ export const AdminEnquiries = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [priceInput, setPriceInput] = useState('');
   const [trackingInput, setTrackingInput] = useState('');
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => { fetchEnquiries(); }, []);
@@ -76,6 +87,24 @@ export const AdminEnquiries = () => {
         try { return JSON.parse((o as Order).notes ?? '{}').type === 'custom_design'; } catch { return false; }
       }) as Order[];
       setEnquiries(customOnly);
+
+      const urls = customOnly.flatMap((o) => [...getDesignPhotos(o), ...(o.nail_photos ?? [])]);
+      if (urls.length > 0) {
+        Promise.all(
+          urls.map(async (url) => {
+            const path = pathFromStoredUrl(url, 'nail-photos');
+            if (!path) return null;
+            const { data: signed } = await supabase.storage.from('nail-photos').createSignedUrl(path, 3600);
+            return signed?.signedUrl ? ([url, signed.signedUrl] as const) : null;
+          })
+        ).then((resolved) => {
+          setSignedUrls((prev) => {
+            const next = { ...prev };
+            for (const entry of resolved) if (entry) next[entry[0]] = entry[1];
+            return next;
+          });
+        });
+      }
     }
     setLoading(false);
   };
@@ -214,9 +243,13 @@ export const AdminEnquiries = () => {
                       {designPhotos.length > 0 ? (
                         <div className="flex gap-2 flex-wrap">
                           {designPhotos.slice(0, 4).map((url, i) => (
-                            <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                              <img src={url} alt={`Design ${i + 1}`}
-                                className="w-16 h-16 rounded-xl object-cover border border-border hover:opacity-80 transition-opacity" />
+                            <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
+                              {signedUrls[url] ? (
+                                <img src={signedUrls[url]} alt={`Design ${i + 1}`}
+                                  className="w-16 h-16 rounded-xl object-cover border border-border hover:opacity-80 transition-opacity" />
+                              ) : (
+                                <div className="w-16 h-16 rounded-xl border border-border bg-muted animate-pulse" />
+                              )}
                             </a>
                           ))}
                           {designPhotos.length > 4 && (
@@ -355,9 +388,13 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selected).map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <img src={url} alt="Design reference"
-                            className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
+                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
+                          {signedUrls[url] ? (
+                            <img src={signedUrls[url]} alt="Design reference"
+                              className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
+                          ) : (
+                            <div className="aspect-square w-full rounded-xl border border-border bg-muted animate-pulse" />
+                          )}
                         </a>
                       ))}
                     </div>
@@ -378,9 +415,13 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selected.nail_photos.map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <img src={url} alt="Nail sizing"
-                            className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
+                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
+                          {signedUrls[url] ? (
+                            <img src={signedUrls[url]} alt="Nail sizing"
+                              className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
+                          ) : (
+                            <div className="aspect-square w-full rounded-xl border border-border bg-muted animate-pulse" />
+                          )}
                         </a>
                       ))}
                     </div>

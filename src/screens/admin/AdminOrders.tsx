@@ -66,12 +66,23 @@ const getStyleNotes = (order: Order): string => {
   try { return JSON.parse(order.notes ?? '{}').style_notes ?? ''; } catch { return ''; }
 };
 
+// nail-photos and payment-screenshots are private buckets (customer PII),
+// so the URLs stored on the order — built with getPublicUrl() at upload
+// time — don't actually resolve; they need to be swapped for short-lived
+// signed URLs, generated per-viewer under the admin's own RLS access.
+const pathFromStoredUrl = (url: string, bucket: string): string | null => {
+  const marker = `/object/public/${bucket}/`;
+  const idx = url.indexOf(marker);
+  return idx === -1 ? null : decodeURIComponent(url.slice(idx + marker.length));
+};
+
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState('');
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -155,6 +166,28 @@ export const AdminOrders = () => {
   const openDetail = (order: Order) => {
     setSelectedOrder(order);
     setTrackingInput(order.tracking_number ?? '');
+
+    const targets: { url: string; bucket: string }[] = [
+      ...(order.nail_photos ?? []).map((url) => ({ url, bucket: 'nail-photos' })),
+      ...getDesignPhotos(order).map((url) => ({ url, bucket: 'nail-photos' })),
+      ...(order.payment_screenshot ? [{ url: order.payment_screenshot, bucket: 'payment-screenshots' }] : []),
+    ];
+    if (targets.length === 0) return;
+
+    Promise.all(
+      targets.map(async ({ url, bucket }) => {
+        const path = pathFromStoredUrl(url, bucket);
+        if (!path) return null;
+        const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+        return data?.signedUrl ? ([url, data.signedUrl] as const) : null;
+      })
+    ).then((resolved) => {
+      setSignedUrls((prev) => {
+        const next = { ...prev };
+        for (const entry of resolved) if (entry) next[entry[0]] = entry[1];
+        return next;
+      });
+    });
   };
 
   return (
@@ -390,9 +423,13 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selectedOrder).map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <img src={url} alt="Design reference"
-                            className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
+                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
+                          {signedUrls[url] ? (
+                            <img src={signedUrls[url]} alt="Design reference"
+                              className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
+                          ) : (
+                            <div className="aspect-square w-full rounded-lg border border-border bg-muted animate-pulse" />
+                          )}
                         </a>
                       ))}
                     </div>
@@ -413,9 +450,13 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selectedOrder.nail_photos.map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <img src={url} alt="Customer nail sizing"
-                            className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
+                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
+                          {signedUrls[url] ? (
+                            <img src={signedUrls[url]} alt="Customer nail sizing"
+                              className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
+                          ) : (
+                            <div className="aspect-square w-full rounded-lg border border-border bg-muted animate-pulse" />
+                          )}
                         </a>
                       ))}
                     </div>
@@ -428,9 +469,13 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Payment Screenshot</p>
                     {selectedOrder.payment_screenshot ? (
                       <div className="space-y-3">
-                        <a href={selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
-                          <img src={selectedOrder.payment_screenshot} alt="Payment screenshot"
-                            className="rounded-xl border border-border max-h-64 object-contain hover:opacity-90 transition-opacity" />
+                        <a href={signedUrls[selectedOrder.payment_screenshot] ?? selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
+                          {signedUrls[selectedOrder.payment_screenshot] ? (
+                            <img src={signedUrls[selectedOrder.payment_screenshot]} alt="Payment screenshot"
+                              className="rounded-xl border border-border max-h-64 object-contain hover:opacity-90 transition-opacity" />
+                          ) : (
+                            <div className="h-40 w-full max-w-xs rounded-xl border border-border bg-muted animate-pulse" />
+                          )}
                         </a>
                         {selectedOrder.payment_status !== 'confirmed' && (
                           <Button onClick={() => confirmPayment(selectedOrder.id)}
