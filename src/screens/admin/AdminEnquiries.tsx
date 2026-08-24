@@ -62,6 +62,20 @@ const pathFromStoredUrl = (url: string, bucket: string): string | null => {
   return idx === -1 ? null : decodeURIComponent(url.slice(idx + marker.length));
 };
 
+// signedUrls[url] is undefined while signing is in flight, 'error' if
+// createSignedUrl failed (see console for why), or the working URL.
+function SignedThumb({ signed, alt, className }: { signed?: string; alt: string; className: string }) {
+  if (signed === 'error') {
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center text-center px-1`}>
+        <span className="text-[9px] text-muted-foreground leading-tight">Failed to load</span>
+      </div>
+    );
+  }
+  if (!signed) return <div className={`${className} bg-muted animate-pulse`} />;
+  return <img src={signed} alt={alt} className={className} />;
+}
+
 export const AdminEnquiries = () => {
   const [enquiries, setEnquiries] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,8 +108,12 @@ export const AdminEnquiries = () => {
           urls.map(async (url) => {
             const path = pathFromStoredUrl(url, 'nail-photos');
             if (!path) return null;
-            const { data: signed } = await supabase.storage.from('nail-photos').createSignedUrl(path, 3600);
-            return signed?.signedUrl ? ([url, signed.signedUrl] as const) : null;
+            const { data: signed, error } = await supabase.storage.from('nail-photos').createSignedUrl(path, 3600);
+            if (error) {
+              console.error(`[enquiry photos] sign failed for nail-photos/${path}:`, error.message, url);
+              return [url, 'error'] as const;
+            }
+            return [url, signed.signedUrl] as const;
           })
         ).then((resolved) => {
           setSignedUrls((prev) => {
@@ -243,13 +261,9 @@ export const AdminEnquiries = () => {
                       {designPhotos.length > 0 ? (
                         <div className="flex gap-2 flex-wrap">
                           {designPhotos.slice(0, 4).map((url, i) => (
-                            <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
-                              {signedUrls[url] ? (
-                                <img src={signedUrls[url]} alt={`Design ${i + 1}`}
-                                  className="w-16 h-16 rounded-xl object-cover border border-border hover:opacity-80 transition-opacity" />
-                              ) : (
-                                <div className="w-16 h-16 rounded-xl border border-border bg-muted animate-pulse" />
-                              )}
+                            <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                              <SignedThumb signed={signedUrls[url]} alt={`Design ${i + 1}`}
+                                className="w-16 h-16 rounded-xl object-cover border border-border hover:opacity-80 transition-opacity" />
                             </a>
                           ))}
                           {designPhotos.length > 4 && (
@@ -388,13 +402,9 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selected).map((url) => (
-                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
-                          {signedUrls[url] ? (
-                            <img src={signedUrls[url]} alt="Design reference"
-                              className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
-                          ) : (
-                            <div className="aspect-square w-full rounded-xl border border-border bg-muted animate-pulse" />
-                          )}
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Design reference"
+                            className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
                         </a>
                       ))}
                     </div>
@@ -415,13 +425,9 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selected.nail_photos.map((url) => (
-                        <a key={url} href={signedUrls[url] ?? url} target="_blank" rel="noopener noreferrer">
-                          {signedUrls[url] ? (
-                            <img src={signedUrls[url]} alt="Nail sizing"
-                              className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
-                          ) : (
-                            <div className="aspect-square w-full rounded-xl border border-border bg-muted animate-pulse" />
-                          )}
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Nail sizing"
+                            className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
                         </a>
                       ))}
                     </div>
