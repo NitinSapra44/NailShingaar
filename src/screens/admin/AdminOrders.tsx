@@ -70,10 +70,17 @@ const getStyleNotes = (order: Order): string => {
 // so the URLs stored on the order — built with getPublicUrl() at upload
 // time — don't actually resolve; they need to be swapped for short-lived
 // signed URLs, generated per-viewer under the admin's own RLS access.
-const pathFromStoredUrl = (url: string, bucket: string): string | null => {
-  const marker = `/object/public/${bucket}/`;
-  const idx = url.indexOf(marker);
-  return idx === -1 ? null : decodeURIComponent(url.slice(idx + marker.length));
+// product-images is public and needs no signing — order_items.product_image
+// normally points there, EXCEPT on custom-design orders, where it's set to
+// one of the customer's uploaded design photos (nail-photos, private).
+const PRIVATE_BUCKETS = ['nail-photos', 'payment-screenshots'];
+const privateBucketPathFromUrl = (url: string): { bucket: string; path: string } | null => {
+  for (const bucket of PRIVATE_BUCKETS) {
+    const marker = `/object/public/${bucket}/`;
+    const idx = url.indexOf(marker);
+    if (idx !== -1) return { bucket, path: decodeURIComponent(url.slice(idx + marker.length)) };
+  }
+  return null;
 };
 
 export const AdminOrders = () => {
@@ -167,18 +174,19 @@ export const AdminOrders = () => {
     setSelectedOrder(order);
     setTrackingInput(order.tracking_number ?? '');
 
-    const targets: { url: string; bucket: string }[] = [
-      ...(order.nail_photos ?? []).map((url) => ({ url, bucket: 'nail-photos' })),
-      ...getDesignPhotos(order).map((url) => ({ url, bucket: 'nail-photos' })),
-      ...(order.payment_screenshot ? [{ url: order.payment_screenshot, bucket: 'payment-screenshots' }] : []),
+    const candidateUrls: string[] = [
+      ...(order.nail_photos ?? []),
+      ...getDesignPhotos(order),
+      ...(order.payment_screenshot ? [order.payment_screenshot] : []),
+      ...(order.items ?? []).map((item) => item.product_image).filter((u): u is string => !!u),
     ];
-    if (targets.length === 0) return;
+    if (candidateUrls.length === 0) return;
 
     Promise.all(
-      targets.map(async ({ url, bucket }) => {
-        const path = pathFromStoredUrl(url, bucket);
-        if (!path) return null;
-        const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+      candidateUrls.map(async (url) => {
+        const resolved = privateBucketPathFromUrl(url);
+        if (!resolved) return null;
+        const { data } = await supabase.storage.from(resolved.bucket).createSignedUrl(resolved.path, 3600);
         return data?.signedUrl ? ([url, data.signedUrl] as const) : null;
       })
     ).then((resolved) => {
@@ -398,13 +406,16 @@ export const AdminOrders = () => {
                   <div>
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Products Ordered</p>
                     <div className="space-y-2">
-                      {selectedOrder.items.map((item) => (
+                      {selectedOrder.items.map((item) => {
+                        const isPrivate = item.product_image ? privateBucketPathFromUrl(item.product_image) : null;
+                        const src = item.product_image && (isPrivate ? signedUrls[item.product_image] : item.product_image);
+                        return (
                         <div key={item.id} className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2">
-                          {item.product_image ? (
-                            <img src={item.product_image} alt={item.product_name}
+                          {src ? (
+                            <img src={src} alt={item.product_name}
                               className="h-14 w-14 object-cover rounded-lg border border-border shrink-0" />
                           ) : (
-                            <div className="h-14 w-14 rounded-lg border border-border bg-muted shrink-0" />
+                            <div className={`h-14 w-14 rounded-lg border border-border bg-muted shrink-0 ${isPrivate ? 'animate-pulse' : ''}`} />
                           )}
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{item.product_name}</p>
@@ -412,7 +423,8 @@ export const AdminOrders = () => {
                           </div>
                           <p className="text-sm font-semibold shrink-0">₹{item.price}</p>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
