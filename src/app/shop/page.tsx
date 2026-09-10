@@ -13,7 +13,6 @@ import {
   Pagination, PaginationContent, PaginationItem, PaginationLink,
   PaginationNext, PaginationPrevious, PaginationEllipsis,
 } from '@/components/ui/pagination';
-import { supabase } from '@/integrations/supabase/client';
 import { Product, Category } from '@/types';
 
 const PAGE_SIZE = 12;
@@ -40,43 +39,19 @@ function ShopContent() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data: categoriesData } = await supabase.from('categories').select('*');
+        const categoriesData = await fetch('/api/categories').then((r) => r.json());
         setCategories(categoriesData || []);
 
-        let filteredProductIds: string[] | null = null;
-        if (selectedCategories.length > 0) {
-          const { data: junctionRows } = await (supabase as any)
-            .from('product_categories')
-            .select('product_id')
-            .in('category_id', selectedCategories);
-          filteredProductIds = ((junctionRows ?? []) as { product_id: string }[]).map((r) => r.product_id);
-        }
+        const params = new URLSearchParams({
+          sort: sortBy,
+          page: String(page),
+          pageSize: String(PAGE_SIZE),
+        });
+        if (searchQuery) params.set('search', searchQuery);
+        if (featuredOnly) params.set('featured', 'true');
+        if (selectedCategories.length > 0) params.set('categoryIds', selectedCategories.join(','));
 
-        let query = supabase.from('products').select('*', { count: 'exact' });
-        if (searchQuery) query = query.ilike('name', `%${searchQuery}%`);
-        if (featuredOnly) query = query.eq('is_featured', true);
-        if (filteredProductIds !== null) {
-          if (filteredProductIds.length === 0) {
-            setProducts([]);
-            setTotalCount(0);
-            setLoading(false);
-            return;
-          }
-          query = query.in('id', filteredProductIds);
-        }
-
-        switch (sortBy) {
-          case 'price-low': query = query.order('price', { ascending: true }); break;
-          case 'price-high': query = query.order('price', { ascending: false }); break;
-          case 'name': query = query.order('name', { ascending: true }); break;
-          default: query = query.order('created_at', { ascending: false });
-        }
-
-        const from = (page - 1) * PAGE_SIZE;
-        query = query.range(from, from + PAGE_SIZE - 1);
-
-        const { data: productsData, error, count } = await query;
-        if (error) throw error;
+        const { data: productsData, count } = await fetch(`/api/products?${params}`).then((r) => r.json());
         setProducts(productsData || []);
         setTotalCount(count ?? 0);
       } catch (error) {

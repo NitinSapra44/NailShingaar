@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/products/ProductCard';
-import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 
 const FeaturedProducts = () => {
@@ -15,13 +14,8 @@ const FeaturedProducts = () => {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('is_featured', true)
-          .limit(4);
-
-        if (error) throw error;
+        const res = await fetch('/api/products?featured=true&pageSize=4&page=1');
+        const { data } = await res.json();
         setProducts(data || []);
       } catch (error) {
         console.error('Error fetching featured products:', error);

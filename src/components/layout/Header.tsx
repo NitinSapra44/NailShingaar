@@ -11,7 +11,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
-import { supabase } from '@/integrations/supabase/client';
 import type { Category } from '@/types';
 
 const Header = () => {
@@ -31,9 +30,9 @@ const Header = () => {
   if (user) accountHref = isAdmin ? '/admin' : '/orders';
 
   useEffect(() => {
-    supabase.from('categories').select('*').order('name').then(({ data }) => {
-      setCategories(data ?? []);
-    });
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => setCategories(data ?? []));
   }, []);
 
   useEffect(() => {

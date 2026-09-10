@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { Category } from '@/types';
 
 // Fallback nail images mapped by category slug
@@ -34,9 +33,9 @@ const CategoriesSection = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase.from('categories').select('*').limit(7);
-        if (error) throw error;
-        setCategories(data || []);
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        setCategories((data ?? []).slice(0, 7));
       } catch {
         // silently ignore
       } finally {

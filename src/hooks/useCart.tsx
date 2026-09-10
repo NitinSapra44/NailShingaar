@@ -1,5 +1,4 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { CartItem, Product } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -38,14 +37,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         // Fetch product details for local cart
         const productIds = parsed.map(item => item.productId);
         if (productIds.length > 0) {
-          const { data: products } = await supabase
-            .from('products')
-            .select('*')
-            .in('id', productIds);
-          
+          const { data: products } = await fetch(`/api/products?ids=${productIds.join(',')}`).then((r) => r.json());
+
           const itemsWithProducts = parsed.map(item => ({
             ...item,
-            product: products?.find(p => p.id === item.productId)
+            product: products?.find((p: Product) => p.id === item.productId)
           }));
           setItems(itemsWithProducts);
         }
@@ -55,15 +51,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .select(`
-          *,
-          product:products(*)
-        `)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const res = await fetch('/api/cart');
+      if (!res.ok) throw new Error('Failed to fetch cart');
+      const data = await res.json();
       setItems(data || []);
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -96,18 +86,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('cart_items')
-        .upsert({
-          user_id: user.id,
-          product_id: productId,
-          size,
-          quantity
-        }, {
-          onConflict: 'user_id,product_id,size'
-        });
-
-      if (error) throw error;
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, size, quantity }),
+      });
+      if (!res.ok) throw new Error('Failed to add to cart');
       await fetchCart();
       toast({ title: 'Added to cart!', description: 'Item has been added to your cart.' });
     } catch (error) {
@@ -128,14 +112,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .eq('size', size);
-
-      if (error) throw error;
+      const res = await fetch(`/api/cart?product_id=${productId}&size=${encodeURIComponent(size)}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to remove from cart');
       await fetchCart();
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -162,14 +142,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('cart_items')
-        .update({ quantity })
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .eq('size', size);
-
-      if (error) throw error;
+      const res = await fetch('/api/cart', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, size, quantity }),
+      });
+      if (!res.ok) throw new Error('Failed to update quantity');
       await fetchCart();
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -184,12 +162,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const res = await fetch('/api/cart', { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to clear cart');
       setItems([]);
     } catch (error) {
       console.error('Error clearing cart:', error);

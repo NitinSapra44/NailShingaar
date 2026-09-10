@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Post {
   id: string;
@@ -19,14 +18,9 @@ const BlogSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any)
-      .from('blog_posts')
-      .select('id, title, slug, excerpt, cover_image_url, created_at')
-      .eq('published', true)
-      .order('created_at', { ascending: false })
-      .limit(3)
-      .then(({ data }: { data: Post[] | null }) => {
+    fetch('/api/blog?published=true&limit=3')
+      .then((res) => res.json())
+      .then((data: Post[]) => {
         setPosts(data || []);
         setLoading(false);
       });

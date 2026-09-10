@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
-import { supabase } from '@/integrations/supabase/client';
 import { Category } from '@/types';
 
 export default function CategoriesPage() {
@@ -12,8 +11,9 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from('categories').select('*').order('name')
-      .then(({ data }) => { setCategories(data || []); setLoading(false); });
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => { setCategories(data || []); setLoading(false); });
   }, []);
 
   return (

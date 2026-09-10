@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,28 +51,12 @@ const getStyleNotes = (order: Order): string => {
   try { return JSON.parse(order.notes ?? '{}').style_notes ?? ''; } catch { return ''; }
 };
 
-// nail-photos is a private bucket (customer PII), so the URLs stored on the
-// order — built with getPublicUrl() at upload time — don't actually
-// resolve; they need to be swapped for short-lived signed URLs, generated
-// per-viewer under the admin's own RLS access.
-const pathFromStoredUrl = (url: string, bucket: string): string | null => {
-  const marker = `/object/public/${bucket}/`;
-  const idx = url.indexOf(marker);
-  return idx === -1 ? null : decodeURIComponent(url.slice(idx + marker.length));
-};
-
-// signedUrls[url] is undefined while signing is in flight, 'error' if
-// createSignedUrl failed (see console for why), or the working URL.
-function SignedThumb({ signed, alt, className }: { signed?: string; alt: string; className: string }) {
-  if (signed === 'error') {
-    return (
-      <div className={`${className} bg-muted flex items-center justify-center text-center px-1`}>
-        <span className="text-[9px] text-muted-foreground leading-tight">Failed to load</span>
-      </div>
-    );
-  }
-  if (!signed) return <div className={`${className} bg-muted animate-pulse`} />;
-  return <img src={signed} alt={alt} className={className} />;
+// Cloudinary delivery URLs are public by default (unlike Supabase's
+// private nail-photos bucket), so photos render directly with no
+// per-viewer signing step.
+function Thumb({ url, alt, className }: { url?: string; alt: string; className: string }) {
+  if (!url) return <div className={`${className} bg-muted`} />;
+  return <img src={url} alt={alt} className={className} />;
 }
 
 export const AdminEnquiries = () => {
@@ -83,55 +66,35 @@ export const AdminEnquiries = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [priceInput, setPriceInput] = useState('');
   const [trackingInput, setTrackingInput] = useState('');
-  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => { fetchEnquiries(); }, []);
 
   const fetchEnquiries = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      const customOnly = (data ?? []).filter((o) => {
-        try { return JSON.parse((o as Order).notes ?? '{}').type === 'custom_design'; } catch { return false; }
-      }) as Order[];
+    try {
+      const res = await fetch('/api/orders?all=true');
+      if (!res.ok) throw new Error('Failed to load enquiries');
+      const data: Order[] = await res.json();
+      const customOnly = data.filter((o) => {
+        try { return JSON.parse(o.notes ?? '{}').type === 'custom_design'; } catch { return false; }
+      });
       setEnquiries(customOnly);
-
-      const urls = customOnly.flatMap((o) => [...getDesignPhotos(o), ...(o.nail_photos ?? [])]);
-      if (urls.length > 0) {
-        Promise.all(
-          urls.map(async (url) => {
-            const path = pathFromStoredUrl(url, 'nail-photos');
-            if (!path) return null;
-            const { data: signed, error } = await supabase.storage.from('nail-photos').createSignedUrl(path, 3600);
-            if (error) {
-              console.error(`[enquiry photos] sign failed for nail-photos/${path}:`, error.message, url);
-              return [url, 'error'] as const;
-            }
-            return [url, signed.signedUrl] as const;
-          })
-        ).then((resolved) => {
-          setSignedUrls((prev) => {
-            const next = { ...prev };
-            for (const entry of resolved) if (entry) next[entry[0]] = entry[1];
-            return next;
-          });
-        });
-      }
+    } catch (err) {
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to load enquiries', variant: 'destructive' });
     }
     setLoading(false);
   };
 
   const updateStatus = async (id: string, status: OrderStatus) => {
     setUpdatingId(id);
-    const { error } = await supabase.from('orders').update({ status }).eq('id', id);
-    if (error) {
-      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    const res = await fetch(`/api/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      toast({ title: 'Update failed', variant: 'destructive' });
     } else {
       setEnquiries((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
       if (selected?.id === id) setSelected((prev) => prev ? { ...prev, status } : prev);
@@ -147,9 +110,13 @@ export const AdminEnquiries = () => {
       return;
     }
     setUpdatingId(id);
-    const { error } = await supabase.from('orders').update({ total: price, payment_status: 'pending' }).eq('id', id);
-    if (error) {
-      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    const res = await fetch(`/api/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ total: price, payment_status: 'pending' }),
+    });
+    if (!res.ok) {
+      toast({ title: 'Update failed', variant: 'destructive' });
     } else {
       setEnquiries((prev) => prev.map((o) => o.id === id ? { ...o, total: price } : o));
       if (selected?.id === id) setSelected((prev) => prev ? { ...prev, total: price } : prev);
@@ -160,12 +127,13 @@ export const AdminEnquiries = () => {
 
   const confirmPayment = async (id: string) => {
     setUpdatingId(id);
-    const { error } = await supabase
-      .from('orders')
-      .update({ payment_status: 'confirmed', status: 'confirmed' })
-      .eq('id', id);
-    if (error) {
-      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    const res = await fetch(`/api/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payment_status: 'confirmed', status: 'confirmed' }),
+    });
+    if (!res.ok) {
+      toast({ title: 'Update failed', variant: 'destructive' });
     } else {
       setEnquiries((prev) => prev.map((o) => o.id === id ? { ...o, payment_status: 'confirmed', status: 'confirmed' } : o));
       if (selected?.id === id) setSelected((prev) => prev ? { ...prev, payment_status: 'confirmed', status: 'confirmed' } : prev);
@@ -177,12 +145,13 @@ export const AdminEnquiries = () => {
   const saveTracking = async (id: string) => {
     if (!trackingInput.trim()) return;
     setUpdatingId(id);
-    const { error } = await supabase
-      .from('orders')
-      .update({ tracking_number: trackingInput.trim(), status: 'shipped' })
-      .eq('id', id);
-    if (error) {
-      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    const res = await fetch(`/api/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tracking_number: trackingInput.trim(), status: 'shipped' }),
+    });
+    if (!res.ok) {
+      toast({ title: 'Update failed', variant: 'destructive' });
     } else {
       setEnquiries((prev) => prev.map((o) => o.id === id ? { ...o, tracking_number: trackingInput.trim(), status: 'shipped' } : o));
       if (selected?.id === id) setSelected((prev) => prev ? { ...prev, tracking_number: trackingInput.trim(), status: 'shipped' } : prev);
@@ -261,8 +230,8 @@ export const AdminEnquiries = () => {
                       {designPhotos.length > 0 ? (
                         <div className="flex gap-2 flex-wrap">
                           {designPhotos.slice(0, 4).map((url, i) => (
-                            <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
-                              <SignedThumb signed={signedUrls[url]} alt={`Design ${i + 1}`}
+                            <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                              <Thumb url={url} alt={`Design ${i + 1}`}
                                 className="w-16 h-16 rounded-xl object-cover border border-border hover:opacity-80 transition-opacity" />
                             </a>
                           ))}
@@ -402,8 +371,8 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selected).map((url) => (
-                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
-                          <SignedThumb signed={signedUrls[url]} alt="Design reference"
+                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                          <Thumb url={url} alt="Design reference"
                             className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
                         </a>
                       ))}
@@ -425,8 +394,8 @@ export const AdminEnquiries = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selected.nail_photos.map((url) => (
-                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
-                          <SignedThumb signed={signedUrls[url]} alt="Nail sizing"
+                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                          <Thumb url={url} alt="Nail sizing"
                             className="aspect-square w-full object-cover rounded-xl border border-border hover:opacity-80 transition-opacity" />
                         </a>
                       ))}

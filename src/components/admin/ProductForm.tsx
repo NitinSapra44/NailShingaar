@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -63,12 +62,13 @@ async function compressImage(file: File): Promise<File> {
 
 async function uploadToStorage(file: File): Promise<string> {
   const compressed = await compressImage(file);
-  const ext = compressed.name.split('.').pop() ?? 'jpg';
-  const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { error } = await supabase.storage.from('product-images').upload(path, compressed, { upsert: false });
-  if (error) throw error;
-  const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-  return data.publicUrl;
+  const formData = new FormData();
+  formData.append('file', compressed);
+  formData.append('folder', 'product-images');
+  const res = await fetch('/api/upload', { method: 'POST', body: formData });
+  if (!res.ok) throw new Error('Upload failed');
+  const { url } = await res.json();
+  return url;
 }
 
 export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) => {
@@ -97,18 +97,14 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
   const videoFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    supabase.from('categories').select('*').order('name').then(({ data }) => {
-      setCategories(data ?? []);
-    });
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => setCategories(data ?? []));
 
     if (product) {
-      (supabase as any)
-        .from('product_categories')
-        .select('category_id')
-        .eq('product_id', product.id)
-        .then(({ data }: { data: { category_id: string }[] | null }) => {
-          setSelectedCategories((data ?? []).map((r) => r.category_id));
-        });
+      fetch(`/api/products/${product.id}/categories`)
+        .then((res) => res.json())
+        .then((categoryIds: string[]) => setSelectedCategories(categoryIds ?? []));
     }
   }, [product]);
 
@@ -153,11 +149,13 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
     setUploadingVideo(true);
     try {
       const urls = await Promise.all(files.map(async (file) => {
-        const ext = file.name.split('.').pop() ?? 'mp4';
-        const path = `products/videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: false });
-        if (error) throw error;
-        return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', 'product-images');
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Video upload failed');
+        const { url } = await res.json();
+        return url;
       }));
       setVideos((prev) => [...prev, ...urls]);
     } catch (err: unknown) {
@@ -203,28 +201,25 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
         videos,
         is_featured: isFeatured,
         is_new: isNew,
-        category_id: selectedCategories[0] ?? null,
+        category_ids: selectedCategories,
       };
 
-      let productId: string;
-
       if (product) {
-        const { error } = await supabase.from('products').update(productData).eq('id', product.id);
-        if (error) throw error;
-        productId = product.id;
+        const res = await fetch(`/api/products/${product.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        if (!res.ok) throw new Error('Failed to update product');
         toast.success('Product updated!');
       } else {
-        const { data, error } = await supabase.from('products').insert(productData).select().single();
-        if (error) throw error;
-        productId = data.id;
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        if (!res.ok) throw new Error('Failed to create product');
         toast.success('Product created!');
-      }
-
-      await (supabase as any).from('product_categories').delete().eq('product_id', productId);
-      if (selectedCategories.length > 0) {
-        await (supabase as any).from('product_categories').insert(
-          selectedCategories.map((category_id) => ({ product_id: productId, category_id }))
-        );
       }
 
       onSuccess();

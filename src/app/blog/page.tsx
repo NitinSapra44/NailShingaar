@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { desc, eq } from 'drizzle-orm';
+import { db } from '@/lib/db/client';
+import { blogPosts } from '@/lib/db/schema';
 import Layout from '@/components/layout/Layout';
 import type { Metadata } from 'next';
 
@@ -9,17 +11,24 @@ export const metadata: Metadata = {
   description: 'Read our latest nail care tips, press-on nail tutorials, and bridal nail trends from Nail Shingaar by Reet.',
 };
 
+// Queries Postgres directly (server component) — render per-request rather
+// than at build time, since build environments won't always have DATABASE_URL
+// access and blog content changes without a redeploy.
+export const dynamic = 'force-dynamic';
+
 async function getPosts() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  const { data } = await supabase
-    .from('blog_posts')
-    .select('id, title, slug, excerpt, cover_image_url, created_at')
-    .eq('published', true)
-    .order('created_at', { ascending: false });
-  return data || [];
+  return db
+    .select({
+      id: blogPosts.id,
+      title: blogPosts.title,
+      slug: blogPosts.slug,
+      excerpt: blogPosts.excerpt,
+      cover_image_url: blogPosts.coverImageUrl,
+      created_at: blogPosts.createdAt,
+    })
+    .from(blogPosts)
+    .where(eq(blogPosts.published, true))
+    .orderBy(desc(blogPosts.createdAt));
 }
 
 export default async function BlogPage() {

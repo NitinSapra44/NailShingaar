@@ -6,7 +6,6 @@ import { Upload, X, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { Order } from '@/types';
@@ -26,9 +25,10 @@ export default function PayPage() {
 
   useEffect(() => {
     if (!orderId) return;
-    supabase.from('orders').select('*').eq('id', orderId).single()
-      .then(({ data, error }) => {
-        if (error || !data) { router.replace('/orders'); return; }
+    fetch(`/api/orders/${orderId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) { router.replace('/orders'); return; }
         const o = data as Order;
         // Guard: only allow access if payment is still pending
         if (o.payment_status !== 'pending') { router.replace('/orders'); return; }
@@ -67,21 +67,20 @@ export default function PayPage() {
     if (!user || !order) return;
     setSubmitting(true);
     try {
-      const ts = Date.now();
       const compressed = await compressImage(screenshot);
-      const path = `${user.id}/${ts}_payment.jpg`;
-      const { error: uploadError } = await supabase.storage
-        .from('payment-screenshots')
-        .upload(path, compressed, { upsert: true, contentType: 'image/jpeg' });
-      if (uploadError) throw new Error(uploadError.message);
+      const formData = new FormData();
+      formData.append('file', compressed);
+      formData.append('folder', 'payment-screenshots');
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!uploadRes.ok) throw new Error('Upload failed');
+      const { url: screenshotUrl } = await uploadRes.json();
 
-      const screenshotUrl = supabase.storage.from('payment-screenshots').getPublicUrl(path).data.publicUrl;
-
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({ payment_screenshot: screenshotUrl, payment_status: 'screenshot_uploaded' })
-        .eq('id', order.id);
-      if (updateError) throw new Error(updateError.message);
+      const updateRes = await fetch(`/api/orders/${order.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_screenshot: screenshotUrl, payment_status: 'screenshot_uploaded' }),
+      });
+      if (!updateRes.ok) throw new Error('Failed to update order');
 
       toast({ title: 'Payment screenshot submitted!', description: 'Reet will confirm your payment and start crafting.' });
       router.replace('/orders');

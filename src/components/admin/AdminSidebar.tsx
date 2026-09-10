@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Package, FolderOpen, ShoppingCart, ArrowLeft, LogOut, Sparkles, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 
 const menuItems = [
   { title: 'Dashboard',  url: '/admin',              icon: LayoutDashboard },
@@ -26,12 +25,15 @@ export const AdminSidebar = ({ onClose }: AdminSidebarProps) => {
   const [pendingEnquiries, setPendingEnquiries] = useState(0);
 
   useEffect(() => {
-    supabase.from('orders').select('id, notes, status').eq('status', 'pending').then(({ data }) => {
-      const count = (data ?? []).filter((o) => {
-        try { return JSON.parse((o.notes as string) ?? '{}').type === 'custom_design'; } catch { return false; }
-      }).length;
-      setPendingEnquiries(count);
-    });
+    fetch('/api/orders?all=true')
+      .then((res) => res.json())
+      .then((data) => {
+        const count = (data ?? []).filter((o: { status: string; notes: string | null }) => {
+          if (o.status !== 'pending') return false;
+          try { return JSON.parse(o.notes ?? '{}').type === 'custom_design'; } catch { return false; }
+        }).length;
+        setPendingEnquiries(count);
+      });
   }, []);
 
   const linkCls = (url: string) => cn(

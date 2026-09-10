@@ -6,7 +6,6 @@ import { Package, Clock, CheckCircle2, Truck, Star, ArrowRight, ChevronDown, Che
 import Layout from '@/components/layout/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import type { Order, OrderStatus, PaymentStatus } from '@/types';
@@ -149,8 +148,9 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-      .then(({ data }) => { setOrders((data ?? []) as Order[]); setLoading(false); });
+    fetch('/api/orders')
+      .then((res) => res.json())
+      .then((data) => { setOrders((data ?? []) as Order[]); setLoading(false); });
   }, [user]);
 
   if (authLoading || loading) {

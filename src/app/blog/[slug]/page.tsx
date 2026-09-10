@@ -1,45 +1,46 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { and, eq } from 'drizzle-orm';
+import { db } from '@/lib/db/client';
+import { blogPosts } from '@/lib/db/schema';
 import Layout from '@/components/layout/Layout';
 import type { Metadata } from 'next';
 
-const serverClient = () => createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Queries Postgres directly (server component) — render per-request rather
+// than at build time, since build environments won't always have DATABASE_URL
+// access and blog content changes without a redeploy.
+export const dynamic = 'force-dynamic';
+
+async function getPublishedPost(slug: string) {
+  const [row] = await db
+    .select()
+    .from(blogPosts)
+    .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
+    .limit(1);
+  return row ?? null;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const { data } = await serverClient()
-    .from('blog_posts')
-    .select('title, meta_description, cover_image_url')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single();
+  const data = await getPublishedPost(slug);
 
   if (!data) return { title: 'Post Not Found | Nail Shingaar' };
 
   return {
     title: `${data.title} | Nail Shingaar by Reet`,
-    description: data.meta_description || data.title,
+    description: data.metaDescription || data.title,
     openGraph: {
       title: data.title,
-      description: data.meta_description || '',
-      images: data.cover_image_url ? [{ url: data.cover_image_url }] : [],
+      description: data.metaDescription || '',
+      images: data.coverImageUrl ? [{ url: data.coverImageUrl }] : [],
     },
   };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data: post } = await serverClient()
-    .from('blog_posts')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single();
+  const post = await getPublishedPost(slug);
 
   if (!post) notFound();
 
@@ -54,15 +55,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </Link>
 
         {/* Cover image */}
-        {post.cover_image_url && (
+        {post.coverImageUrl && (
           <div className="aspect-[3/2] rounded-2xl overflow-hidden mb-8 shadow-soft">
-            <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover" />
+            <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
           </div>
         )}
 
         {/* Meta */}
         <p className="text-xs text-muted-foreground tracking-[0.2em] uppercase mb-3">
-          {new Date(post.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          {post.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
 
         {/* Title */}

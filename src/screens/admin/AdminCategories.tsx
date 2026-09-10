@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,29 +85,25 @@ export const AdminCategories = () => {
 
   const fetchCategories = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-
-    if (error) {
+    try {
+      const res = await fetch('/api/categories');
+      if (!res.ok) throw new Error('Failed to load categories');
+      setCategories(await res.json());
+    } catch (error) {
       console.error('Error fetching categories:', error);
       toast.error('Failed to load categories');
-    } else {
-      setCategories(data || []);
     }
     setLoading(false);
   };
 
   const uploadCategoryImage = async (file: File): Promise<string> => {
-    const ext = file.name.split('.').pop();
-    const path = `categories/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from('product-images')
-      .upload(path, file, { upsert: true });
-    if (error) throw error;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-    return data.publicUrl;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'product-images');
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Image upload failed');
+    const { url } = await res.json();
+    return url;
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,19 +138,20 @@ export const AdminCategories = () => {
       };
 
       if (editingCategory) {
-        const { error } = await supabase
-          .from('categories')
-          .update(categoryData)
-          .eq('id', editingCategory.id);
-
-        if (error) throw error;
+        const res = await fetch(`/api/categories/${editingCategory.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryData),
+        });
+        if (!res.ok) throw new Error('Failed to update category');
         toast.success('Category updated successfully!');
       } else {
-        const { error } = await supabase
-          .from('categories')
-          .insert([categoryData]);
-
-        if (error) throw error;
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryData),
+        });
+        if (!res.ok) throw new Error('Failed to create category');
         toast.success('Category created successfully!');
       }
       
@@ -174,12 +170,8 @@ export const AdminCategories = () => {
     if (!deleteCategory) return;
 
     try {
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', deleteCategory.id);
-
-      if (error) throw error;
+      const res = await fetch(`/api/categories/${deleteCategory.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete category');
       toast.success('Category deleted successfully');
       fetchCategories();
     } catch (error: any) {

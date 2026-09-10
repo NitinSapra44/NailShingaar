@@ -1,5 +1,4 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { Product } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -32,14 +31,11 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
       if (localWishlist) {
         const productIds = JSON.parse(localWishlist) as string[];
         if (productIds.length > 0) {
-          const { data: products } = await supabase
-            .from('products')
-            .select('*')
-            .in('id', productIds);
+          const { data: products } = await fetch(`/api/products?ids=${productIds.join(',')}`).then((r) => r.json());
 
           setItems(productIds.map((productId) => ({
             productId,
-            product: products?.find((p) => p.id === productId),
+            product: products?.find((p: Product) => p.id === productId),
           })));
         } else {
           setItems([]);
@@ -52,15 +48,9 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('wishlist')
-        .select(`
-          product_id,
-          product:products(*)
-        `)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const res = await fetch('/api/wishlist');
+      if (!res.ok) throw new Error('Failed to fetch wishlist');
+      const data: { product_id: string; product?: Product }[] = await res.json();
       setItems((data || []).map((row) => ({ productId: row.product_id, product: row.product ?? undefined })));
     } catch (error) {
       console.error('Error fetching wishlist:', error);
@@ -88,11 +78,12 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('wishlist')
-        .upsert({ user_id: user.id, product_id: productId }, { onConflict: 'user_id,product_id' });
-
-      if (error) throw error;
+      const res = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId }),
+      });
+      if (!res.ok) throw new Error('Failed to add to wishlist');
       await fetchWishlist();
       toast({ title: 'Added to wishlist!', description: 'Item has been added to your wishlist.' });
     } catch (error) {
@@ -111,13 +102,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('wishlist')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', productId);
-
-      if (error) throw error;
+      const res = await fetch(`/api/wishlist?product_id=${productId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to remove from wishlist');
       await fetchWishlist();
     } catch (error) {
       console.error('Error removing from wishlist:', error);

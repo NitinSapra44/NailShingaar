@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { Product, Category } from '@/types';
 
 export default function CategoryDetailPage() {
@@ -19,17 +18,11 @@ export default function CategoryDetailPage() {
     const fetchData = async () => {
       if (!slug) return;
       try {
-        const { data: categoryData } = await supabase.from('categories').select('*').eq('slug', slug).maybeSingle();
+        const categoryData: Category | null = await fetch(`/api/categories/by-slug/${slug}`).then((r) => r.json());
         setCategory(categoryData);
         if (categoryData) {
-          const { data: junctionRows } = await (supabase as any)
-            .from('product_categories').select('product_id').eq('category_id', categoryData.id);
-          const productIds = ((junctionRows ?? []) as { product_id: string }[]).map((r) => r.product_id);
-          if (productIds.length > 0) {
-            const { data: productsData } = await supabase
-              .from('products').select('*').in('id', productIds).order('created_at', { ascending: false });
-            setProducts(productsData || []);
-          }
+          const { data: productsData } = await fetch(`/api/products?categoryIds=${categoryData.id}`).then((r) => r.json());
+          setProducts(productsData || []);
         }
       } catch (error) {
         console.error('Error fetching category:', error);

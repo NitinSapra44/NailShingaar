@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { NailQuestionnaire, ShippingDetails } from '@/types';
 
@@ -159,12 +158,15 @@ export default function CustomOrderPage() {
       img.src = URL.createObjectURL(file);
     });
 
-  const uploadFile = async (bucket: string, file: File, path: string): Promise<string> => {
+  const uploadFile = async (folder: 'nail-photos' | 'payment-screenshots', file: File): Promise<string> => {
     const compressed = file.type.startsWith('image/') ? await compressImage(file) : file;
-    const finalPath = path.replace(/\.\w+$/, '.jpg');
-    const { error } = await supabase.storage.from(bucket).upload(finalPath, compressed, { upsert: true, contentType: 'image/jpeg' });
-    if (error) throw new Error(error.message);
-    return supabase.storage.from(bucket).getPublicUrl(finalPath).data.publicUrl;
+    const formData = new FormData();
+    formData.append('file', compressed);
+    formData.append('folder', folder);
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    const { url } = await res.json();
+    return url;
   };
 
   const handleSubmitEnquiry = async () => {
@@ -172,55 +174,53 @@ export default function CustomOrderPage() {
     if (!user) { router.push('/auth?redirect=/custom-order'); return; }
     setSubmitting(true);
     try {
-      const ts = Date.now();
-
       const designPhotoUrls: string[] = [];
-      for (let i = 0; i < designPhotos.length; i++) {
-        const file = designPhotos[i];
-        designPhotoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_design_${i}.${file.name.split('.').pop()}`));
+      for (const file of designPhotos) {
+        designPhotoUrls.push(await uploadFile('nail-photos', file));
       }
 
       const nailPhotoUrls: string[] = [];
       for (const slot of REQUIRED_SLOTS) {
         const file = nailPhotos[slot.key];
-        if (file) nailPhotoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_${slot.key}.${file.name.split('.').pop()}`));
+        if (file) nailPhotoUrls.push(await uploadFile('nail-photos', file));
       }
-      for (let i = 0; i < extraPhotos.length; i++) {
-        const file = extraPhotos[i];
-        nailPhotoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_extra_${i}.${file.name.split('.').pop()}`));
+      for (const file of extraPhotos) {
+        nailPhotoUrls.push(await uploadFile('nail-photos', file));
       }
 
-      const { data: order, error: orderError } = await supabase.from('orders').insert({
-        user_id: user.id,
-        status: 'pending',
-        total: 0,
-        shipping_name: shipping.full_name,
-        shipping_phone: shipping.phone,
-        shipping_address: `${shipping.address}, ${shipping.pincode}`,
-        shipping_city: shipping.city,
-        nail_length: questionnaire.nail_length,
-        nail_shape: questionnaire.nail_shape,
-        color_preference: questionnaire.color_preference || null,
-        nail_photos: nailPhotoUrls,
-        payment_status: 'pending',
-        notes: JSON.stringify({
-          type: 'custom_design',
-          style_notes: styleNotes || null,
-          design_photos: designPhotoUrls,
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order: {
+            total: 0,
+            shipping_name: shipping.full_name,
+            shipping_phone: shipping.phone,
+            shipping_address: `${shipping.address}, ${shipping.pincode}`,
+            shipping_city: shipping.city,
+            nail_length: questionnaire.nail_length,
+            nail_shape: questionnaire.nail_shape,
+            color_preference: questionnaire.color_preference || null,
+            nail_photos: nailPhotoUrls,
+            payment_status: 'pending',
+            notes: JSON.stringify({
+              type: 'custom_design',
+              style_notes: styleNotes || null,
+              design_photos: designPhotoUrls,
+            }),
+          },
+          items: [{
+            product_id: null,
+            product_name: 'Custom Design — Press-On Nails',
+            product_image: designPhotoUrls[0] ?? null,
+            size: questionnaire.nail_shape,
+            quantity: 1,
+            price: 0,
+          }],
         }),
-      }).select().single();
-
-      if (orderError) throw new Error(orderError.message);
-
-      await supabase.from('order_items').insert({
-        order_id: order.id,
-        product_id: null,
-        product_name: 'Custom Design — Press-On Nails',
-        product_image: designPhotoUrls[0] ?? null,
-        size: questionnaire.nail_shape,
-        quantity: 1,
-        price: 0,
       });
+      if (!res.ok) throw new Error('Failed to submit enquiry');
+      const order = await res.json();
 
       router.push(`/order-confirmation/${order.id}`);
     } catch (err: unknown) {

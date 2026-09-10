@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,24 +36,17 @@ export const AdminDashboard = () => {
   }, []);
 
   const fetchAll = async () => {
-    const [productsRes, categoriesRes, ordersRes, recentRes] = await Promise.all([
-      supabase.from('products').select('id', { count: 'exact', head: true }),
-      supabase.from('categories').select('id', { count: 'exact', head: true }),
-      supabase.from('orders').select('total'),
-      supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(8),
-    ]);
+    const res = await fetch('/api/admin/dashboard');
+    const data = await res.json();
 
-    const allOrders = (ordersRes.data ?? []) as Order[];
-    const revenue = allOrders.reduce((sum, o) => sum + Number(o.total), 0);
-
-    const recent = (recentRes.data ?? []) as Order[];
+    const recent = (data.recentOrders ?? []) as Order[];
     setRecentOrders(recent);
     setAwaitingPayment(recent.filter((o) => o.payment_status === 'screenshot_uploaded'));
     setStats({
-      products: productsRes.count || 0,
-      categories: categoriesRes.count || 0,
-      orders: ordersRes.data?.length || 0,
-      revenue,
+      products: data.products || 0,
+      categories: data.categories || 0,
+      orders: data.orders || 0,
+      revenue: data.revenue || 0,
     });
     setLoading(false);
   };

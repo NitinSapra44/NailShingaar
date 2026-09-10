@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,10 +61,13 @@ export const AdminBlog = () => {
 
   const fetchPosts = async () => {
     setLoading(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).from('blog_posts').select('*').order('created_at', { ascending: false });
-    if (error) toast.error('Failed to load posts');
-    else setPosts((data as BlogPost[]) || []);
+    try {
+      const res = await fetch('/api/blog');
+      if (!res.ok) throw new Error('Failed to load posts');
+      setPosts((await res.json()) as BlogPost[]);
+    } catch {
+      toast.error('Failed to load posts');
+    }
     setLoading(false);
   };
 
@@ -77,12 +79,13 @@ export const AdminBlog = () => {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    const ext = file.name.split('.').pop();
-    const path = `blog/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: true });
-    if (error) throw error;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-    return data.publicUrl;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'product-images');
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    const { url } = await res.json();
+    return url;
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,18 +118,23 @@ export const AdminBlog = () => {
         cover_image_url: form.cover_image_url || null,
         meta_description: form.meta_description.trim() || null,
         published: form.published,
-        updated_at: new Date().toISOString(),
       };
 
       if (editing) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any).from('blog_posts').update(payload).eq('id', editing.id);
-        if (error) throw error;
+        const res = await fetch(`/api/blog/${editing.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('Failed to update post');
         toast.success('Post updated!');
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any).from('blog_posts').insert([payload]);
-        if (error) throw error;
+        const res = await fetch('/api/blog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('Failed to create post');
         toast.success('Post created!');
       }
       setIsFormOpen(false);
@@ -141,17 +149,19 @@ export const AdminBlog = () => {
 
   const handleDelete = async () => {
     if (!deletePost) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from('blog_posts').delete().eq('id', deletePost.id);
-    if (error) toast.error('Failed to delete post');
+    const res = await fetch(`/api/blog/${deletePost.id}`, { method: 'DELETE' });
+    if (!res.ok) toast.error('Failed to delete post');
     else { toast.success('Post deleted'); fetchPosts(); }
     setDeletePost(null);
   };
 
   const togglePublish = async (post: BlogPost) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from('blog_posts').update({ published: !post.published }).eq('id', post.id);
-    if (error) toast.error('Failed to update');
+    const res = await fetch(`/api/blog/${post.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ published: !post.published }),
+    });
+    if (!res.ok) toast.error('Failed to update');
     else fetchPosts();
   };
 

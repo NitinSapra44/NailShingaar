@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
@@ -16,9 +15,9 @@ const Footer = () => {
   const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
 
   useEffect(() => {
-    supabase.from('categories').select('name, slug').order('name').then(({ data }) => {
-      setCategories(data || []);
-    });
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => setCategories(data || []));
   }, []);
 
   return (
