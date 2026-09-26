@@ -4,97 +4,67 @@
 
 @layer base {
   :root {
-    /* Nail Shingaar — Cerise #C0186A · Ink #251A1E */
-    --background: 336 100% 96%;
-    --foreground: 340 10% 16%;
+    /* ── Brand tokens: "Modern Indian Luxe" ──
+       Stored as HSL channels so Tailwind opacity modifiers work (bg-primary/20). */
+    --color-bg: 26 47% 97%;             /* #FBF7F4 ivory */
+    --color-bg-soft: 8 45% 94%;         /* #F6E9E7 blush */
+    --color-surface: 0 0% 100%;         /* #FFFFFF */
+    --color-text: 333 15% 14%;          /* #2A1F24 */
+    --color-text-muted: 338 7% 45%;     /* #7A6A70 */
+    --color-primary: 333 57% 44%;       /* #B0306A magenta */
+    --color-primary-hover: 333 60% 37%; /* #962558 */
+    --color-primary-soft: 335 58% 93%;  /* #F7E1EA */
+    --color-deep: 345 60% 27%;          /* #6D1B2F maroon */
+    --color-deep-text: 14 62% 96%;      /* #FBF1EE */
+    --color-accent: 36 40% 54%;         /* #B8925A muted gold (rules, icons, badges) */
+    --color-accent-soft: 36 49% 89%;    /* #F1E6D6 */
+    /* #B8925A is only 2.7:1 on ivory, below AA for small text. Gold *text*
+       (eyebrows, dates) uses this darker shade instead: 4.7:1 on ivory. */
+    --color-accent-text: 38 45% 37%;    /* #8A6A35 */
+    --color-border: 0 27% 91%;          /* #EFE3E3 */
+    --color-success: 150 44% 33%;       /* #2F7A55 */
+    --color-success-soft: 148 35% 93%;  /* #E6F3EC */
+    --color-star: 41 54% 54%;           /* #C9A14A */
 
-    --card: 0 0% 100%;
-    --card-foreground: 340 10% 16%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 340 10% 16%;
-
-    --primary: 328 75% 44%;
+    /* ── shadcn/ui variables, mapped onto the brand tokens ── */
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text);
+    --primary: var(--color-primary);
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 328 60% 93%;
-    --secondary-foreground: 328 45% 32%;
-
-    --muted: 336 40% 92%;
-    --muted-foreground: 340 6% 50%;
-
-    --accent: 328 50% 90%;
-    --accent-foreground: 328 45% 28%;
-
-    --destructive: 0 70% 58%;
+    --secondary: var(--color-primary-soft);
+    --secondary-foreground: var(--color-primary-hover);
+    --muted: var(--color-bg-soft);
+    --muted-foreground: var(--color-text-muted);
+    --accent: var(--color-bg-soft);
+    --accent-foreground: var(--color-text);
+    --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-primary);
+    --radius: 1rem;
 
-    --border: 328 30% 88%;
-    --input: 328 30% 88%;
-    --ring: 328 72% 46%;
+    /* Legacy aliases still used across pages; kept pointing at the new palette. */
+    --pink: var(--color-primary);
+    --pink-light: var(--color-primary-soft);
+    --pink-dark: var(--color-primary-hover);
+    --ink: var(--color-text);
+    --ink-light: var(--color-bg);
 
-    --radius: 0.75rem;
-
-    /* Brand tokens */
-    --pink: 328 75% 44%;
-    --pink-light: 328 60% 93%;
-    --pink-dark: 328 68% 33%;
-    --ink: 340 10% 16%;
-    --ink-light: 336 100% 98%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 340 10% 20%;
-    --sidebar-primary: 336 68% 50%;
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-text);
+    --sidebar-primary: var(--color-primary);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 336 50% 94%;
-    --sidebar-accent-foreground: 336 45% 32%;
-    --sidebar-border: 340 10% 90%;
-    --sidebar-ring: 336 68% 50%;
-  }
+    --sidebar-accent: var(--color-primary-soft);
+    --sidebar-accent-foreground: var(--color-primary-hover);
+    --sidebar-border: var(--color-border);
+    --sidebar-ring: var(--color-primary);
 
-  .dark {
-    --background: 340 12% 9%;
-    --foreground: 0 0% 94%;
-
-    --card: 340 12% 12%;
-    --card-foreground: 0 0% 94%;
-
-    --popover: 340 12% 12%;
-    --popover-foreground: 0 0% 94%;
-
-    --primary: 336 68% 58%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 340 15% 20%;
-    --secondary-foreground: 336 40% 85%;
-
-    --muted: 340 10% 18%;
-    --muted-foreground: 340 6% 58%;
-
-    --accent: 336 25% 25%;
-    --accent-foreground: 336 50% 88%;
-
-    --destructive: 0 60% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 340 10% 22%;
-    --input: 340 10% 22%;
-    --ring: 336 68% 58%;
-
-    --pink: 336 68% 58%;
-    --pink-light: 336 30% 22%;
-    --pink-dark: 336 65% 46%;
-    --ink: 0 0% 94%;
-    --ink-light: 340 10% 18%;
-
-    --sidebar-background: 340 12% 9%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 336 68% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 340 15% 20%;
-    --sidebar-accent-foreground: 336 40% 85%;
-    --sidebar-border: 340 10% 22%;
-    --sidebar-ring: 336 68% 58%;
+    --shadow-hover: 0 10px 30px -12px hsl(var(--color-text) / 0.18);
   }
 }
 
@@ -102,79 +72,97 @@
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: 'DM Sans', sans-serif;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.65;
+    /* Cormorant defaults to old-style figures; stats and prices need lining ones. */
+    font-variant-numeric: lining-nums;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--color-primary));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-@layer base {
-  h1, h2, h3 {
-    letter-spacing: -0.02em;
+@layer components {
+  /* Type scale */
+  .text-display {
+    @apply font-serif text-[40px] md:text-[64px];
+    font-weight: 500;
+    line-height: 1.05;
+  }
+  .text-h2 {
+    @apply font-serif text-[32px] md:text-[44px];
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .text-h3 {
+    @apply font-serif text-[20px] md:text-[22px];
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .eyebrow {
+    @apply font-sans text-xs font-semibold uppercase text-gold-text;
+    letter-spacing: 0.18em;
+  }
+  .text-price {
+    @apply font-sans text-lg font-semibold text-primary;
+  }
+
+  /* Section rhythm: 48 / 64 / 96px */
+  .section-y {
+    @apply py-12 md:py-16 lg:py-24;
   }
 }
 
 @layer utilities {
+  /* Legacy utilities remapped to the new system so untouched pages stay on-brand. */
   .font-display {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 800;
-  }
-
-  .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--pink)), hsl(var(--pink-dark)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    @apply font-serif;
+    font-weight: 500;
   }
 
   .font-script {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
+    @apply font-serif italic;
+    font-weight: 500;
   }
 
-  .bg-gradient-hero {
-    background: linear-gradient(
-      145deg,
-      hsl(var(--ink-light)) 0%,
-      hsl(0 0% 100%) 55%,
-      hsl(var(--pink-light)) 100%
-    );
+  /* One highlighted word per heading: italic serif in brand colour (no gradient). */
+  .text-gradient {
+    @apply font-serif italic text-primary;
   }
 
-  .bg-gradient-card {
-    background: linear-gradient(
-      135deg,
-      hsl(0 0% 100%) 0%,
-      hsl(var(--pink-light)) 100%
-    );
-  }
-
-  .bg-gradient-rose {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--pink-light)) 0%,
-      hsl(var(--ink-light)) 100%
-    );
-  }
-
+  .bg-gradient-hero,
   .bg-gradient-champagne {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--ink-light)) 0%,
-      hsl(0 0% 100%) 100%
-    );
+    background-color: hsl(var(--color-bg));
   }
 
-  .shadow-soft {
-    box-shadow: 0 4px 20px -4px hsl(var(--foreground) / 0.08);
-  }
-
-  .shadow-card {
-    box-shadow: 0 10px 40px -10px hsl(var(--pink) / 0.22);
-  }
-
-  .shadow-glow {
-    box-shadow: 0 0 28px hsl(var(--pink) / 0.35);
+  .bg-gradient-card,
+  .bg-gradient-rose {
+    background-color: hsl(var(--color-bg-soft));
   }
 
   .step-active {
@@ -182,10 +170,17 @@
   }
 
   .step-done {
-    @apply bg-accent text-accent-foreground;
+    @apply bg-primary-soft text-primary-hover;
   }
 
   .step-idle {
     @apply bg-muted text-muted-foreground;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

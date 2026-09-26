@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+const token = (name: string) => `hsl(var(--color-${name}) / <alpha-value>)`;
+
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
@@ -7,17 +9,24 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        md: "1.5rem",
+        lg: "2rem",
+      },
       screens: {
-        "2xl": "1400px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1240px",
       },
     },
     extend: {
       fontFamily: {
-        display: ["Bricolage Grotesque", "sans-serif"],
-        serif: ["Bricolage Grotesque", "sans-serif"],
-        sans: ["DM Sans", "sans-serif"],
-        script: ["Fraunces", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        display: ["var(--font-serif)", "Georgia", "serif"],
+        script: ["var(--font-serif)", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -28,6 +37,8 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          hover: token("primary-hover"),
+          soft: token("primary-soft"),
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -63,21 +74,46 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Brand palette
-        pink: {
-          DEFAULT: "hsl(var(--pink))",
-          light: "hsl(var(--pink-light))",
-          dark: "hsl(var(--pink-dark))",
-        },
+        // Brand tokens
+        ivory: token("bg"),
+        blush: token("bg-soft"),
+        surface: token("surface"),
         ink: {
-          DEFAULT: "hsl(var(--ink))",
-          light: "hsl(var(--ink-light))",
+          DEFAULT: token("text"),
+          muted: token("text-muted"),
+          light: token("bg"),
+        },
+        deep: {
+          DEFAULT: token("deep"),
+          foreground: token("deep-text"),
+        },
+        gold: {
+          DEFAULT: token("accent"),
+          soft: token("accent-soft"),
+          text: token("accent-text"),
+        },
+        success: {
+          DEFAULT: token("success"),
+          soft: token("success-soft"),
+        },
+        star: token("star"),
+        // Legacy alias used across existing pages
+        pink: {
+          DEFAULT: token("primary"),
+          light: token("primary-soft"),
+          dark: token("primary-hover"),
         },
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        card: "16px",
+        media: "12px",
+      },
+      maxWidth: {
+        content: "1240px",
+        reading: "680px",
       },
       keyframes: {
         "accordion-down": {
@@ -89,20 +125,16 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "0%": { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
-          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "0%": { transform: "scale(0.97)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -116,22 +148,21 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "fade-up": "fade-up 0.6s ease-out forwards",
-        "scale-in": "scale-in 0.3s ease-out",
-        float: "float 4s ease-in-out infinite",
+        "fade-in": "fade-in 0.4s ease-out forwards",
+        "fade-up": "fade-up 0.4s ease-out forwards",
+        "scale-in": "scale-in 0.25s ease-out",
         shimmer: "shimmer 2s linear infinite",
         marquee: "marquee 30s linear infinite",
       },
-      backgroundImage: {
-        "gradient-rose": "linear-gradient(135deg, hsl(var(--pink-light)) 0%, hsl(var(--ink-light)) 100%)",
-        "gradient-champagne": "linear-gradient(135deg, hsl(var(--ink-light)) 0%, hsl(0 0% 100%) 100%)",
-        "gradient-nude": "linear-gradient(180deg, hsl(var(--ink-light)) 0%, hsl(0 0% 100%) 100%)",
-      },
       boxShadow: {
-        soft: "0 4px 20px -4px hsl(var(--foreground) / 0.08)",
-        card: "0 10px 40px -10px hsl(var(--pink) / 0.25)",
-        glow: "0 0 28px hsl(var(--pink) / 0.45)",
+        // No shadows by default in the new system; legacy names resolve to none / the hover shadow.
+        soft: "none",
+        hover: "var(--shadow-hover)",
+        card: "var(--shadow-hover)",
+        glow: "var(--shadow-hover)",
+      },
+      transitionTimingFunction: {
+        out: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
     },
   },
