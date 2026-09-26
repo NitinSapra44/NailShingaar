@@ -138,9 +138,17 @@
     @apply font-sans text-[15px] font-medium text-foreground;
   }
 
-  /* Section rhythm: 56 / 80 / 128px */
+  /* Section rhythm: 56 / 80 / 96px */
   .section-y {
-    @apply py-14 md:py-20 lg:py-32;
+    @apply py-14 md:py-20 lg:py-24;
+  }
+
+  /* Consecutive sections on the same background read as one band:
+     drop the second one's top padding so the gaps don't stack. */
+  [data-tone="default"] + [data-tone="default"],
+  [data-tone="soft"] + [data-tone="soft"],
+  [data-tone="deep"] + [data-tone="deep"] {
+    padding-top: 0;
   }
 }
 

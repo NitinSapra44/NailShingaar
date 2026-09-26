@@ -18,7 +18,7 @@ type SectionProps = React.HTMLAttributes<HTMLElement> & {
 
 export function Section({ tone = 'default', bleed, className, containerClassName, children, ...props }: SectionProps) {
   return (
-    <section className={cn('section-y', toneClass[tone], className)} {...props}>
+    <section data-tone={tone} className={cn("section-y", toneClass[tone], className)} {...props}>
       {bleed ? children : <Container className={containerClassName}>{children}</Container>}
     </section>
   );
