@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -65,12 +66,35 @@ const getStyleNotes = (order: Order): string => {
   try { return JSON.parse(order.notes ?? '{}').style_notes ?? ''; } catch { return ''; }
 };
 
-// Cloudinary delivery URLs are public by default (unlike Supabase's
-// private nail-photos/payment-screenshots buckets), so photos can be
-// rendered directly with no per-viewer signing step.
-function Thumb({ url, alt, className }: { url?: string; alt: string; className: string }) {
-  if (!url) return <div className={`${className} bg-muted`} />;
-  return <img src={url} alt={alt} className={className} />;
+// nail-photos and payment-screenshots are private buckets (customer PII),
+// so the URLs stored on the order — built with getPublicUrl() at upload
+// time — don't actually resolve; they need to be swapped for short-lived
+// signed URLs, generated per-viewer under the admin's own RLS access.
+// product-images is public and needs no signing — order_items.product_image
+// normally points there, EXCEPT on custom-design orders, where it's set to
+// one of the customer's uploaded design photos (nail-photos, private).
+const PRIVATE_BUCKETS = ['nail-photos', 'payment-screenshots'];
+const privateBucketPathFromUrl = (url: string): { bucket: string; path: string } | null => {
+  for (const bucket of PRIVATE_BUCKETS) {
+    const marker = `/object/public/${bucket}/`;
+    const idx = url.indexOf(marker);
+    if (idx !== -1) return { bucket, path: decodeURIComponent(url.slice(idx + marker.length)) };
+  }
+  return null;
+};
+
+// signedUrls[url] is undefined while signing is in flight, 'error' if
+// createSignedUrl failed (see console for why), or the working URL.
+function SignedThumb({ signed, alt, className }: { signed?: string; alt: string; className: string }) {
+  if (signed === 'error') {
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center text-center px-1`}>
+        <span className="text-[9px] text-muted-foreground leading-tight">Failed to load</span>
+      </div>
+    );
+  }
+  if (!signed) return <div className={`${className} bg-muted animate-pulse`} />;
+  return <img src={signed} alt={alt} className={className} />;
 }
 
 export const AdminOrders = () => {
@@ -79,6 +103,7 @@ export const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState('');
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -87,25 +112,27 @@ export const AdminOrders = () => {
 
   const fetchOrders = async () => {
     setLoading(true);
-    try {
-      const res = await fetch('/api/orders?all=true');
-      if (!res.ok) throw new Error('Failed to load orders');
-      setOrders((await res.json()) as Order[]);
-    } catch (err) {
-      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to load orders', variant: 'destructive' });
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, items:order_items(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      setOrders((data ?? []) as Order[]);
     }
     setLoading(false);
   };
 
   const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
     setUpdatingId(orderId);
-    const res = await fetch(`/api/orders/${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    if (!res.ok) {
-      toast({ title: 'Update failed', variant: 'destructive' });
+    const { error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
     } else {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
       if (selectedOrder?.id === orderId) setSelectedOrder((prev) => prev ? { ...prev, status } : prev);
@@ -116,13 +143,12 @@ export const AdminOrders = () => {
 
   const confirmPayment = async (orderId: string) => {
     setUpdatingId(orderId);
-    const res = await fetch(`/api/orders/${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payment_status: 'confirmed', status: 'confirmed' }),
-    });
-    if (!res.ok) {
-      toast({ title: 'Update failed', variant: 'destructive' });
+    const { error } = await supabase
+      .from('orders')
+      .update({ payment_status: 'confirmed', status: 'confirmed' })
+      .eq('id', orderId);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
     } else {
       setOrders((prev) =>
         prev.map((o) =>
@@ -139,13 +165,12 @@ export const AdminOrders = () => {
   const saveTracking = async (orderId: string) => {
     if (!trackingInput.trim()) return;
     setUpdatingId(orderId);
-    const res = await fetch(`/api/orders/${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tracking_number: trackingInput.trim(), status: 'shipped' }),
-    });
-    if (!res.ok) {
-      toast({ title: 'Update failed', variant: 'destructive' });
+    const { error } = await supabase
+      .from('orders')
+      .update({ tracking_number: trackingInput.trim(), status: 'shipped' })
+      .eq('id', orderId);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
     } else {
       setOrders((prev) =>
         prev.map((o) =>
@@ -162,6 +187,33 @@ export const AdminOrders = () => {
   const openDetail = (order: Order) => {
     setSelectedOrder(order);
     setTrackingInput(order.tracking_number ?? '');
+
+    const candidateUrls: string[] = [
+      ...(order.nail_photos ?? []),
+      ...getDesignPhotos(order),
+      ...(order.payment_screenshot ? [order.payment_screenshot] : []),
+      ...(order.items ?? []).map((item) => item.product_image).filter((u): u is string => !!u),
+    ];
+    if (candidateUrls.length === 0) return;
+
+    Promise.all(
+      candidateUrls.map(async (url) => {
+        const resolved = privateBucketPathFromUrl(url);
+        if (!resolved) return null;
+        const { data, error } = await supabase.storage.from(resolved.bucket).createSignedUrl(resolved.path, 3600);
+        if (error) {
+          console.error(`[order photos] sign failed for ${resolved.bucket}/${resolved.path}:`, error.message, url);
+          return [url, 'error'] as const;
+        }
+        return [url, data.signedUrl] as const;
+      })
+    ).then((resolved) => {
+      setSignedUrls((prev) => {
+        const next = { ...prev };
+        for (const entry of resolved) if (entry) next[entry[0]] = entry[1];
+        return next;
+      });
+    });
   };
 
   return (
@@ -373,10 +425,17 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Products Ordered</p>
                     <div className="space-y-2">
                       {selectedOrder.items.map((item) => {
+                        const isPrivate = item.product_image ? privateBucketPathFromUrl(item.product_image) : null;
                         const thumbClass = 'h-14 w-14 object-cover rounded-lg border border-border shrink-0';
                         return (
                         <div key={item.id} className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2">
-                          <Thumb url={item.product_image ?? undefined} alt={item.product_name} className={thumbClass} />
+                          {!item.product_image ? (
+                            <div className={`${thumbClass} bg-muted`} />
+                          ) : isPrivate ? (
+                            <SignedThumb signed={signedUrls[item.product_image]} alt={item.product_name} className={thumbClass} />
+                          ) : (
+                            <img src={item.product_image} alt={item.product_name} className={thumbClass} />
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{item.product_name}</p>
                             <p className="text-xs text-muted-foreground">Size: {item.size} · Qty: {item.quantity}</p>
@@ -395,8 +454,8 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Design Reference Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {getDesignPhotos(selectedOrder).map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <Thumb url={url} alt="Design reference"
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Design reference"
                             className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
                         </a>
                       ))}
@@ -418,8 +477,8 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Nail Size Photos</p>
                     <div className="grid grid-cols-4 gap-2">
                       {selectedOrder.nail_photos.map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                          <Thumb url={url} alt="Customer nail sizing"
+                        <a key={url} href={signedUrls[url] && signedUrls[url] !== 'error' ? signedUrls[url] : url} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[url]} alt="Customer nail sizing"
                             className="aspect-square w-full object-cover rounded-lg border border-border hover:opacity-90 transition-opacity" />
                         </a>
                       ))}
@@ -433,8 +492,8 @@ export const AdminOrders = () => {
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Payment Screenshot</p>
                     {selectedOrder.payment_screenshot ? (
                       <div className="space-y-3">
-                        <a href={selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
-                          <Thumb url={selectedOrder.payment_screenshot ?? undefined} alt="Payment screenshot"
+                        <a href={signedUrls[selectedOrder.payment_screenshot] && signedUrls[selectedOrder.payment_screenshot] !== 'error' ? signedUrls[selectedOrder.payment_screenshot] : selectedOrder.payment_screenshot} target="_blank" rel="noopener noreferrer">
+                          <SignedThumb signed={signedUrls[selectedOrder.payment_screenshot]} alt="Payment screenshot"
                             className="h-40 w-full max-w-xs rounded-xl border border-border object-contain hover:opacity-90 transition-opacity" />
                         </a>
                         {selectedOrder.payment_status !== 'confirmed' && (

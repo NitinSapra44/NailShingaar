@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading, BlogCard, Reveal } from '@/components/ui-kit';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Post {
   id: string;
@@ -20,9 +21,14 @@ const BlogSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/blog?published=true&limit=3')
-      .then((res) => res.json())
-      .then((data: Post[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('blog_posts')
+      .select('id, title, slug, excerpt, cover_image_url, created_at')
+      .eq('published', true)
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }: { data: Post[] | null }) => {
         setPosts(data || []);
         setLoading(false);
       });

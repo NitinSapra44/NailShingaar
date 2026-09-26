@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { NailQuestionnaire, ShippingDetails, Product } from '@/types';
 
@@ -184,15 +185,12 @@ export default function CheckoutPage() {
       img.src = URL.createObjectURL(file);
     });
 
-  const uploadFile = async (folder: 'nail-photos' | 'payment-screenshots', file: File): Promise<string> => {
+  const uploadFile = async (bucket: string, file: File, path: string): Promise<string> => {
     const compressed = file.type.startsWith('image/') ? await compressImage(file) : file;
-    const formData = new FormData();
-    formData.append('file', compressed);
-    formData.append('folder', folder);
-    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('Upload failed');
-    const { url } = await res.json();
-    return url;
+    const finalPath = path.replace(/\.\w+$/, '.jpg');
+    const { error } = await supabase.storage.from(bucket).upload(finalPath, compressed, { upsert: true, contentType: 'image/jpeg' });
+    if (error) throw new Error(error.message);
+    return supabase.storage.from(bucket).getPublicUrl(finalPath).data.publicUrl;
   };
 
   const handleSubmitOrder = async () => {
@@ -204,37 +202,37 @@ export default function CheckoutPage() {
     if (!lineItems || lineItems.length === 0) return;
     setSubmitting(true);
     try {
+      const ts = Date.now();
       const photoUrls: string[] = [];
       for (const slot of REQUIRED_SLOTS) {
         const file = nailPhotos[slot.key];
-        if (file) photoUrls.push(await uploadFile('nail-photos', file));
+        if (file) photoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_${slot.key}.${file.name.split('.').pop()}`));
       }
-      for (const file of extraPhotos) {
-        photoUrls.push(await uploadFile('nail-photos', file));
+      for (let i = 0; i < extraPhotos.length; i++) {
+        const file = extraPhotos[i];
+        photoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_extra_${i}.${file.name.split('.').pop()}`));
       }
-      const screenshotUrl = await uploadFile('payment-screenshots', paymentScreenshot);
+      const screenshotUrl = await uploadFile('payment-screenshots', paymentScreenshot, `${user.id}/${ts}_payment.${paymentScreenshot.name.split('.').pop()}`);
 
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order: {
-            total: orderTotal,
-            shipping_name: shipping.full_name, shipping_phone: shipping.phone,
-            shipping_address: `${shipping.address}, ${shipping.pincode}`, shipping_city: shipping.city,
-            nail_length: questionnaire.nail_length, nail_shape: questionnaire.nail_shape,
-            color_preference: questionnaire.color_preference || null,
-            nail_photos: photoUrls, payment_screenshot: screenshotUrl, payment_status: 'screenshot_uploaded',
-          },
-          items: lineItems.map((item) => ({
-            product_id: item.product.id, product_name: item.product.name,
-            product_image: item.product.image_url, size: questionnaire.nail_shape,
-            quantity: item.quantity, price: item.product.price,
-          })),
-        }),
-      });
-      if (!res.ok) throw new Error('Failed to place order');
-      const order = await res.json();
+      const { data: order, error: orderError } = await supabase.from('orders').insert({
+        user_id: user.id, status: 'pending', total: orderTotal,
+        shipping_name: shipping.full_name, shipping_phone: shipping.phone,
+        shipping_address: `${shipping.address}, ${shipping.pincode}`, shipping_city: shipping.city,
+        nail_length: questionnaire.nail_length, nail_shape: questionnaire.nail_shape,
+        color_preference: questionnaire.color_preference || null,
+        nail_photos: photoUrls, payment_screenshot: screenshotUrl, payment_status: 'screenshot_uploaded',
+      }).select().single();
+
+      if (orderError) throw new Error(orderError.message);
+
+      const { error: itemsError } = await supabase.from('order_items').insert(
+        lineItems.map((item) => ({
+          order_id: order.id, product_id: item.product.id, product_name: item.product.name,
+          product_image: item.product.image_url, size: questionnaire.nail_shape,
+          quantity: item.quantity, price: item.product.price,
+        }))
+      );
+      if (itemsError) throw new Error(itemsError.message);
 
       if (fromCart) {
         await clearCart();

@@ -12,6 +12,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 import type { Category } from '@/types';
 
 const NAV_LINK =
@@ -47,9 +48,9 @@ const Header = () => {
   if (user) accountLabel = isAdmin ? 'Admin Panel' : 'My Orders';
 
   useEffect(() => {
-    fetch('/api/categories')
-      .then((res) => res.json())
-      .then((data) => setCategories(data ?? []));
+    supabase.from('categories').select('*').order('name').then(({ data }) => {
+      setCategories(data ?? []);
+    });
   }, []);
 
   useEffect(() => {

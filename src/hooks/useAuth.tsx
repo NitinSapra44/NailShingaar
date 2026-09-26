@@ -1,20 +1,10 @@
-'use client';
-
-import { createContext, useContext, ReactNode } from 'react';
-import {
-  useSession,
-  signIn as nextAuthSignIn,
-  signOut as nextAuthSignOut,
-} from 'next-auth/react';
-
-interface AuthUser {
-  id: string;
-  email: string | null;
-  name: string | null;
-}
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
+  session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -24,54 +14,58 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const user: AuthUser | null = session?.user
-    ? {
-        id: session.user.id,
-        email: session.user.email ?? null,
-        name: session.user.name ?? null,
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
       }
-    : null;
+    );
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, fullName }),
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      return { error: new Error(body.error ?? 'Failed to create account') };
-    }
+    return () => subscription.unsubscribe();
+  }, []);
 
-    // Log the new user in immediately — there's no email-verification step
-    // with the Credentials provider (unlike Supabase Auth's signUp flow).
-    return signIn(email, password);
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName
+        }
+      }
+    });
+    return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const result = await nextAuthSignIn('credentials', {
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      password,
-      redirect: false,
+      password
     });
-
-    if (result?.error) {
-      return { error: new Error('Invalid email or password') };
-    }
-    return { error: null };
+    return { error };
   };
 
   const signOut = async () => {
-    await nextAuthSignOut({ redirect: false });
+    await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading: status === 'loading', signUp, signIn, signOut }}
-    >
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

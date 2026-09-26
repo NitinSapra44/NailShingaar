@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { CheckCircle2, Package, Clock, Loader2, Home, Sparkles, MessageCircle } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import type { Order } from '@/types';
 
 const STATUS_STEPS: { key: Order['status']; label: string; desc: string }[] = [
@@ -35,18 +36,14 @@ export default function OrderConfirmationPage() {
 
   useEffect(() => {
     if (!orderId) return;
+    supabase.from('orders').select('*').eq('id', orderId).single()
+      .then(({ data, error }) => { if (!error) setOrder(data as Order); setLoading(false); });
 
-    const fetchOrder = () =>
-      fetch(`/api/orders/${orderId}`)
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => { if (data) setOrder(data as Order); setLoading(false); });
-
-    fetchOrder();
-
-    // No realtime push without Supabase — poll for status/price updates instead
-    // (e.g. after Reet quotes a price on a custom-design enquiry).
-    const interval = setInterval(fetchOrder, 15000);
-    return () => clearInterval(interval);
+    const channel = supabase.channel(`order-${orderId}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
+        (payload) => setOrder(payload.new as Order))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [orderId]);
 
   if (loading) {

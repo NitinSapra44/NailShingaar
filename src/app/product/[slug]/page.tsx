@@ -9,6 +9,7 @@ import { Container, Section, SectionHeading, Breadcrumbs, Skeleton, Accordion, A
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from '@/components/ui/carousel';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
@@ -32,9 +33,12 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!slug) return;
-    fetch(`/api/products/by-slug/${slug}`)
-      .then((res) => res.json())
-      .then((data) => {
+    supabase
+      .from('products')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle()
+      .then(({ data }) => {
         if (data) setProduct(data);
         setLoading(false);
       });

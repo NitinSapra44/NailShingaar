@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { Button } from '@/components/ui/button';
@@ -45,14 +46,16 @@ export const AdminProducts = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    try {
-      const res = await fetch('/api/products?sort=newest&pageSize=1000&page=1');
-      if (!res.ok) throw new Error('Failed to load products');
-      const { data } = await res.json();
-      setProducts(data || []);
-    } catch (error) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to load products');
+    } else {
+      setProducts(data || []);
     }
     setLoading(false);
   };
@@ -61,8 +64,12 @@ export const AdminProducts = () => {
     if (!deleteProduct) return;
 
     try {
-      const res = await fetch(`/api/products/${deleteProduct.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete product');
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', deleteProduct.id);
+
+      if (error) throw error;
       toast.success('Product deleted successfully');
       fetchProducts();
     } catch (error: any) {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Section, PageHeader, CollectionCard, Skeleton, Reveal } from '@/components/ui-kit';
+import { supabase } from '@/integrations/supabase/client';
 import { Category } from '@/types';
 
 export default function CategoriesPage() {
@@ -10,9 +11,8 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/categories')
-      .then((res) => res.json())
-      .then((data) => { setCategories(data || []); setLoading(false); });
+    supabase.from('categories').select('*').order('name')
+      .then(({ data }) => { setCategories(data || []); setLoading(false); });
   }, []);
 
   return (
