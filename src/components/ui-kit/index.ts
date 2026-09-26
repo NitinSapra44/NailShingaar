@@ -10,3 +10,5 @@ export { Button, buttonVariants } from '@/components/ui/button';
 export { Badge } from '@/components/ui/badge';
 export { Skeleton } from '@/components/ui/skeleton';
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+export { Breadcrumbs, type Crumb } from './Breadcrumbs';
+export { PageHeader } from './PageHeader';

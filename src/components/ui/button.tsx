@@ -26,6 +26,10 @@ const buttonVariants = cva(
         icon: "h-10 w-10",
       },
     },
+    // Link-style buttons sit inline with text: drop the size's height/padding.
+    compoundVariants: [
+      { variant: "link", size: ["default", "sm", "lg"], className: "h-auto px-0 py-1" },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
