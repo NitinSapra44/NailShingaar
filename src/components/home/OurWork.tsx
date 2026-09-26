@@ -2,7 +2,14 @@ import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { Section, SectionHeading, Container, Reveal, Accent } from '@/components/ui-kit';
 
-const GALLERY = ['/Work/W-1.jpg', '/Work/W-2.jpg', '/Work/W-3.jpg', '/Work/W-4.jpg', '/Work/W-5.jpg', '/Work/W-6.jpg'];
+const GALLERY = [
+  { src: '/editorial/work-soft-muse.jpg', name: 'Soft Muse' },
+  { src: '/editorial/work-royal-jewel.jpg', name: 'Royal Jewel' },
+  { src: '/editorial/work-princess-bow.jpg', name: 'Princess Bow' },
+  { src: '/editorial/work-golden-grace.jpg', name: 'Golden Grace' },
+  { src: '/editorial/work-dotty-berry.jpg', name: 'Dotty Berry' },
+  { src: '/editorial/work-crimson-rose.jpg', name: 'Crimson Rose' },
+];
 
 export default function OurWork() {
   return (
@@ -28,11 +35,11 @@ export default function OurWork() {
       </Container>
       {/* Edge-to-edge strip */}
       <div className="grid grid-cols-3 gap-1 md:grid-cols-6">
-        {GALLERY.map((src, i) => (
+        {GALLERY.map(({ src, name }) => (
           <div key={src} className="group relative aspect-square overflow-hidden bg-blush">
             <Image
               src={src}
-              alt={`Nail Shingaar handcrafted press-on nail design ${i + 1}`}
+              alt={`${name} press-on nails by Nail Shingaar`}
               fill
               sizes="(max-width: 768px) 33vw, 17vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Ruler, Sparkles, Truck, Star } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Ruler, Sparkles, Truck, Star } from 'lucide-react';
 import { Container, Accent } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
 
@@ -9,6 +9,37 @@ const TRUST = [
   { icon: Sparkles, label: 'Handcrafted' },
   { icon: Truck, label: 'Pan-India delivery' },
   { icon: Star, label: '5.0 on Google' },
+];
+
+// Real product photography; slugs point at the existing product pages.
+const MOSAIC = [
+  {
+    name: 'White Garden',
+    slug: 'white-garden',
+    src: '/editorial/hero-white-garden.jpg',
+    alt: 'Hands wearing White Garden press-on nails against an orange backdrop',
+    className: 'col-span-2 aspect-[3/2] md:col-span-6',
+    sizes: '(max-width: 768px) 100vw, 50vw',
+    priority: true,
+  },
+  {
+    name: 'Ivory Royale',
+    slug: 'ivory-royale',
+    src: '/editorial/hero-ivory-royale.jpg',
+    alt: 'Model wearing Ivory Royale press-on nails with glitter makeup',
+    className: 'aspect-[4/5] md:col-span-3',
+    sizes: '(max-width: 768px) 50vw, 25vw',
+    priority: false,
+  },
+  {
+    name: 'Emerald Luxe',
+    slug: 'emerald-luxe',
+    src: '/editorial/hero-emerald-luxe.jpg',
+    alt: 'Model wearing Emerald Luxe press-on nails, holding a chocolate bar',
+    className: 'aspect-[4/5] md:col-span-3',
+    sizes: '(max-width: 768px) 50vw, 25vw',
+    priority: false,
+  },
 ];
 
 export default function HeroSection() {
@@ -42,39 +73,27 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Photo mosaic */}
+        {/* Photo mosaic — each tile links to the product it shows */}
         <div className="mt-12 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-12 md:gap-4">
-          <div className="relative col-span-2 aspect-[3/2] overflow-hidden rounded-media bg-blush md:col-span-6 md:aspect-auto md:h-[480px]">
-            <Image
-              src="/Work/W-5.jpg"
-              alt="Hands wearing pastel floral press-on nails by Nail Shingaar"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </div>
-          <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush md:col-span-3 md:aspect-auto md:h-[480px]">
-            <Image
-              src="/reet-photo.jpg"
-              alt="Reet, the nail artist behind Nail Shingaar"
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover object-[50%_30%]"
-            />
-            <span className="absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
-              7+ years of nail artistry
-            </span>
-          </div>
-          <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush md:col-span-3 md:aspect-auto md:h-[480px]">
-            <Image
-              src="/Work/W-1.jpg"
-              alt="A boxed set of handmade press-on nails"
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover"
-            />
-          </div>
+          {MOSAIC.map((t) => (
+            <Link
+              key={t.slug}
+              href={`/product/${t.slug}`}
+              className={`group relative overflow-hidden rounded-media bg-blush md:aspect-auto md:h-[480px] ${t.className}`}
+            >
+              <Image
+                src={t.src}
+                alt={t.alt}
+                fill
+                priority={t.priority}
+                sizes={t.sizes}
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
+              <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur transition-colors group-hover:bg-foreground group-hover:text-background">
+                {t.name} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+              </span>
+            </Link>
+          ))}
         </div>
 
         <ul className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
