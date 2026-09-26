@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { Section, SectionHeading, CollectionCard, Skeleton, Reveal } from '@/components/ui-kit';
 import { Category } from '@/types';
 
 // Fallback nail images mapped by category slug
@@ -48,83 +47,38 @@ const CategoriesSection = () => {
   const getCategoryImage = (category: Category) =>
     category.image_url || CATEGORY_IMAGES[category.slug] || DEFAULT_IMAGE;
 
+  const track =
+    '-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3';
+  const item = 'w-[78%] shrink-0 snap-start sm:w-auto';
+
   if (loading) {
     return (
-      <section className="py-20 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="animate-pulse aspect-[4/3] rounded-2xl bg-muted" />
-            ))}
-          </div>
+      <Section tone="soft" aria-busy="true">
+        <SectionHeading eyebrow="Explore" title="Shop by Collection" subtitle="From everyday elegance to bridal splendour." />
+        <div className={track}>
+          {[1, 2, 3].map((n) => (
+            <Skeleton key={n} className={`${item} aspect-[4/5] rounded-card`} />
+          ))}
         </div>
-      </section>
+      </Section>
     );
   }
 
   if (categories.length === 0) return null;
 
-  const displayCategories = categories.map((c) => ({
-    name: c.name,
-    slug: c.slug,
-    description: c.description ?? '',
-    image: getCategoryImage(c),
-  }));
-
   return (
-    <section className="py-20 bg-card">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <span className="font-script text-2xl text-primary">explore</span>
-          <h2 className="font-display text-3xl md:text-4xl font-semibold mt-1">
-            Shop by <span className="text-gradient">Collection</span>
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            From everyday elegance to bridal splendour — find your perfect set
-          </p>
-        </div>
-
-        {/* Bento-style grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {displayCategories.map((cat, index) => {
-            const isFeatured = index === 0 || index === 3;
-            return (
-              <Link
-                key={cat.slug}
-                href={`/categories/${cat.slug}`}
-                className={`group relative overflow-hidden rounded-2xl shadow-soft hover:shadow-card transition-all duration-300 animate-fade-up ${
-                  isFeatured ? 'md:row-span-1 aspect-[4/3]' : 'aspect-[4/3]'
-                }`}
-                style={{ animationDelay: `${index * 80}ms` }}
-              >
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
-
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="font-display text-base md:text-lg font-semibold text-white leading-tight">
-                    {cat.name}
-                  </h3>
-                  {cat.description && (
-                    <p className="text-xs text-white/75 mt-0.5 line-clamp-1">{cat.description}</p>
-                  )}
-                </div>
-
-                {/* Arrow */}
-                <div className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="h-4 w-4 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+    <Section tone="soft">
+      <Reveal>
+        <SectionHeading eyebrow="Explore" title="Shop by Collection" subtitle="From everyday elegance to bridal splendour." />
+      </Reveal>
+      <div className={track}>
+        {categories.map((c, index) => (
+          <Reveal key={c.slug} delay={index * 60} className={item}>
+            <CollectionCard name={c.name} slug={c.slug} description={c.description} image={getCategoryImage(c)} />
+          </Reveal>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 };
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Section, SectionHeading, Skeleton, Reveal, Accent } from '@/components/ui-kit';
 import ProductCard from '@/components/products/ProductCard';
 import { Product } from '@/types';
 
@@ -27,62 +28,53 @@ const FeaturedProducts = () => {
     fetchFeaturedProducts();
   }, []);
 
+  // Only 4 products are fetched, so tablet uses 2 columns (a 3-col row would leave an orphan).
+  const grid = 'grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6';
+  const heading = (
+    <SectionHeading
+      align="left"
+      eyebrow="Most Loved"
+      title={<>Our <Accent>Bestsellers</Accent></>}
+      action={
+        <Button asChild variant="link" className="group">
+          <Link href="/shop?featured=true">
+            View all <ArrowRight className="transition-transform group-hover:translate-x-1" aria-hidden />
+          </Link>
+        </Button>
+      }
+    />
+  );
+
   if (loading) {
     return (
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-square rounded-2xl bg-muted" />
-                <div className="mt-4 h-4 w-3/4 rounded bg-muted" />
-                <div className="mt-2 h-4 w-1/2 rounded bg-muted" />
-              </div>
-            ))}
-          </div>
+      <Section aria-busy="true">
+        {heading}
+        <div className={grid}>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-card bg-surface p-3">
+              <Skeleton className="aspect-[4/5]" />
+              <Skeleton className="mt-4 h-5 w-3/4" />
+              <Skeleton className="mt-2 h-4 w-1/3" />
+            </div>
+          ))}
         </div>
-      </section>
+      </Section>
     );
   }
 
   if (products.length === 0) return null;
 
   return (
-    <section className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.25em] text-muted-foreground uppercase mb-2">Most Loved</p>
-            <h2 className="font-display text-4xl md:text-6xl">
-              Featured <span className="text-gradient">Collection</span>
-            </h2>
-            <p className="mt-3 text-muted-foreground italic">
-              Our most loved designs, handpicked for you
-            </p>
-          </div>
-          <Button asChild variant="ghost" className="group">
-            <Link href="/shop?featured=true">
-              View All
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              className="animate-fade-up"
-              style={{ animationDelay: `${index * 100}ms` } as any}
-              priority={index === 0}
-            />
-          ))}
-        </div>
+    <Section>
+      <Reveal>{heading}</Reveal>
+      <div className={grid}>
+        {products.map((product, index) => (
+          <Reveal key={product.id} delay={index * 60}>
+            <ProductCard product={product} priority={index === 0} />
+          </Reveal>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 };
 
