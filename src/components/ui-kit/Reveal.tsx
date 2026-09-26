@@ -40,7 +40,7 @@ export function Reveal({ delay = 0, className, style, children, ...props }: Reve
     <div
       ref={ref}
       className={cn(
-        'transition-[opacity,transform] duration-[400ms] ease-out',
+        'transition-[opacity,transform] [transition-duration:400ms] ease-out',
         state === 'hidden' && 'opacity-0 translate-y-4',
         className,
       )}

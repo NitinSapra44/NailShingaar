@@ -3,13 +3,28 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone } from 'lucide-react';
+
 const InstagramIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
     <circle cx="12" cy="12" r="4" />
     <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
   </svg>
 );
+
+const SOCIAL =
+  'flex h-11 w-11 items-center justify-center rounded-full border border-gold/70 text-deep-foreground transition-colors hover:border-gold hover:bg-gold hover:text-deep';
+
+const FOOTER_LINK = 'text-sm text-deep-foreground/75 transition-colors hover:text-deep-foreground';
+
+const HELP_LINKS = [
+  { href: '/blog', label: 'Blog' },
+  { href: '/size-guide', label: 'Size Guide (Coin Method)' },
+  { href: '/how-to-order', label: 'How to Order' },
+  { href: '/faq', label: 'FAQs' },
+  { href: '/shipping', label: 'Shipping Info' },
+  { href: '/contact', label: 'Contact Us' },
+];
 
 const Footer = () => {
   const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
@@ -21,107 +36,87 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-pink-light border-t border-primary/20">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-
+    <footer className="bg-deep text-deep-foreground">
+      <div className="container pb-10 pt-16 md:pt-20">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Brand */}
-          <div className="space-y-4">
-            <Link href="/" className="inline-block">
-              <img src="/logo.png" alt="Nail Shingaar by Reet" className="h-14 w-auto object-contain" />
+          <div className="space-y-5">
+            <Link href="/" className="inline-block" aria-label="Nail Shingaar by Reet — home">
+              {/* TODO(asset): replace the CSS-inverted logo with a proper light/ivory logo file */}
+              <img src="/logo.png" alt="Nail Shingaar by Reet" className="h-14 w-auto object-contain brightness-0 invert" />
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="max-w-xs text-sm leading-relaxed text-deep-foreground/75">
               Handcrafted custom press-on nails made with love. Every set is uniquely crafted to fit your fingers perfectly.
             </p>
             <div className="flex gap-3">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/nailshingaar"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                className={SOCIAL}
+                aria-label="Nail Shingaar on Instagram"
               >
                 <InstagramIcon />
               </a>
-              <a
-                href="mailto:nailshingaar@gmail.com"
-                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Mail className="h-4 w-4" />
+              <a href="mailto:nailshingaar@gmail.com" className={SOCIAL} aria-label="Email nailshingaar@gmail.com">
+                <Mail className="h-[18px] w-[18px]" aria-hidden />
               </a>
-              <a
-                href="tel:+919569570825"
-                className="h-9 w-9 rounded-full bg-pink-light flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Phone className="h-4 w-4" />
+              <a href="tel:+919569570825" className={SOCIAL} aria-label="Call +91 95695 70825">
+                <Phone className="h-[18px] w-[18px]" aria-hidden />
               </a>
             </div>
           </div>
 
           {/* Collections */}
-          <div className="space-y-4">
-            <h4 className="font-display text-lg font-semibold">Collections</h4>
-            <nav className="flex flex-col gap-2">
-              {categories.length > 0 ? categories.map((cat) => (
-                <Link
-                  key={cat.slug}
-                  href={`/categories/${cat.slug}`}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {cat.name}
-                </Link>
-              )) : (
-                <Link href="/categories" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+          <nav className="space-y-4" aria-label="Collections">
+            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Collections</h2>
+            <div className="flex flex-col gap-2.5">
+              {categories.length > 0 ? (
+                categories.map((cat) => (
+                  <Link key={cat.slug} href={`/categories/${cat.slug}`} className={FOOTER_LINK}>
+                    {cat.name}
+                  </Link>
+                ))
+              ) : (
+                <Link href="/categories" className={FOOTER_LINK}>
                   View All Collections
                 </Link>
               )}
-            </nav>
-          </div>
+            </div>
+          </nav>
 
           {/* Help */}
-          <div className="space-y-4">
-            <h4 className="font-display text-lg font-semibold">Help</h4>
-            <nav className="flex flex-col gap-2">
-              <Link href="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Blog
-              </Link>
-              <Link href="/size-guide" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Size Guide (Coin Method)
-              </Link>
-              <Link href="/how-to-order" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                How to Order
-              </Link>
-              <Link href="/faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                FAQs
-              </Link>
-              <Link href="/shipping" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Shipping Info
-              </Link>
-              <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Contact Us
-              </Link>
-            </nav>
-          </div>
+          <nav className="space-y-4" aria-label="Help">
+            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Help</h2>
+            <div className="flex flex-col gap-2.5">
+              {HELP_LINKS.map((l) => (
+                <Link key={l.href} href={l.href} className={FOOTER_LINK}>
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="font-display text-lg font-semibold">Get in Touch</h4>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Get in Touch</h2>
+            <p className="text-sm leading-relaxed text-deep-foreground/75">
               Have a question or want a custom design? Reach out — Reet would love to hear from you.
             </p>
-            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <a href="mailto:nailshingaar@gmail.com" className="flex items-center gap-2 hover:text-primary transition-colors">
-                <Mail className="h-4 w-4" /> nailshingaar@gmail.com
+            <div className="flex flex-col gap-2.5 text-sm">
+              <a href="mailto:nailshingaar@gmail.com" className={`flex items-center gap-2.5 ${FOOTER_LINK}`}>
+                <Mail className="h-4 w-4 text-gold" aria-hidden /> nailshingaar@gmail.com
               </a>
-              <a href="https://wa.me/919569570825" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
-                <Phone className="h-4 w-4" /> +91 95695 70825
+              <a href="https://wa.me/919569570825" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2.5 ${FOOTER_LINK}`}>
+                <Phone className="h-4 w-4 text-gold" aria-hidden /> +91 95695 70825
               </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-gold/30 pt-8 text-center text-sm text-deep-foreground/70 md:flex-row md:text-left">
           <p>© {new Date().getFullYear()} Nail Shingaar by Reet. All rights reserved.</p>
-          <p className="font-script text-base text-primary">Made with love, crafted for you ✦</p>
+          <p className="font-serif text-lg italic text-deep-foreground">Made with love, crafted for you ✦</p>
         </div>
       </div>
     </footer>
