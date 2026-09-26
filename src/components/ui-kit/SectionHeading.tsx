@@ -38,11 +38,13 @@ export function SectionHeading({
         <Heading className={cn(Heading === 'h1' ? 'type-display' : 'type-h2', onDark ? 'text-deep-foreground' : 'text-foreground')}>
           {title}
         </Heading>
-        {subtitle && (
-          <p className={cn('mt-4 text-base md:text-lg', onDark ? 'text-deep-foreground/80' : 'text-muted-foreground')}>
-            {subtitle}
-          </p>
-        )}
+        {subtitle &&
+          (typeof subtitle === 'string' ? (
+            <p className={cn('mt-4 text-base md:text-lg', onDark ? 'text-deep-foreground/80' : 'text-muted-foreground')}>{subtitle}</p>
+          ) : (
+            // Rich subtitles (stars, links) may contain block elements, so no <p> wrapper.
+            <div className={cn('mt-4 text-base md:text-lg', onDark ? 'text-deep-foreground/80' : 'text-muted-foreground')}>{subtitle}</div>
+          ))}
       </div>
       {!centered && action && <div className="shrink-0">{action}</div>}
     </div>

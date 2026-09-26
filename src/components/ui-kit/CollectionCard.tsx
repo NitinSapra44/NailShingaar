@@ -9,6 +9,7 @@ type CollectionCardProps = {
   description?: string | null;
   image: string;
   sizes?: string;
+  priority?: boolean;
   className?: string;
 };
 
@@ -18,6 +19,7 @@ export function CollectionCard({
   description,
   image,
   sizes = '(max-width: 640px) 80vw, (max-width: 1024px) 50vw, 33vw',
+  priority,
   className,
 }: CollectionCardProps) {
   return (
@@ -34,6 +36,7 @@ export function CollectionCard({
         alt={`${name} press-on nails collection`}
         fill
         sizes={sizes}
+        priority={priority}
         className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent" aria-hidden />

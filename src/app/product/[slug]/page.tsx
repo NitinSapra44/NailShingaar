@@ -76,6 +76,16 @@ export default function ProductDetailPage() {
     };
   }, [product]);
 
+  // Lift the floating WhatsApp button above the mobile sticky bar while it's shown.
+  useEffect(() => {
+    const root = document.documentElement;
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    root.style.setProperty('--bottom-bar-offset', showStickyBar && isMobile ? '72px' : '0px');
+    return () => {
+      root.style.removeProperty("--bottom-bar-offset");
+    };
+  }, [showStickyBar]);
+
   const handleOrderClick = () => {
     if (!product) return;
     sessionStorage.setItem('checkout_product', JSON.stringify({ product, quantity }));
@@ -171,7 +181,7 @@ export default function ProductDetailPage() {
           <span className="absolute inset-0 flex items-center justify-center bg-ink/20"><Play className="h-5 w-5 text-white" aria-hidden /></span>
         </>
       ) : (
-        <Image src={item.src} alt="" fill sizes="80px" className="object-cover" />
+        <Image src={item.src} alt="" fill sizes="80px" priority={i === 0} className="object-cover" />
       )}
     </button>
   );

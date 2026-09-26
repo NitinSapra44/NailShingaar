@@ -15,17 +15,17 @@ const isCustomEnquiry = (order: Order) => {
 };
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: React.ElementType }> = {
-  pending:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  confirmed: { label: 'Confirmed', color: 'bg-blue-100 text-blue-800',     icon: CheckCircle2 },
-  shipped:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-800', icon: Truck },
-  delivered: { label: 'Delivered', color: 'bg-green-100 text-green-800',   icon: Star },
-  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-800',       icon: Package },
+  pending:   { label: 'Pending',   color: 'bg-gold-soft text-deep', icon: Clock },
+  confirmed: { label: 'Confirmed', color: 'bg-primary-soft text-primary-hover',     icon: CheckCircle2 },
+  shipped:   { label: 'Shipped',   color: 'bg-blush text-deep', icon: Truck },
+  delivered: { label: 'Delivered', color: 'bg-success-soft text-success',   icon: Star },
+  cancelled: { label: 'Cancelled', color: 'bg-destructive/10 text-destructive',       icon: Package },
 };
 const paymentConfig: Record<PaymentStatus, { label: string; color: string }> = {
-  pending:             { label: 'Payment pending',     color: 'bg-gray-100 text-gray-600' },
-  screenshot_uploaded: { label: 'Screenshot received', color: 'bg-orange-100 text-orange-700' },
-  confirmed:           { label: 'Payment confirmed',   color: 'bg-green-100 text-green-700' },
-  failed:              { label: 'Payment failed',      color: 'bg-red-100 text-red-700' },
+  pending:             { label: 'Payment pending',     color: 'bg-muted text-foreground' },
+  screenshot_uploaded: { label: 'Screenshot received', color: 'bg-gold-soft text-deep' },
+  confirmed:           { label: 'Payment confirmed',   color: 'bg-success-soft text-success' },
+  failed:              { label: 'Payment failed',      color: 'bg-destructive/10 text-destructive' },
 };
 const TIMELINE: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered'];
 
@@ -47,7 +47,7 @@ function OrderCard({ order }: { order: Order }) {
     : custom ? 'border-primary/30' : 'border-border';
 
   const badgeLabel = readyToPay ? 'Awaiting Payment' : screenshotSent ? 'Screenshot Sent' : cfg.label;
-  const badgeColor = readyToPay ? 'bg-pink-100 text-primary' : screenshotSent ? 'bg-orange-100 text-orange-700' : cfg.color;
+  const badgeColor = readyToPay ? 'bg-primary-soft text-primary-hover' : screenshotSent ? 'bg-gold-soft text-deep' : cfg.color;
 
   return (
     <div className={`rounded-2xl bg-card border shadow-soft overflow-hidden ${borderCls}`}>
@@ -87,9 +87,9 @@ function OrderCard({ order }: { order: Order }) {
       )}
 
       {screenshotSent && (
-        <div className="px-5 pb-4 flex items-center gap-3 bg-orange-50/60 border-t border-orange-200 pt-3">
-          <Clock className="h-4 w-4 text-orange-500 shrink-0" />
-          <p className="text-xs text-orange-800 font-medium">Payment screenshot received — Reet will confirm and start crafting shortly.</p>
+        <div className="px-5 pb-4 flex items-center gap-3 bg-gold-soft/60 border-t border-gold/40 pt-3">
+          <Clock className="h-4 w-4 text-gold shrink-0" />
+          <p className="text-xs text-deep font-medium">Payment screenshot received — Reet will confirm and start crafting shortly.</p>
         </div>
       )}
 
@@ -121,12 +121,12 @@ function OrderCard({ order }: { order: Order }) {
             </div>
           )}
           {order.tracking_number && (
-            <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-purple-50 border border-purple-100">
+            <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-blush border border-border">
               <div>
-                <p className="font-semibold text-purple-900 text-xs uppercase tracking-wide">Tracking Number</p>
-                <p className="font-mono font-semibold text-purple-800 mt-0.5">{order.tracking_number}</p>
+                <p className="font-semibold text-deep text-xs uppercase tracking-wide">Tracking Number</p>
+                <p className="font-mono font-semibold text-foreground mt-0.5">{order.tracking_number}</p>
               </div>
-              <Truck className="w-5 h-5 text-purple-400" />
+              <Truck className="w-5 h-5 text-gold" />
             </div>
           )}
           <div className="text-sm text-muted-foreground">

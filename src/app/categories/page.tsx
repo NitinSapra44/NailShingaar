@@ -41,6 +41,7 @@ export default function CategoriesPage() {
                   description={category.description}
                   image={category.image_url || 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600'}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  priority={index === 0}
                 />
               </Reveal>
             ))}

@@ -71,7 +71,7 @@ export default function AboutPage() {
                 <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-card px-4 py-2.5 flex items-center gap-2 border border-border">
                   <div className="flex -space-x-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="h-3.5 w-3.5 fill-star text-star" />
                     ))}
                   </div>
                   <span className="text-xs font-semibold text-foreground">1000+ happy clients</span>

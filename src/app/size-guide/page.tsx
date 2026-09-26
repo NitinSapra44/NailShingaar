@@ -142,11 +142,11 @@ export default function SizeGuidePage() {
         </ul>
 
         {/* Warning */}
-        <div className="mt-8 p-5 rounded-2xl bg-orange-50 border border-orange-200 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-orange-500 shrink-0 mt-0.5" />
+        <div className="mt-8 p-5 rounded-2xl bg-gold-soft border border-gold/50 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-gold shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-sm text-orange-800 mb-1">Important</p>
-            <p className="text-sm text-orange-700">
+            <p className="font-semibold text-sm text-deep mb-1">Important</p>
+            <p className="text-sm text-foreground/85">
               Inaccurate measurements may result in a poor fit. If you&apos;re unsure, Reet will reach out
               via WhatsApp to confirm sizing before crafting begins.
             </p>

@@ -140,11 +140,11 @@ export default function ShippingPage() {
         </div>
 
         {/* Note */}
-        <div className="mt-6 p-5 rounded-2xl bg-orange-50 border border-orange-200 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-orange-500 shrink-0 mt-0.5" />
+        <div className="mt-6 p-5 rounded-2xl bg-gold-soft border border-gold/50 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-gold shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-sm text-orange-800 mb-1">Please Note</p>
-            <p className="text-sm text-orange-700">
+            <p className="font-semibold text-sm text-deep mb-1">Please Note</p>
+            <p className="text-sm text-foreground/85">
               Delivery timelines are estimates and may vary due to courier delays, public holidays,
               or high-demand periods (festive seasons). Reet will keep you updated via WhatsApp if
               there are any delays.
