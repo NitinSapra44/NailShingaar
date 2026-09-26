@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronUp, HelpCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { PageHeader, Section, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
 
 const faqs = [
@@ -106,66 +106,38 @@ const faqs = [
   },
 ];
 
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-border last:border-0">
-      <button
-        className="w-full flex items-center justify-between py-4 text-left gap-4"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="font-medium text-sm text-foreground">{q}</span>
-        {open
-          ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
-          : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
-      </button>
-      {open && (
-        <p className="text-sm text-muted-foreground leading-relaxed pb-4">{a}</p>
-      )}
-    </div>
-  );
-}
-
 export default function FAQPage() {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-ink-light border-b border-border">
-        <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <HelpCircle className="h-3.5 w-3.5" /> Help Centre
-          </div>
-          <h1 className="font-display text-4xl font-semibold mb-3">Frequently Asked Questions</h1>
-          <p className="text-muted-foreground text-lg">
-            Everything you need to know about our press-on nails, sizing, ordering, and more.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Help Centre"
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about our press-on nails, sizing, ordering, and more."
+      />
 
-      {/* FAQ Sections */}
-      <section className="container mx-auto px-4 py-14 max-w-3xl space-y-10">
+      <Section containerClassName="max-w-3xl space-y-12">
         {faqs.map((section) => (
           <div key={section.category}>
-            <h2 className="font-display text-xl font-semibold text-primary mb-4">{section.category}</h2>
-            <div className="rounded-2xl bg-card border border-border shadow-soft px-6">
+            <h2 className="type-h3 mb-2 border-b border-gold/40 pb-3 text-foreground">{section.category}</h2>
+            <Accordion type="single" collapsible>
               {section.items.map((item) => (
-                <FAQItem key={item.q} q={item.q} a={item.a} />
+                <AccordionItem key={item.q} value={item.q}>
+                  <AccordionTrigger className="font-sans text-base font-semibold">{item.q}</AccordionTrigger>
+                  <AccordionContent>{item.a}</AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           </div>
         ))}
-      </section>
+      </Section>
 
-      {/* Still stuck */}
-      <section className="bg-ink-light border-t border-border">
-        <div className="container mx-auto px-4 py-12 max-w-xl text-center space-y-4">
-          <h2 className="font-display text-2xl font-semibold">Didn't find your answer?</h2>
-          <p className="text-muted-foreground text-sm">Reach out to Reet directly — she replies personally to every message.</p>
-          <Button asChild className="rounded-full shadow-soft hover:shadow-glow">
-            <Link href="/contact">Contact Us <ArrowRight className="ml-2 h-4 w-4" /></Link>
-          </Button>
-        </div>
-      </section>
+      <Section tone="soft" containerClassName="max-w-xl text-center">
+        <h2 className="type-h2 text-foreground">Didn&apos;t find your answer?</h2>
+        <p className="mt-3 text-muted-foreground">Reach out to Reet directly — she replies personally to every message.</p>
+        <Button asChild className="mt-6">
+          <Link href="/contact">Contact Us <ArrowRight aria-hidden /></Link>
+        </Button>
+      </Section>
     </Layout>
   );
 }

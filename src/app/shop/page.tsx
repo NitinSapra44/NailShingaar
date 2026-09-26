@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, Fragment } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Filter, SortAsc } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { PageHeader } from '@/components/ui-kit';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -86,16 +87,11 @@ function ShopContent() {
   return (
     <Layout>
       <div className="min-h-screen bg-background">
-        <div className="bg-gradient-card py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-semibold">
-              {searchQuery ? `Results for "${searchQuery}"` : 'Shop All'}
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              {featuredOnly ? 'Our most loved designs' : 'Discover your perfect press-on nails'}
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow={searchQuery ? 'Search' : 'Shop'}
+          title={searchQuery ? `Results for "${searchQuery}"` : 'Shop All'}
+          subtitle={featuredOnly ? 'Our most loved designs' : 'Discover your perfect press-on nails'}
+        />
 
         <div className="container mx-auto px-4 py-12">
           <div className="flex flex-wrap justify-between items-center gap-4 mb-8">

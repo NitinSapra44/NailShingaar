@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Ruler, Camera, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Camera, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { PageHeader } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
@@ -49,19 +50,11 @@ const tips = [
 export default function SizeGuidePage() {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-ink-light border-b border-border">
-        <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Ruler className="h-3.5 w-3.5" /> Size Guide
-          </div>
-          <h1 className="font-display text-4xl font-semibold mb-3">The Coin Method</h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Every Nail Shingaar set is custom-fitted to your hands. The coin method is the easiest,
-            most accurate way to measure at home — no tape or ruler needed.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Size Guide"
+        title="The Coin Method"
+        subtitle="Every Nail Shingaar set is custom-fitted to your hands. The coin method is the easiest, most accurate way to measure at home — no tape or ruler needed."
+      />
 
       {/* Steps */}
       <section className="container mx-auto px-4 py-14 max-w-3xl">

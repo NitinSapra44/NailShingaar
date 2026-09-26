@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Truck, Clock, Package, MapPin, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { PageHeader } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
@@ -59,19 +60,11 @@ const policies = [
 export default function ShippingPage() {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-ink-light border-b border-border">
-        <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Truck className="h-3.5 w-3.5" /> Shipping Info
-          </div>
-          <h1 className="font-display text-4xl font-semibold mb-3">Shipping & Delivery</h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Every Nail Shingaar set is lovingly packaged and shipped across India.
-            Here's everything you need to know about delivery.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Shipping Info"
+        title="Shipping & Delivery"
+        subtitle="Every Nail Shingaar set is lovingly packaged and shipped across India. Here's everything you need to know about delivery."
+      />
 
       {/* Shipping Options */}
       <section className="container mx-auto px-4 py-14 max-w-3xl">

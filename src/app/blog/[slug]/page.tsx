@@ -48,47 +48,41 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <Layout>
-      <article className="container mx-auto px-4 py-12 max-w-2xl">
-        {/* Back */}
-        <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8">
-          <ArrowLeft className="h-4 w-4" /> Back to Blog
-        </Link>
+      <article className="container pb-20 pt-10 md:pb-28 md:pt-14">
+        <div className="mx-auto max-w-reading">
+          <Link href="/blog" className="group mb-10 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary">
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden /> Back to Blog
+          </Link>
 
-        {/* Cover image */}
+          <time dateTime={post.createdAt.toISOString()} className="eyebrow mb-4 block">
+            {post.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </time>
+          <h1 className="font-serif text-[38px] font-medium leading-[1.1] text-foreground md:text-[52px]">{post.title}</h1>
+
+          {post.excerpt && (
+            <p className="mt-6 border-l-2 border-gold pl-5 font-serif text-xl italic leading-relaxed text-muted-foreground md:text-2xl">
+              {post.excerpt}
+            </p>
+          )}
+        </div>
+
         {post.coverImageUrl && (
-          <div className="aspect-[3/2] rounded-2xl overflow-hidden mb-8 shadow-soft">
-            <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
+          <div className="mx-auto my-10 max-w-4xl overflow-hidden rounded-card md:my-14">
+            <img src={post.coverImageUrl} alt={post.title} className="aspect-[3/2] w-full object-cover" />
           </div>
         )}
 
-        {/* Meta */}
-        <p className="text-xs text-muted-foreground tracking-[0.2em] uppercase mb-3">
-          {post.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
-
-        {/* Title */}
-        <h1 className="font-display text-3xl md:text-4xl font-semibold leading-tight mb-6">{post.title}</h1>
-
-        {/* Excerpt */}
-        {post.excerpt && (
-          <p className="text-lg text-muted-foreground leading-relaxed border-l-4 border-primary pl-4 mb-8 italic">
-            {post.excerpt}
-          </p>
-        )}
-
-        {/* Content */}
-        <div className="prose prose-sm max-w-none space-y-5">
+        <div className="mx-auto max-w-reading space-y-6 text-[17px] leading-[1.75] text-foreground/85">
           {paragraphs.map((para: string, i: number) => (
-            <p key={i} className="text-foreground/85 leading-relaxed text-base">{para}</p>
+            <p key={i}>{para}</p>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 pt-8 border-t border-border text-center">
-          <p className="text-sm text-muted-foreground mb-3">Want nails like this?</p>
+        <div className="mx-auto mt-16 max-w-reading rounded-card border border-gold/40 bg-blush px-6 py-10 text-center">
+          <p className="font-serif text-2xl text-foreground">Want nails like this?</p>
           <Link
             href="/custom-order"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-dark transition-colors shadow-soft"
+            className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
           >
             Order Custom Nails
           </Link>

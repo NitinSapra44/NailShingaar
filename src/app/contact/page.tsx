@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MessageCircle, Instagram, Mail, Clock, Send, CheckCircle2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { PageHeader } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,16 +67,10 @@ export default function ContactPage() {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-ink-light border-b border-border">
-        <div className="container mx-auto px-4 py-14 max-w-3xl text-center">
-          <h1 className="font-display text-4xl font-semibold mb-3">Contact Us</h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Questions, custom order enquiries, or just want to chat about nails?
-            Reet reads and replies to every message personally.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        title="Contact Us"
+        subtitle="Questions, custom order enquiries, or just want to chat about nails? Reet reads and replies to every message personally."
+      />
 
       <section className="container mx-auto px-4 py-14 max-w-4xl">
         <div className="grid md:grid-cols-2 gap-10">
