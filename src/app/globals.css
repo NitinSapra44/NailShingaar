@@ -109,17 +109,17 @@
 
 @layer components {
   /* Type scale */
-  .text-display {
+  .type-display {
     @apply font-serif text-[40px] md:text-[64px];
     font-weight: 500;
     line-height: 1.05;
   }
-  .text-h2 {
+  .type-h2 {
     @apply font-serif text-[32px] md:text-[44px];
     font-weight: 500;
     line-height: 1.1;
   }
-  .text-h3 {
+  .type-h3 {
     @apply font-serif text-[20px] md:text-[22px];
     font-weight: 600;
     line-height: 1.25;
@@ -128,7 +128,7 @@
     @apply font-sans text-xs font-semibold uppercase text-gold-text;
     letter-spacing: 0.18em;
   }
-  .text-price {
+  .type-price {
     @apply font-sans text-lg font-semibold text-primary;
   }
 

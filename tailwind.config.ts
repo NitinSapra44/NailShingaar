@@ -22,6 +22,10 @@ export default {
       },
     },
     extend: {
+      screens: {
+        // Devices with a real hover pointer (desktop); touch devices keep swipe UIs.
+        "can-hover": { raw: "(hover: hover) and (pointer: fine)" },
+      },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
