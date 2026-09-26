@@ -10,11 +10,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Primary
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover",
+        default: "bg-foreground text-background hover:bg-primary",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         // Secondary: 1px ink outline, inverts on hover
         outline: "border border-foreground bg-transparent text-foreground hover:bg-foreground hover:text-background",
-        secondary: "bg-primary-soft text-primary-hover hover:bg-primary-soft/70",
+        secondary: "bg-blush text-foreground hover:bg-border",
         ghost: "hover:bg-blush hover:text-foreground",
         // Ghost/link with animated underline
         link: "h-auto rounded-none px-0 text-foreground bg-[length:0%_1px] bg-left-bottom bg-no-repeat bg-[linear-gradient(currentColor,currentColor)] hover:bg-[length:100%_1px] hover:text-primary transition-[background-size,color] duration-300",

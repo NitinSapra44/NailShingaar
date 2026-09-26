@@ -192,7 +192,7 @@ export default function ProductDetailPage() {
 
   const priceBlock = (
     <div className="flex items-baseline gap-3">
-      <span className="font-sans text-2xl font-semibold text-primary">₹{product.price.toFixed(0)}</span>
+      <span className="font-sans text-2xl font-medium tracking-[-0.02em] text-foreground">₹{product.price.toFixed(0)}</span>
       {!!product.original_price && (
         <span className="text-base text-muted-foreground line-through">₹{product.original_price.toFixed(0)}</span>
       )}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Section, SectionHeading, BlogCard, Reveal } from '@/components/ui-kit';
+import { Section, SectionHeading, BlogCard, Reveal, Accent } from '@/components/ui-kit';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Post {
@@ -40,9 +40,8 @@ const BlogSection = () => {
     <Section tone="soft">
       <Reveal>
         <SectionHeading
-          align="left"
           eyebrow="Journal"
-          title="Nail Notes"
+          title={<>Nail <Accent>notes</Accent></>}
           action={
             <Button asChild variant="link" className="group">
               <Link href="/blog">
@@ -52,7 +51,7 @@ const BlogSection = () => {
           }
         />
       </Reveal>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-3">
         {posts.map((post, i) => (
           <Reveal key={post.id} delay={i * 80} className="h-full">
             <BlogCard post={post} />

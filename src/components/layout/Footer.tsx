@@ -14,7 +14,7 @@ const InstagramIcon = () => (
 );
 
 const SOCIAL =
-  'flex h-11 w-11 items-center justify-center rounded-full border border-gold/70 text-deep-foreground transition-colors hover:border-gold hover:bg-gold hover:text-deep';
+  'flex h-11 w-11 items-center justify-center rounded-full border border-deep-foreground/30 text-deep-foreground transition-colors hover:border-deep-foreground hover:bg-deep-foreground hover:text-deep';
 
 const FOOTER_LINK = 'text-sm text-deep-foreground/75 transition-colors hover:text-deep-foreground';
 
@@ -70,7 +70,7 @@ const Footer = () => {
 
           {/* Collections */}
           <nav className="space-y-4" aria-label="Collections">
-            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Collections</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-deep-foreground/60">Collections</h2>
             <div className="flex flex-col gap-2.5">
               {categories.length > 0 ? (
                 categories.map((cat) => (
@@ -88,7 +88,7 @@ const Footer = () => {
 
           {/* Help */}
           <nav className="space-y-4" aria-label="Help">
-            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Help</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-deep-foreground/60">Help</h2>
             <div className="flex flex-col gap-2.5">
               {HELP_LINKS.map((l) => (
                 <Link key={l.href} href={l.href} className={FOOTER_LINK}>
@@ -100,25 +100,32 @@ const Footer = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h2 className="font-serif text-xl font-semibold text-deep-foreground">Get in Touch</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-deep-foreground/60">Get in Touch</h2>
             <p className="text-sm leading-relaxed text-deep-foreground/75">
               Have a question or want a custom design? Reach out — Reet would love to hear from you.
             </p>
             <div className="flex flex-col gap-2.5 text-sm">
               <a href="mailto:nailshingaar@gmail.com" className={`flex items-center gap-2.5 ${FOOTER_LINK}`}>
-                <Mail className="h-4 w-4 text-gold" aria-hidden /> nailshingaar@gmail.com
+                <Mail className="h-4 w-4 text-deep-foreground/60" aria-hidden /> nailshingaar@gmail.com
               </a>
               <a href="https://wa.me/919569570825" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2.5 ${FOOTER_LINK}`}>
-                <Phone className="h-4 w-4 text-gold" aria-hidden /> +91 95695 70825
+                <Phone className="h-4 w-4 text-deep-foreground/60" aria-hidden /> +91 95695 70825
               </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-gold/30 pt-8 text-center text-sm text-deep-foreground/70 md:flex-row md:text-left">
+        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-deep-foreground/15 pt-8 text-center text-sm text-deep-foreground/70 md:flex-row md:text-left">
           <p>© {new Date().getFullYear()} Nail Shingaar by Reet. All rights reserved.</p>
-          <p className="font-serif text-lg italic text-deep-foreground">Made with love, crafted for you ✦</p>
+          <p className="font-accent text-lg italic text-deep-foreground">Made with love, crafted for you ✦</p>
         </div>
+      </div>
+
+      {/* Oversized wordmark */}
+      <div className="overflow-hidden" aria-hidden>
+        <p className="translate-y-[12%] whitespace-nowrap text-center text-[15.5vw] font-medium leading-[0.8] tracking-[-0.06em] text-deep-foreground/[0.08]">
+          Nail Shingaar
+        </p>
       </div>
     </footer>
   );

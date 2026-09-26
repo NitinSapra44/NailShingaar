@@ -48,8 +48,7 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
   return (
     <div
       className={cn(
-        'group relative flex h-full flex-col rounded-card bg-surface p-2.5 md:p-3',
-        'transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-hover',
+        'group relative flex h-full flex-col',
         className,
       )}
       style={style}
@@ -64,7 +63,7 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
             fill
             sizes={sizes}
             priority={priority}
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           />
           {hasMultiple && (
             <Image
@@ -119,7 +118,7 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
         {/* Badges: only from real product data */}
         <div className="pointer-events-none absolute left-2.5 top-2.5 z-10 flex flex-col gap-1.5">
           {product.is_new && (
-            <span className="rounded-full border border-gold bg-surface px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-text">
+            <span className="rounded-full bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground">
               New
             </span>
           )}
@@ -133,7 +132,7 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
         {/* Wishlist */}
         <button
           type="button"
-          className="absolute right-2.5 top-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface/95 text-primary transition-colors hover:bg-primary-soft"
+          className="absolute right-2.5 top-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 text-foreground backdrop-blur transition-colors hover:text-primary"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -142,16 +141,16 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
           aria-label={inWishlist ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           aria-pressed={inWishlist}
         >
-          <Heart className={cn('h-4 w-4 transition-colors', inWishlist && 'fill-primary')} aria-hidden />
+          <Heart className={cn('h-4 w-4 transition-colors', inWishlist && 'fill-primary text-primary')} aria-hidden />
         </button>
 
         {/* Desktop "Buy Now": slides up on hover or keyboard focus */}
         <Link
           href={href}
           className={cn(
-            'absolute inset-x-2.5 bottom-2.5 z-10 hidden h-10 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground',
+            'absolute inset-x-2.5 bottom-2.5 z-10 hidden h-11 items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background',
             'can-hover:flex translate-y-[calc(100%+12px)] transition-[transform,background-color] duration-300 ease-out',
-            'hover:bg-primary-hover group-hover:translate-y-0 focus-visible:translate-y-0',
+            'hover:bg-primary group-hover:translate-y-0 focus-visible:translate-y-0',
           )}
         >
           Buy Now
@@ -159,28 +158,27 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
       </div>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col px-1 pt-4">
-        <h3 className="line-clamp-2 font-serif text-lg font-semibold leading-snug text-foreground md:text-xl lg:text-[22px]">
-          <Link href={href} className="transition-colors hover:text-primary">
-            {product.name}
-          </Link>
-        </h3>
-
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="type-price">₹{product.price.toFixed(0)}</span>
-          {!!product.original_price && (
-            <span className="text-sm text-muted-foreground line-through">₹{product.original_price.toFixed(0)}</span>
-          )}
+      <div className="flex flex-1 flex-col pt-3.5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="line-clamp-2 text-[15px] font-medium leading-snug tracking-[-0.01em] text-foreground md:text-base">
+            <Link href={href} className="transition-colors hover:text-primary">
+              {product.name}
+            </Link>
+          </h3>
+          <div className="shrink-0 text-right">
+            <span className="type-price">₹{product.price.toFixed(0)}</span>
+            {!!product.original_price && (
+              <span className="block text-xs text-muted-foreground line-through">₹{product.original_price.toFixed(0)}</span>
+            )}
+          </div>
         </div>
 
-        <div className="mt-2.5 flex flex-1 flex-wrap content-end items-center justify-between gap-2">
-          <span className="rounded-full bg-success-soft px-2.5 py-1 text-[11px] font-semibold text-success">
-            Free Shipping
-          </span>
+        <div className="mt-1.5 flex flex-1 flex-wrap content-end items-center justify-between gap-2">
+          <span className="text-xs text-success">Free shipping</span>
           {/* Touch "Buy Now": always visible compact pill */}
           <Link
             href={href}
-            className="inline-flex h-8 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-hover can-hover:hidden"
+            className="inline-flex h-8 items-center rounded-full bg-foreground px-3.5 text-xs font-semibold text-background transition-colors hover:bg-primary can-hover:hidden"
           >
             Buy Now
           </Link>

@@ -115,7 +115,7 @@ export default function FAQPage() {
         subtitle="Everything you need to know about our press-on nails, sizing, ordering, and more."
       />
 
-      <Section containerClassName="max-w-3xl space-y-12">
+      <Section containerClassName="space-y-12 [&>*]:max-w-3xl">
         {faqs.map((section) => (
           <div key={section.category}>
             <h2 className="type-h3 mb-2 border-b border-gold/40 pb-3 text-foreground">{section.category}</h2>

@@ -1,124 +1,91 @@
-'use client';
-
-import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRight, Ruler, Sparkles, Truck, Star } from 'lucide-react';
+import { Container, Accent } from '@/components/ui-kit';
+import { Button } from '@/components/ui/button';
 
-const slides = [
-  { id: 4, bg: '/hero/slide-4.png', position: 'object-left' },
-  { id: 1, bg: '/hero/slide-1.png', position: 'object-center' },
-  { id: 2, bg: '/hero/slide-2.png', position: 'object-center' },
-  { id: 3, bg: '/hero/slide-3.png', position: 'object-center' },
+const TRUST = [
+  { icon: Ruler, label: 'Custom fit' },
+  { icon: Sparkles, label: 'Handcrafted' },
+  { icon: Truck, label: 'Pan-India delivery' },
+  { icon: Star, label: '5.0 on Google' },
 ];
 
-const SWIPE_THRESHOLD = 50;
-
 export default function HeroSection() {
-  const [current, setCurrent] = useState(0);
-  const [animating, setAnimating] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  const goTo = useCallback((idx: number) => {
-    if (animating) return;
-    setAnimating(true);
-    setTimeout(() => {
-      setCurrent(idx);
-      setAnimating(false);
-    }, 400);
-  }, [animating]);
-
-  const next = useCallback(() => goTo((current + 1) % slides.length), [current, goTo]);
-  const prev = useCallback(() => goTo((current - 1 + slides.length) % slides.length), [current, goTo]);
-
-  useEffect(() => {
-    if (paused) return;
-    timerRef.current = setTimeout(next, 5500);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [current, paused, next]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    setPaused(true);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    // Only trigger if horizontal swipe is dominant
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
-      dx < 0 ? next() : prev();
-    }
-    touchStartX.current = null;
-    touchStartY.current = null;
-    setPaused(false);
-  };
-
   return (
-    <section
-      className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
-      style={{ paddingBottom: 'min(66.67%, 100dvh)' }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Background images */}
-      {slides.map((s, i) => (
-        <div
-          key={s.id}
-          className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}
-        >
-          <Link href="/categories" className="block w-full h-full">
-            <img
-              src={s.bg}
-              alt={`Nail Shingaar slide ${i + 1}`}
-              className={`w-full h-full object-cover ${s.position}`}
-              draggable={false}
-            />
-          </Link>
+    <section className="bg-background pb-14 pt-10 md:pb-20 md:pt-16">
+      <Container>
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
+          <div className="lg:col-span-8">
+            <p className="eyebrow mb-6 flex items-center gap-3">
+              <span aria-hidden className="h-px w-8 bg-foreground/30" />
+              Handcrafted press-on nails · Ludhiana
+            </p>
+            <h1 className="type-display text-foreground">
+              Crafting confidence, <Accent>one nail at a&nbsp;time.</Accent>
+            </h1>
+          </div>
+          <div className="lg:col-span-4 lg:pb-3">
+            <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
+              Custom-sized, salon-quality press-ons made by hand — designed to fit your fingers perfectly.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/categories">
+                  Shop the Collection <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/custom-order">Create a Custom Set</Link>
+              </Button>
+            </div>
+          </div>
         </div>
-      ))}
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`rounded-full transition-all duration-300 ${
-              i === current ? 'w-6 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/60'
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
+        {/* Photo mosaic */}
+        <div className="mt-12 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-12 md:gap-4">
+          <div className="relative col-span-2 aspect-[3/2] overflow-hidden rounded-media bg-blush md:col-span-6 md:aspect-auto md:h-[480px]">
+            <Image
+              src="/Work/W-5.jpg"
+              alt="Hands wearing pastel floral press-on nails by Nail Shingaar"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush md:col-span-3 md:aspect-auto md:h-[480px]">
+            <Image
+              src="/reet-photo.jpg"
+              alt="Reet, the nail artist behind Nail Shingaar"
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover object-[50%_30%]"
+            />
+            <span className="absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
+              7+ years of nail artistry
+            </span>
+          </div>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush md:col-span-3 md:aspect-auto md:h-[480px]">
+            <Image
+              src="/Work/W-1.jpg"
+              alt="A boxed set of handmade press-on nails"
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
 
-      {/* Slide counter */}
-      <div className="absolute bottom-4 md:bottom-6 right-4 md:right-6 z-20 text-white/50 text-[10px] md:text-xs font-mono tracking-widest">
-        {String(current + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-      </div>
-
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 h-0.5 bg-white/10">
-        {!paused && (
-          <div
-            key={current}
-            className="h-full bg-primary origin-left"
-            style={{ animation: 'heroProgress 5.5s linear forwards' }}
-          />
-        )}
-      </div>
-
-      <style>{`
-        @keyframes heroProgress {
-          from { transform: scaleX(0); }
-          to   { transform: scaleX(1); }
-        }
-      `}</style>
+        <ul className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
+          {TRUST.map((t) => (
+            <li key={t.label} className="flex items-center gap-2">
+              <t.icon className="h-4 w-4 text-foreground" aria-hidden />
+              {t.label}
+            </li>
+          ))}
+        </ul>
+      </Container>
     </section>
   );
 }

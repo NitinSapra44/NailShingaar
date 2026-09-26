@@ -2,6 +2,7 @@
 
 import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/home/HeroSection';
+import Marquee from '@/components/home/Marquee';
 import CategoriesSection from '@/components/home/CategoriesSection';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import MeetReet from '@/components/home/MeetReet';
@@ -14,6 +15,7 @@ export default function Home() {
   return (
     <Layout>
       <HeroSection />
+      <Marquee />
       <CategoriesSection />
       <FeaturedProducts />
       <MeetReet />

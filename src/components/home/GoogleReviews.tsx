@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
-import { Section, SectionHeading, ReviewCard, Stars, GoogleG, Reveal, type Review } from '@/components/ui-kit';
+import { Section, SectionHeading, ReviewCard, Stars, GoogleG, Reveal, Accent, type Review } from '@/components/ui-kit';
 import { cn } from '@/lib/utils';
 
 const reviews: Review[] = [
@@ -95,12 +95,11 @@ export default function GoogleReviews() {
   }, [api, sync]);
 
   return (
-    <Section tone="soft">
+    <Section>
       <Reveal>
         <SectionHeading
-          align="left"
-          eyebrow="What Clients Say"
-          title="Real Reviews"
+          eyebrow="What clients say"
+          title={<>Real <Accent>reviews</Accent></>}
           subtitle={
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <Stars label="Rated 5 out of 5" />
@@ -123,9 +122,9 @@ export default function GoogleReviews() {
       </Reveal>
 
       <Carousel setApi={setApi} opts={{ align: 'start' }} aria-label="Client reviews">
-        <CarouselContent className="-ml-4 md:-ml-6">
+        <CarouselContent className="-ml-4 md:-ml-10">
           {reviews.map((r) => (
-            <CarouselItem key={r.name} className="basis-[83%] pl-4 sm:basis-1/2 md:pl-6 lg:basis-1/3">
+            <CarouselItem key={r.name} className="basis-[83%] pl-4 sm:basis-1/2 md:pl-10 lg:basis-1/3">
               <ReviewCard review={r} />
             </CarouselItem>
           ))}

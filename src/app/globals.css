@@ -4,24 +4,23 @@
 
 @layer base {
   :root {
-    /* ── Brand tokens: "Modern Indian Luxe" ──
+    /* ── Brand tokens: "Editorial minimal" ──
+       Warm paper + ink; brand magenta is an accent, not a background.
        Stored as HSL channels so Tailwind opacity modifiers work (bg-primary/20). */
-    --color-bg: 26 47% 97%;             /* #FBF7F4 ivory */
-    --color-bg-soft: 8 45% 94%;         /* #F6E9E7 blush */
+    --color-bg: 38 31% 95%;             /* #F6F3EE paper */
+    --color-bg-soft: 34 27% 90%;        /* #ECE6DE sand */
     --color-surface: 0 0% 100%;         /* #FFFFFF */
-    --color-text: 333 15% 14%;          /* #2A1F24 */
-    --color-text-muted: 338 7% 45%;     /* #7A6A70 */
-    --color-primary: 333 57% 44%;       /* #B0306A magenta */
+    --color-text: 24 12% 8%;            /* #171412 ink */
+    --color-text-muted: 26 7% 39%;      /* #6B635D (5.3:1 on paper) */
+    --color-primary: 333 57% 44%;       /* #B0306A brand magenta (accent) */
     --color-primary-hover: 333 60% 37%; /* #962558 */
     --color-primary-soft: 335 58% 93%;  /* #F7E1EA */
-    --color-deep: 345 60% 27%;          /* #6D1B2F maroon */
-    --color-deep-text: 14 62% 96%;      /* #FBF1EE */
-    --color-accent: 36 40% 54%;         /* #B8925A muted gold (rules, icons, badges) */
-    --color-accent-soft: 36 49% 89%;    /* #F1E6D6 */
-    /* #B8925A is only 2.7:1 on ivory, below AA for small text. Gold *text*
-       (eyebrows, dates) uses this darker shade instead: 4.7:1 on ivory. */
-    --color-accent-text: 38 45% 37%;    /* #8A6A35 */
-    --color-border: 0 27% 91%;          /* #EFE3E3 */
+    --color-deep: 24 12% 8%;            /* ink bands: announcement bar, footer, one feature section */
+    --color-deep-text: 38 31% 95%;      /* paper on ink */
+    --color-accent: 30 12% 60%;         /* #A69A8E taupe: hairlines, small icons */
+    --color-accent-soft: 34 27% 90%;    /* sand */
+    --color-accent-text: 26 7% 39%;     /* eyebrows/dates: same as muted text for AA */
+    --color-border: 35 24% 86%;         /* #E4DDD3 */
     --color-success: 150 44% 33%;       /* #2F7A55 */
     --color-success-soft: 148 35% 93%;  /* #E6F3EC */
     --color-star: 41 54% 54%;           /* #C9A14A */
@@ -45,8 +44,8 @@
     --destructive-foreground: 0 0% 100%;
     --border: var(--color-border);
     --input: var(--color-border);
-    --ring: var(--color-primary);
-    --radius: 1rem;
+    --ring: var(--color-text);
+    --radius: 0.625rem;
 
     /* Legacy aliases still used across pages; kept pointing at the new palette. */
     --pink: var(--color-primary);
@@ -80,21 +79,25 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-size: 16px;
-    line-height: 1.65;
-    /* Cormorant defaults to old-style figures; stats and prices need lining ones. */
+    line-height: 1.6;
     font-variant-numeric: lining-nums;
   }
 
   h1, h2, h3, h4 {
-    @apply font-serif;
+    @apply font-display;
     font-weight: 500;
-    letter-spacing: -0.01em;
-    line-height: 1.15;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
 
   :focus-visible {
-    outline: 2px solid hsl(var(--color-primary));
+    outline: 2px solid hsl(var(--color-text));
     outline-offset: 2px;
+  }
+
+  ::selection {
+    background: hsl(var(--color-primary-soft));
+    color: hsl(var(--color-text));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -108,51 +111,52 @@
 }
 
 @layer components {
-  /* Type scale */
+  /* Type scale — big, tight, editorial */
   .type-display {
-    @apply font-serif text-[40px] md:text-[64px];
+    @apply font-display text-[46px] sm:text-[64px] lg:text-[96px];
     font-weight: 500;
-    line-height: 1.05;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
   }
   .type-h2 {
-    @apply font-serif text-[32px] md:text-[44px];
+    @apply font-display text-[36px] md:text-[56px];
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
   .type-h3 {
-    @apply font-serif text-[20px] md:text-[22px];
-    font-weight: 600;
+    @apply font-display text-[19px] md:text-[21px];
+    font-weight: 500;
     line-height: 1.25;
+    letter-spacing: -0.015em;
   }
   .eyebrow {
-    @apply font-sans text-xs font-semibold uppercase text-gold-text;
-    letter-spacing: 0.18em;
+    @apply font-sans text-[11px] font-semibold uppercase text-muted-foreground;
+    letter-spacing: 0.16em;
   }
   .type-price {
-    @apply font-sans text-lg font-semibold text-primary;
+    @apply font-sans text-[15px] font-medium text-foreground;
   }
 
-  /* Section rhythm: 48 / 64 / 96px */
+  /* Section rhythm: 56 / 80 / 128px */
   .section-y {
-    @apply py-12 md:py-16 lg:py-24;
+    @apply py-14 md:py-20 lg:py-32;
   }
 }
 
 @layer utilities {
-  /* Legacy utilities remapped to the new system so untouched pages stay on-brand. */
+  /* Legacy utilities remapped to the editorial system so untouched pages stay on-brand. */
   .font-display {
-    @apply font-serif;
-    font-weight: 500;
+    font-family: var(--font-sans), system-ui, sans-serif;
   }
 
-  .font-script {
-    @apply font-serif italic;
-    font-weight: 500;
-  }
-
-  /* One highlighted word per heading: italic serif in brand colour (no gradient). */
+  /* Italic serif accent — the one expressive note in a heading. */
+  .font-script,
   .text-gradient {
-    @apply font-serif italic text-primary;
+    font-family: var(--font-accent), Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 
   .bg-gradient-hero,
@@ -166,7 +170,7 @@
   }
 
   .step-active {
-    @apply bg-primary text-primary-foreground;
+    @apply bg-foreground text-background;
   }
 
   .step-done {

@@ -28,9 +28,13 @@ export default {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        serif: ["var(--font-serif)", "Georgia", "serif"],
-        display: ["var(--font-serif)", "Georgia", "serif"],
-        script: ["var(--font-serif)", "Georgia", "serif"],
+        // Headings/titles use the display sans. `serif` is kept as an alias so the
+        // many existing `font-serif` titles adopt the new display face.
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-sans)", "system-ui", "sans-serif"],
+        // Italic serif accent words only.
+        accent: ["var(--font-accent)", "Georgia", "serif"],
+        script: ["var(--font-accent)", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -110,10 +114,10 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 8px)",
-        card: "16px",
-        media: "12px",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        card: "10px",
+        media: "6px",
       },
       maxWidth: {
         content: "1240px",

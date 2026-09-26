@@ -1,23 +1,23 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { Cormorant_Garamond, DM_Sans } from 'next/font/google';
+import { Instrument_Sans, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
-const serif = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['500', '600'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-serif',
-});
-
-// 700 is included only so existing `font-bold` usages (admin tables, badges) don't get faux-bolded.
-const sans = DM_Sans({
+const sans = Instrument_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-sans',
+});
+
+// Italic accent words only.
+const accent = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-accent',
 });
 
 const GA_MEASUREMENT_ID = 'G-ZWP0SG8R95';
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="en" className={`${sans.variable} ${accent.variable}`}>
       <body>
         <Script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">

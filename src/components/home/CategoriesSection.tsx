@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Section, SectionHeading, CollectionCard, Skeleton, Reveal } from '@/components/ui-kit';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Section, SectionHeading, CollectionCard, Skeleton, Reveal, Accent } from '@/components/ui-kit';
 import { supabase } from '@/integrations/supabase/client';
 import { Category } from '@/types';
 
@@ -49,16 +52,31 @@ const CategoriesSection = () => {
     category.image_url || CATEGORY_IMAGES[category.slug] || DEFAULT_IMAGE;
 
   const track =
-    '-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3';
+    '-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3';
   const item = 'w-[78%] shrink-0 snap-start sm:w-auto';
+
+  const heading = (
+    <SectionHeading
+      eyebrow="Collections"
+      title={<>Shop by <Accent>collection</Accent></>}
+      subtitle="From everyday elegance to bridal splendour."
+      action={
+        <Button asChild variant="link" className="group">
+          <Link href="/categories">
+            All collections <ArrowRight className="transition-transform group-hover:translate-x-1" aria-hidden />
+          </Link>
+        </Button>
+      }
+    />
+  );
 
   if (loading) {
     return (
-      <Section tone="soft" aria-busy="true">
-        <SectionHeading eyebrow="Explore" title="Shop by Collection" subtitle="From everyday elegance to bridal splendour." />
+      <Section aria-busy="true">
+        {heading}
         <div className={track}>
           {[1, 2, 3].map((n) => (
-            <Skeleton key={n} className={`${item} aspect-[4/5] rounded-card`} />
+            <Skeleton key={n} className={`${item} aspect-[4/5]`} />
           ))}
         </div>
       </Section>
@@ -68,10 +86,8 @@ const CategoriesSection = () => {
   if (categories.length === 0) return null;
 
   return (
-    <Section tone="soft">
-      <Reveal>
-        <SectionHeading eyebrow="Explore" title="Shop by Collection" subtitle="From everyday elegance to bridal splendour." />
-      </Reveal>
+    <Section>
+      <Reveal>{heading}</Reveal>
       <div className={track}>
         {categories.map((c, index) => (
           <Reveal key={c.slug} delay={index * 60} className={item}>

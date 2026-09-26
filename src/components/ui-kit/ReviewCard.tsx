@@ -21,27 +21,29 @@ export const GoogleG = ({ className }: { className?: string }) => (
 
 export function ReviewCard({ review, className }: { review: Review; className?: string }) {
   return (
-    <figure className={cn('flex h-full flex-col gap-4 rounded-card border border-border bg-surface p-6', className)}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft font-serif text-base font-semibold text-primary-hover"
-            aria-hidden
-          >
-            {review.initials}
-          </span>
-          <figcaption className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">{review.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {review.badge ? `${review.badge} · ` : ''}
-              {review.time}
-            </p>
-          </figcaption>
-        </div>
+    <figure className={cn('flex h-full flex-col border-t border-foreground/15 pt-6', className)}>
+      <div className="flex items-center justify-between">
+        <Stars />
         <GoogleG />
       </div>
-      <Stars />
-      <blockquote className="flex-1 text-[15px] leading-relaxed text-foreground/85">{review.text}</blockquote>
+      <blockquote className="mt-5 flex-1 text-lg font-medium leading-snug tracking-[-0.02em] text-foreground md:text-xl">
+        “{review.text}”
+      </blockquote>
+      <figcaption className="mt-8 flex items-center gap-3">
+        <span
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blush text-sm font-semibold text-foreground"
+          aria-hidden
+        >
+          {review.initials}
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold text-foreground">{review.name}</span>
+          <span className="block text-xs text-muted-foreground">
+            {review.badge ? `${review.badge} · ` : ''}
+            {review.time}
+          </span>
+        </span>
+      </figcaption>
     </figure>
   );
 }

@@ -35,12 +35,12 @@ const FeaturedProducts = () => {
   }, []);
 
   // Only 4 products are fetched, so tablet uses 2 columns (a 3-col row would leave an orphan).
-  const grid = 'grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6';
+  const grid = 'grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6';
   const heading = (
     <SectionHeading
       align="left"
       eyebrow="Most Loved"
-      title={<>Our <Accent>Bestsellers</Accent></>}
+      title={<>Our <Accent>bestsellers</Accent></>}
       action={
         <Button asChild variant="link" className="group">
           <Link href="/shop?featured=true">
@@ -53,11 +53,11 @@ const FeaturedProducts = () => {
 
   if (loading) {
     return (
-      <Section aria-busy="true">
+      <Section tone="soft" aria-busy="true">
         {heading}
         <div className={grid}>
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-card bg-surface p-3">
+            <div key={i}>
               <Skeleton className="aspect-[4/5]" />
               <Skeleton className="mt-4 h-5 w-3/4" />
               <Skeleton className="mt-2 h-4 w-1/3" />
@@ -71,7 +71,7 @@ const FeaturedProducts = () => {
   if (products.length === 0) return null;
 
   return (
-    <Section>
+    <Section tone="soft">
       <Reveal>{heading}</Reveal>
       <div className={grid}>
         {products.map((product, index) => (
