@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, Ruler, Sparkles, Truck, Star } from 'lucide-react';
+import { ArrowRight, Ruler, Sparkles, Truck, Star } from 'lucide-react';
 import { Container, Accent } from '@/components/ui-kit';
 import { Button } from '@/components/ui/button';
+import { HeroVideo } from './HeroVideo';
 
 const TRUST = [
   { icon: Ruler, label: 'Custom fit' },
@@ -11,41 +11,26 @@ const TRUST = [
   { icon: Star, label: '5.0 on Google' },
 ];
 
-// Real product photography; slugs point at the existing product pages.
-const MOSAIC = [
-  {
-    name: 'White Garden',
-    slug: 'white-garden',
-    src: '/editorial/hero-white-garden.jpg',
-    alt: 'Hands wearing White Garden press-on nails against an orange backdrop',
-    className: 'col-span-2 aspect-[3/2] md:col-span-6',
-    sizes: '(max-width: 768px) 100vw, 50vw',
-    priority: true,
-  },
-  {
-    name: 'Ivory Royale',
-    slug: 'ivory-royale',
-    src: '/editorial/hero-ivory-royale.jpg',
-    alt: 'Model wearing Ivory Royale press-on nails with glitter makeup',
-    className: 'aspect-[4/5] md:col-span-3',
-    sizes: '(max-width: 768px) 50vw, 25vw',
-    priority: false,
-  },
-  {
-    name: 'Emerald Luxe',
-    slug: 'emerald-luxe',
-    src: '/editorial/hero-emerald-luxe.jpg',
-    alt: 'Model wearing Emerald Luxe press-on nails, holding a chocolate bar',
-    className: 'aspect-[4/5] md:col-span-3',
-    sizes: '(max-width: 768px) 50vw, 25vw',
-    priority: false,
-  },
-];
-
 export default function HeroSection() {
   return (
-    <section className="bg-background pb-14 pt-10 md:pb-20 md:pt-16">
-      <Container>
+    <section className="bg-background">
+      {/* Full-bleed film. Sage fallback matches the footage while it loads. */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#A3AD98] sm:aspect-video md:max-h-[calc(100svh-7rem)]">
+        <HeroVideo />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-2/5 bg-gradient-to-t from-ink/35 to-transparent md:block"
+        />
+        <div className="absolute bottom-5 left-5 z-10 hidden md:block lg:bottom-8 lg:left-8">
+          <Button asChild className="bg-white text-foreground hover:bg-primary hover:text-white">
+            <Link href="/categories">
+              Shop the Collection <ArrowRight aria-hidden />
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      <Container className="pb-14 pt-10 md:pb-20 md:pt-16">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
           <div className="lg:col-span-8">
             <p className="eyebrow mb-6 flex items-center gap-3">
@@ -73,30 +58,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Photo mosaic — each tile links to the product it shows */}
-        <div className="mt-12 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-12 md:gap-4">
-          {MOSAIC.map((t) => (
-            <Link
-              key={t.slug}
-              href={`/product/${t.slug}`}
-              className={`group relative overflow-hidden rounded-media bg-blush md:aspect-auto md:h-[480px] ${t.className}`}
-            >
-              <Image
-                src={t.src}
-                alt={t.alt}
-                fill
-                priority={t.priority}
-                sizes={t.sizes}
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-              <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur transition-colors group-hover:bg-foreground group-hover:text-background">
-                {t.name} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        <ul className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
+        <ul className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
           {TRUST.map((t) => (
             <li key={t.label} className="flex items-center gap-2">
               <t.icon className="h-4 w-4 text-foreground" aria-hidden />
