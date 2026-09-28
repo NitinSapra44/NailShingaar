@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 // Stats are facts already published on the site (About page + Google reviews section).
 const STATS = [
   { value: '7+', label: 'Years of experience' },
-  { value: '1000+', label: 'Happy clients' },
-  { value: '5.0', label: 'Google rating' },
+  { value: '3000+', label: 'Happy clients' },
+  { value: '4.8', label: 'Google rating' },
 ];
 
 export default function MeetReet() {

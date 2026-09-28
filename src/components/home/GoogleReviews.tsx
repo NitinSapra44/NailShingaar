@@ -102,8 +102,8 @@ export default function GoogleReviews() {
           title={<>Real <Accent>reviews</Accent></>}
           subtitle={
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <Stars label="Rated 5 out of 5" />
-              <span className="font-semibold text-foreground">5.0 on Google</span>
+              <Stars value={4.8} label="Rated 4.8 out of 5" />
+              <span className="font-semibold text-foreground">4.8 on Google</span>
               <GoogleG />
               {/* TODO(copy): add the total Google review count once confirmed */}
             </span>

@@ -8,7 +8,7 @@ const TRUST = [
   { icon: Ruler, label: 'Custom fit' },
   { icon: Sparkles, label: 'Handcrafted' },
   { icon: Truck, label: 'Pan-India delivery' },
-  { icon: Star, label: '5.0 on Google' },
+  { icon: Star, label: '4.8 on Google' },
 ];
 
 export default function HeroSection() {
