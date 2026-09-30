@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, ChevronRight, Upload, X, Camera, Loader2, Info } from 'lucide-react';
+import { Check, ChevronRight, Upload, X, Camera, Loader2, Info, ShieldCheck } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { shippingFor } from '@/lib/pricing';
+import { isRazorpayEnabled, payForOrder } from '@/services/razorpay';
 import type { NailQuestionnaire, ShippingDetails, Product } from '@/types';
 
 interface CheckoutLineItem {
@@ -37,6 +39,7 @@ const REQUIRED_SLOTS = [
   { key: 'full_hand',     label: 'Full Hand Overview',    hint: 'Relaxed shot of your whole hand, no coin needed' },
 ];
 const STEPS = ['Nail Sizing', 'Shipping', 'Payment'];
+const ONLINE_PAYMENTS = isRazorpayEnabled();
 
 function StepBar({ current }: Readonly<{ current: number }>) {
   return (
@@ -121,7 +124,7 @@ export default function CheckoutPage() {
   const paymentRef = useRef<HTMLInputElement | null>(null);
 
   const subtotal = (lineItems ?? []).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shippingCost = subtotal >= 999 ? 0 : 99;
+  const shippingCost = shippingFor(subtotal);
   const orderTotal = subtotal + shippingCost;
 
   const handlePhotoChange = (key: string, file: File | null) => {
@@ -194,7 +197,7 @@ export default function CheckoutPage() {
   };
 
   const handleSubmitOrder = async () => {
-    if (!paymentScreenshot) {
+    if (!ONLINE_PAYMENTS && !paymentScreenshot) {
       toast({ title: 'Screenshot required', description: 'Please upload your payment screenshot.', variant: 'destructive' });
       return;
     }
@@ -212,7 +215,9 @@ export default function CheckoutPage() {
         const file = extraPhotos[i];
         photoUrls.push(await uploadFile('nail-photos', file, `${user.id}/${ts}_extra_${i}.${file.name.split('.').pop()}`));
       }
-      const screenshotUrl = await uploadFile('payment-screenshots', paymentScreenshot, `${user.id}/${ts}_payment.${paymentScreenshot.name.split('.').pop()}`);
+      const screenshotUrl = paymentScreenshot && !ONLINE_PAYMENTS
+        ? await uploadFile('payment-screenshots', paymentScreenshot, `${user.id}/${ts}_payment.${paymentScreenshot.name.split('.').pop()}`)
+        : null;
 
       const { data: order, error: orderError } = await supabase.from('orders').insert({
         user_id: user.id, status: 'pending', total: orderTotal,
@@ -220,7 +225,8 @@ export default function CheckoutPage() {
         shipping_address: `${shipping.address}, ${shipping.pincode}`, shipping_city: shipping.city,
         nail_length: questionnaire.nail_length, nail_shape: questionnaire.nail_shape,
         color_preference: questionnaire.color_preference || null,
-        nail_photos: photoUrls, payment_screenshot: screenshotUrl, payment_status: 'screenshot_uploaded',
+        nail_photos: photoUrls, payment_screenshot: screenshotUrl,
+        payment_status: ONLINE_PAYMENTS ? 'pending' : 'screenshot_uploaded',
       }).select().single();
 
       if (orderError) throw new Error(orderError.message);
@@ -234,10 +240,37 @@ export default function CheckoutPage() {
       );
       if (itemsError) throw new Error(itemsError.message);
 
+      // The order exists now, so empty the cart even if payment is abandoned:
+      // it can be paid later from /pay/<id> (linked from My Orders).
       if (fromCart) {
         await clearCart();
       } else {
         sessionStorage.removeItem('checkout_product');
+      }
+
+      if (ONLINE_PAYMENTS) {
+        let result: Awaited<ReturnType<typeof payForOrder>>;
+        try {
+          result = await payForOrder({
+            orderId: order.id,
+            description: `Order #${order.id.slice(0, 8).toUpperCase()}`,
+            prefill: { name: shipping.full_name, contact: shipping.phone, email: user.email ?? undefined },
+            onFailed: (reason) => toast({ title: 'Payment failed', description: reason, variant: 'destructive' }),
+          });
+        } catch (err: unknown) {
+          toast({
+            title: 'Your order is saved',
+            description: err instanceof Error ? err.message : 'Payment could not start. You can pay from this page.',
+            variant: 'destructive',
+          });
+          router.push(`/pay/${order.id}`);
+          return;
+        }
+        if (result.status === 'dismissed') {
+          toast({ title: 'Payment not completed', description: 'Your order is saved. Pay whenever you’re ready.' });
+          router.push(`/pay/${order.id}`);
+          return;
+        }
       }
       router.push(`/order-confirmation/${order.id}`);
     } catch (err: unknown) {
@@ -429,48 +462,65 @@ export default function CheckoutPage() {
             {step === 2 && (
               <div className="space-y-6 animate-fade-up">
                 <h2 className="font-display text-xl font-semibold">Payment</h2>
-                <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center">
-                  <p className="font-semibold text-lg">Scan & Pay ₹{orderTotal.toFixed(0)}</p>
-                  <div className="flex justify-center">
-                    <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
-                      <img
-                        src="/qr-code.jpg"
-                        alt="UPI QR Code — Nail Shingaar by Reet"
-                        className="w-48 h-48 object-contain rounded-xl"
-                      />
-                    </div>
+                {ONLINE_PAYMENTS ? (
+                  <div className="p-6 rounded-2xl bg-card border border-border space-y-3">
+                    <p className="font-semibold text-lg">Pay ₹{orderTotal.toFixed(0)} securely</p>
+                    <p className="text-sm text-muted-foreground">
+                      UPI, cards, net banking and wallets via Razorpay. Your nail photos are uploaded and the order is saved before the payment window opens.
+                    </p>
+                    <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <ShieldCheck className="h-4 w-4 text-success" aria-hidden />
+                      Payments are processed by Razorpay. We never see your card or UPI details.
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
-                </div>
-
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Upload Payment Screenshot *</Label>
-                  <p className="text-sm text-muted-foreground">After paying, take a screenshot and upload it here.</p>
-                  {paymentPreview ? (
-                    <div className="relative rounded-xl overflow-hidden border border-border max-h-64">
-                      <img src={paymentPreview} alt="Payment screenshot" className="w-full object-contain" />
-                      <button type="button" onClick={() => handlePaymentScreenshot(null)}
-                        className="absolute top-2 right-2 h-7 w-7 rounded-full bg-foreground/70 text-background flex items-center justify-center">
-                        <X className="h-4 w-4" />
-                      </button>
+                ) : (
+                  <>
+                <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center">
+                    <p className="font-semibold text-lg">Scan & Pay ₹{orderTotal.toFixed(0)}</p>
+                    <div className="flex justify-center">
+                      <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
+                        <img
+                          src="/qr-code.jpg"
+                          alt="UPI QR Code — Nail Shingaar by Reet"
+                          className="w-48 h-48 object-contain rounded-xl"
+                        />
+                      </div>
                     </div>
-                  ) : (
-                    <button type="button" onClick={() => paymentRef.current?.click()}
-                      className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
-                      <Upload className="h-8 w-8 text-muted-foreground" />
-                      <span className="text-sm font-medium">Click to upload screenshot</span>
-                      <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>
-                    </button>
-                  )}
-                  <input ref={paymentRef} type="file" accept="image/*" className="hidden"
-                    onChange={(e) => handlePaymentScreenshot(e.target.files?.[0] ?? null)} />
-                </div>
+                    <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">Upload Payment Screenshot *</Label>
+                    <p className="text-sm text-muted-foreground">After paying, take a screenshot and upload it here.</p>
+                    {paymentPreview ? (
+                      <div className="relative rounded-xl overflow-hidden border border-border max-h-64">
+                        <img src={paymentPreview} alt="Payment screenshot" className="w-full object-contain" />
+                        <button type="button" onClick={() => handlePaymentScreenshot(null)}
+                          className="absolute top-2 right-2 h-7 w-7 rounded-full bg-foreground/70 text-background flex items-center justify-center">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => paymentRef.current?.click()}
+                        className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-sm font-medium">Click to upload screenshot</span>
+                        <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>
+                      </button>
+                    )}
+                    <input ref={paymentRef} type="file" accept="image/*" className="hidden"
+                      onChange={(e) => handlePaymentScreenshot(e.target.files?.[0] ?? null)} />
+                  </div>
+                  </>
+                )}
 
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(1)}>Back</Button>
                   <Button className="flex-1 rounded-full shadow-soft hover:shadow-glow" size="lg"
                     onClick={handleSubmitOrder} disabled={submitting}>
-                    {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Placing Order…</> : 'Place Order'}
+                    {submitting
+                      ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{ONLINE_PAYMENTS ? 'Processing…' : 'Placing Order…'}</>
+                      : ONLINE_PAYMENTS ? `Pay ₹${orderTotal.toFixed(0)}` : 'Place Order'}
                   </Button>
                 </div>
               </div>

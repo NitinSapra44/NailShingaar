@@ -104,6 +104,28 @@ export default function OrderConfirmationPage() {
           </div>
         )}
 
+        {!isCustomEnquiry && order.payment_status === 'confirmed' && (
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-success-soft border border-success/30 mb-8">
+            <CheckCircle2 className="h-5 w-5 text-success mt-0.5 shrink-0" />
+            <div>
+              <p className="font-semibold text-sm">Payment received — ₹{order.total.toFixed(0)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Your order is confirmed. Reet will start crafting your set.</p>
+            </div>
+          </div>
+        )}
+
+        {!isCustomEnquiry && order.payment_status === 'pending' && (
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-pink-light border border-accent mb-8">
+            <Clock className="h-5 w-5 text-accent-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="font-semibold text-sm">Confirming your payment</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                This usually takes under a minute. Check <a href="/orders" className="underline">My Orders</a> shortly. If you weren’t charged, you can pay from there.
+              </p>
+            </div>
+          </div>
+        )}
+
         {!isCustomEnquiry && order.payment_status === 'screenshot_uploaded' && (
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-pink-light border border-accent mb-8">
             <Clock className="h-5 w-5 text-accent-foreground mt-0.5 shrink-0" />
