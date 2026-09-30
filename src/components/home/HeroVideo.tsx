@@ -3,31 +3,56 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 
-// Silent, looping hero film. Captions are baked into the footage (top centre),
-// so the frame is never cropped at the top. Respects prefers-reduced-motion
-// and offers a pause control (WCAG 2.2.2).
+// Silent, looping hero film. Autoplays everywhere, including phones: if the
+// browser blocks autoplay (iOS Low Power Mode, Android Data Saver) it retries
+// on the first touch/scroll. A pause control is kept for WCAG 2.2.2.
 export function HeroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(true);
+  // Set once the visitor pauses, so we never restart against their wishes.
+  const userPaused = useRef(false);
 
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      v.pause();
-      setPlaying(false);
-    }
+
+    // iOS only autoplays inline, muted video; set both as properties too.
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+
+    const kick = () => {
+      if (userPaused.current || !v.paused) return;
+      v.play().catch(() => {});
+    };
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    const onVisible = () => { if (document.visibilityState === 'visible') kick(); };
+    const gestures = ['touchstart', 'pointerdown', 'scroll', 'keydown'] as const;
+
+    v.addEventListener('play', onPlay);
+    v.addEventListener('pause', onPause);
+    document.addEventListener('visibilitychange', onVisible);
+    gestures.forEach((e) => window.addEventListener(e, kick, { passive: true }));
+    kick();
+
+    return () => {
+      v.removeEventListener('play', onPlay);
+      v.removeEventListener('pause', onPause);
+      document.removeEventListener('visibilitychange', onVisible);
+      gestures.forEach((e) => window.removeEventListener(e, kick));
+    };
   }, []);
 
   const toggle = () => {
     const v = ref.current;
     if (!v) return;
     if (v.paused) {
-      void v.play();
-      setPlaying(true);
+      userPaused.current = false;
+      v.play().catch(() => {});
     } else {
+      userPaused.current = true;
       v.pause();
-      setPlaying(false);
     }
   };
 
