@@ -486,8 +486,20 @@ export const AdminOrders = () => {
                   </div>
                 )}
 
-                {/* Payment screenshot — only for regular orders */}
-                {!isCustomEnquiry(selectedOrder) && (
+                {/* Paid online — confirmed automatically after Razorpay verification */}
+                {selectedOrder.razorpay_payment_id && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2 font-medium">Payment</p>
+                    <p className="text-sm text-green-700 font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4" /> Paid online via Razorpay
+                      {selectedOrder.paid_at && ` · ${new Date(selectedOrder.paid_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`}
+                    </p>
+                    <p className="mt-1 font-mono text-xs text-muted-foreground">{selectedOrder.razorpay_payment_id}</p>
+                  </div>
+                )}
+
+                {/* Payment screenshot — only for regular orders paid by manual UPI */}
+                {!isCustomEnquiry(selectedOrder) && !selectedOrder.razorpay_payment_id && (
                   <div>
                     <p className="text-xs text-muted-foreground mb-2 font-medium">Payment Screenshot</p>
                     {selectedOrder.payment_screenshot ? (
@@ -513,7 +525,9 @@ export const AdminOrders = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No screenshot uploaded yet.</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrder.payment_status === 'pending' ? 'Not paid yet.' : 'No screenshot uploaded yet.'}
+                      </p>
                     )}
                   </div>
                 )}

@@ -76,6 +76,9 @@ export interface Order {
   // Payment
   payment_screenshot: string | null;
   payment_status: PaymentStatus;
+  razorpay_order_id?: string | null;
+  razorpay_payment_id?: string | null;
+  paid_at?: string | null;
   // Delivery
   tracking_number: string | null;
   notes: string | null;

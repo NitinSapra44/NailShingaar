@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Upload, X, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
+import { Upload, X, Loader2, CheckCircle2, Sparkles, ShieldCheck } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { Order } from '@/types';
+import { isCustomDesignOrder } from '@/lib/pricing';
+import { isRazorpayEnabled, payForOrder } from '@/services/razorpay';
+
+const ONLINE_PAYMENTS = isRazorpayEnabled();
 
 export default function PayPage() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -32,6 +36,8 @@ export default function PayPage() {
         const o = data as Order;
         // Guard: only allow access if payment is still pending
         if (o.payment_status !== 'pending') { router.replace('/orders'); return; }
+        // Custom designs can't be paid until Reet has quoted a price.
+        if (!(o.total > 0)) { router.replace('/orders'); return; }
         setOrder(o);
         setLoading(false);
       });
@@ -105,16 +111,49 @@ export default function PayPage() {
 
   if (!order) return null;
 
+  const custom = isCustomDesignOrder(order);
+  const shortId = order.id.slice(0, 8).toUpperCase();
+
+  const handlePayOnline = async () => {
+    setSubmitting(true);
+    try {
+      const result = await payForOrder({
+        orderId: order.id,
+        description: custom ? 'Custom design press-on nails' : `Order #${shortId}`,
+        prefill: { name: order.shipping_name, contact: order.shipping_phone, email: user?.email ?? undefined },
+        onFailed: (reason) => toast({ title: 'Payment failed', description: reason, variant: 'destructive' }),
+      });
+      if (result.status === 'dismissed') return;
+      if (custom) {
+        // The confirmation page is written for new enquiries; My Orders shows the paid state.
+        toast({
+          title: result.status === 'paid' ? 'Payment received!' : 'Confirming your payment',
+          description: 'Reet will start crafting your custom set.',
+        });
+        router.replace('/orders');
+      } else {
+        router.replace(`/order-confirmation/${order.id}`);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Payment could not start. Please try again.';
+      toast({ title: 'Payment failed', description: message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12 max-w-lg">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-pink-light text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-3">
-            <Sparkles className="h-3.5 w-3.5" /> Custom Design Order
+            <Sparkles className="h-3.5 w-3.5" /> {custom ? 'Custom Design Order' : `Order #${shortId}`}
           </div>
           <h1 className="font-display text-3xl font-semibold mb-2">Complete Your Payment</h1>
           <p className="text-muted-foreground text-sm">
-            Reet has reviewed your design and quoted a price — pay to start crafting!
+            {custom
+              ? 'Reet has reviewed your design and quoted a price — pay to start crafting!'
+              : 'Your order is saved. Complete the payment and Reet will start crafting your set.'}
           </p>
         </div>
 
@@ -122,7 +161,7 @@ export default function PayPage() {
         <div className="p-5 rounded-2xl bg-card border border-primary/30 shadow-soft mb-6 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Custom Design — Press-On Nails</p>
+              <p className="text-xs text-muted-foreground">{custom ? 'Custom Design — Press-On Nails' : 'Press-On Nails'}</p>
               <p className="font-semibold text-lg mt-0.5">₹{order.total.toFixed(0)}</p>
             </div>
             <CheckCircle2 className="h-8 w-8 text-primary" />
@@ -133,52 +172,68 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* UPI payment box */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center mb-6">
-          <p className="font-semibold text-lg">Pay via UPI</p>
-          <div className="flex justify-center">
-            <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
-              <img
-                src="/qr-code.jpg"
-                alt="UPI QR Code — Nail Shingaar by Reet"
-                className="w-52 h-52 object-contain rounded-xl"
-              />
+        {ONLINE_PAYMENTS ? (
+          <>
+            <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <ShieldCheck className="h-4 w-4 text-success" aria-hidden />
+              UPI, cards, net banking and wallets — processed securely by Razorpay
+            </p>
+            <Button className="w-full mt-4 rounded-full" size="lg" onClick={handlePayOnline} disabled={submitting}>
+              {submitting
+                ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening payment…</>
+                : `Pay ₹${order.total.toFixed(0)}`}
+            </Button>
+          </>
+        ) : (
+          <>
+          {/* UPI payment box */}
+          <div className="p-6 rounded-2xl bg-card border border-border shadow-soft space-y-4 text-center mb-6">
+            <p className="font-semibold text-lg">Pay via UPI</p>
+            <div className="flex justify-center">
+              <div className="p-3 rounded-2xl border-2 border-primary/20 bg-white inline-block shadow-soft">
+                <img
+                  src="/qr-code.jpg"
+                  alt="UPI QR Code — Nail Shingaar by Reet"
+                  className="w-52 h-52 object-contain rounded-xl"
+                />
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
           </div>
-          <p className="text-sm text-muted-foreground">Scan with PhonePe, GPay, Paytm or any UPI app</p>
-        </div>
 
-        {/* Screenshot upload */}
-        <div className="space-y-3">
-          <Label className="text-base font-semibold">Upload Payment Screenshot *</Label>
-          <p className="text-sm text-muted-foreground">After paying, take a screenshot of the success screen and upload it here.</p>
+          {/* Screenshot upload */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Upload Payment Screenshot *</Label>
+            <p className="text-sm text-muted-foreground">After paying, take a screenshot of the success screen and upload it here.</p>
 
-          {preview ? (
-            <div className="relative rounded-xl overflow-hidden border border-border max-h-72">
-              <img src={preview} alt="Payment screenshot" className="w-full object-contain" />
-              <button type="button" onClick={() => handleFile(null)}
-                className="absolute top-2 right-2 h-7 w-7 rounded-full bg-foreground/70 text-background flex items-center justify-center">
-                <X className="h-4 w-4" />
+            {preview ? (
+              <div className="relative rounded-xl overflow-hidden border border-border max-h-72">
+                <img src={preview} alt="Payment screenshot" className="w-full object-contain" />
+                <button type="button" onClick={() => handleFile(null)}
+                  className="absolute top-2 right-2 h-7 w-7 rounded-full bg-foreground/70 text-background flex items-center justify-center">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileRef.current?.click()}
+                className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <span className="text-sm font-medium">Click to upload screenshot</span>
+                <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>
               </button>
-            </div>
-          ) : (
-            <button type="button" onClick={() => fileRef.current?.click()}
-              className="w-full py-10 rounded-xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-pink-light/30 transition-colors">
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium">Click to upload screenshot</span>
-              <span className="text-xs text-muted-foreground">JPG, PNG up to 5 MB</span>
-            </button>
-          )}
-          <input ref={fileRef} type="file" accept="image/*" className="hidden"
-            onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
-        </div>
+            )}
+            <input ref={fileRef} type="file" accept="image/*" className="hidden"
+              onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+          </div>
 
-        <Button className="w-full mt-6 rounded-full shadow-soft hover:shadow-glow" size="lg"
-          onClick={handleSubmit} disabled={submitting || !screenshot}>
-          {submitting
-            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</>
-            : <><CheckCircle2 className="h-4 w-4 mr-2" />Submit Payment</>}
-        </Button>
+          <Button className="w-full mt-6 rounded-full shadow-soft hover:shadow-glow" size="lg"
+            onClick={handleSubmit} disabled={submitting || !screenshot}>
+            {submitting
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</>
+              : <><CheckCircle2 className="h-4 w-4 mr-2" />Submit Payment</>}
+          </Button>
+          </>
+        )}
       </div>
     </Layout>
   );

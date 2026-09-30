@@ -40,7 +40,9 @@ function OrderCard({ order }: { order: Order }) {
 
   // Custom enquiry states
   const awaitingQuote   = custom && order.total === 0 && order.status === 'pending';
-  const readyToPay      = custom && order.total > 0 && order.payment_status === 'pending';
+  // Custom designs become payable once quoted; shop orders are payable if the
+  // customer closed the Razorpay window before paying.
+  const readyToPay      = order.total > 0 && order.payment_status === 'pending' && order.status !== 'cancelled';
   const screenshotSent  = custom && order.payment_status === 'screenshot_uploaded';
 
   const borderCls = readyToPay
@@ -78,8 +80,14 @@ function OrderCard({ order }: { order: Order }) {
       {readyToPay && (
         <div className="px-5 pb-4 flex items-center justify-between gap-4 bg-pink-light/40 border-t border-primary/20 pt-3">
           <div>
-            <p className="text-sm font-semibold text-foreground">Price confirmed: ₹{order.total.toFixed(0)}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Reet has reviewed your design and set a price. Pay to start crafting!</p>
+            <p className="text-sm font-semibold text-foreground">
+              {custom ? `Price confirmed: ₹${order.total.toFixed(0)}` : `Payment due: ₹${order.total.toFixed(0)}`}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {custom
+                ? 'Reet has reviewed your design and set a price. Pay to start crafting!'
+                : 'Your order is saved but not paid yet. Pay to start crafting!'}
+            </p>
           </div>
           <Button asChild size="sm" className="rounded-full shadow-soft hover:shadow-glow shrink-0">
             <Link href={`/pay/${order.id}`}>Pay Now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>

@@ -141,6 +141,9 @@ export type Database = {
           user_id: string | null
           payment_status: string
           payment_screenshot: string | null
+          paid_at: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
           notes: string | null
           nail_shape: string | null
           nail_length: string | null
@@ -161,6 +164,9 @@ export type Database = {
           user_id?: string | null
           payment_status?: string
           payment_screenshot?: string | null
+          paid_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           notes?: string | null
           nail_shape?: string | null
           nail_length?: string | null
@@ -181,6 +187,9 @@ export type Database = {
           user_id?: string | null
           payment_status?: string
           payment_screenshot?: string | null
+          paid_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           notes?: string | null
           nail_shape?: string | null
           nail_length?: string | null
