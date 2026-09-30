@@ -14,20 +14,11 @@ const TRUST = [
 export default function HeroSection() {
   return (
     <section className="bg-background">
-      {/* Full-bleed film. Sage fallback matches the footage while it loads. */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#A3AD98] sm:aspect-video md:max-h-[calc(100svh-7rem)]">
+      {/* Full-bleed film. Branding and caption are baked into the footage (top and
+          bottom centre), so the whole 16:9 frame stays visible on desktop. Sage
+          fallback matches the footage while it loads. */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#A3AD98] sm:aspect-video">
         <HeroVideo />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-2/5 bg-gradient-to-t from-ink/35 to-transparent md:block"
-        />
-        <div className="absolute bottom-5 left-5 z-10 hidden md:block lg:bottom-8 lg:left-8">
-          <Button asChild className="bg-white text-foreground hover:bg-primary hover:text-white">
-            <Link href="/categories">
-              Shop the Collection <ArrowRight aria-hidden />
-            </Link>
-          </Button>
-        </div>
       </div>
 
       <Container className="pb-14 pt-10 md:pb-20 md:pt-16">

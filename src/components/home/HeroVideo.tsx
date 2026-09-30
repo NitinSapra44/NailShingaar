@@ -35,8 +35,8 @@ export function HeroVideo() {
     <>
       <video
         ref={ref}
-        className="absolute inset-0 h-full w-full object-cover object-top"
-        poster="/hero/hero-poster.jpg"
+        className="absolute inset-0 h-full w-full object-cover"
+        poster="/hero/hero-v3-poster.jpg"
         autoPlay
         muted
         loop
@@ -44,8 +44,8 @@ export function HeroVideo() {
         preload="auto"
         aria-label="A hand wearing blue-tipped almond press-on nails by Nail Shingaar"
       >
-        <source src="/hero/hero-720.mp4" type="video/mp4" media="(max-width: 767px)" />
-        <source src="/hero/hero-1080.mp4" type="video/mp4" />
+        <source src="/hero/hero-v3-720.mp4" type="video/mp4" media="(max-width: 767px)" />
+        <source src="/hero/hero-v3-1080.mp4" type="video/mp4" />
       </video>
       <button
         type="button"
