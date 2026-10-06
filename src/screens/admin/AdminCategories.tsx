@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadPublicImage } from '@/lib/image-upload';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -103,12 +104,7 @@ export const AdminCategories = () => {
   const uploadCategoryImage = async (file: File): Promise<string> => {
     const ext = file.name.split('.').pop();
     const path = `categories/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from('product-images')
-      .upload(path, file, { upsert: true });
-    if (error) throw error;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-    return data.publicUrl;
+    return uploadPublicImage(path, file);
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

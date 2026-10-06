@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { StorageImg } from '@/components/ui-kit/StorageImage';
 import { Button } from '@/components/ui/button';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCart } from '@/hooks/useCart';
@@ -60,7 +61,7 @@ export default function WishlistPage() {
               <div key={productId} className="p-4 rounded-2xl bg-card shadow-soft border border-border">
                 <div className="flex gap-4">
                   <Link href={`/product/${product.slug}`} className="flex-shrink-0">
-                    <img src={product.image_url} alt={product.name} className="w-24 h-24 object-cover rounded-xl" />
+                    <StorageImg variant={600} src={product.image_url} alt={product.name} className="w-24 h-24 object-cover rounded-xl" />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link href={`/product/${product.slug}`} className="font-medium hover:text-primary transition-colors leading-snug line-clamp-2">

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import Layout from '@/components/layout/Layout';
+import { StorageImg } from '@/components/ui-kit/StorageImage';
 import type { Metadata } from 'next';
 
 const serverClient = () => createClient(
@@ -67,7 +68,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {post.cover_image_url && (
           <div className="mx-auto my-10 max-w-4xl overflow-hidden rounded-card md:my-14">
-            <img src={post.cover_image_url} alt={post.title} className="aspect-[3/2] w-full object-cover" />
+            <StorageImg variant={1200} loading="eager" src={post.cover_image_url} alt={post.title} className="aspect-[3/2] w-full object-cover" />
           </div>
         )}
 

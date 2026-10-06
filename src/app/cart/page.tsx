@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { StorageImg } from '@/components/ui-kit/StorageImage';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
@@ -62,7 +63,7 @@ export default function CartPage() {
               return (
                 <div key={`${productId}-${size}`} className="flex gap-4 p-4 rounded-2xl bg-card shadow-soft border border-border">
                   <Link href={`/product/${product.slug}`} className="flex-shrink-0">
-                    <img src={product.image_url} alt={product.name} className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-xl" />
+                    <StorageImg variant={600} src={product.image_url} alt={product.name} className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-xl" />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link href={`/product/${product.slug}`} className="font-medium hover:text-primary transition-colors leading-snug">

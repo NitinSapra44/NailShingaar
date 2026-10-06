@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { StorageImage } from '@/components/ui-kit/StorageImage';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,8 @@ export function CollectionCard({
   return (
     <Link href={`/categories/${slug}`} className={cn('group block', className)}>
       <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush">
-        <Image
+        <StorageImage
+          variant={1200}
           src={image}
           alt={`${name} press-on nails collection`}
           fill

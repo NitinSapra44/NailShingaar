@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
+import { StorageImg } from '@/components/ui-kit/StorageImage';
 import ProductCard from '@/components/products/ProductCard';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -89,7 +90,9 @@ export default function CategoryDetailPage() {
   return (
     <Layout>
       <div className="relative h-72 overflow-hidden md:h-96">
-        <img
+        <StorageImg
+          variant={1200}
+          loading="eager"
           src={category.image_url || 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1200'}
           alt={`${category.name} press-on nails`}
           className="h-full w-full object-cover"

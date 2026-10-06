@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { StorageImage } from '@/components/ui-kit/StorageImage';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,8 @@ export function BlogCard({ post, className }: { post: BlogCardPost; className?: 
     >
       <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-blush">
         {post.cover_image_url ? (
-          <Image
+          <StorageImage
+            variant={1200}
             src={post.cover_image_url}
             alt={post.title}
             fill

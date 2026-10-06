@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { StorageImage } from '@/components/ui-kit/StorageImage';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { Product } from '@/types';
@@ -32,6 +32,14 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
 
   const [api, setApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
+  // Only download photos the shopper is about to see: the hover image on first
+  // hover, the next carousel slide once the shopper touches the card.
+  const [hovered, setHovered] = useState(false);
+  const [loadedUpTo, setLoadedUpTo] = useState(0);
+  const preloadNext = () => setLoadedUpTo((n) => Math.max(n, activeIndex + 1));
+  useEffect(() => {
+    if (activeIndex > 0) setLoadedUpTo((n) => Math.max(n, activeIndex + 1));
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!api) return;
@@ -56,8 +64,15 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
       {/* Media */}
       <div className="relative aspect-[4/5] overflow-hidden rounded-media bg-blush">
         {/* Hover-capable devices: first image, cross-fade to the second on hover */}
-        <Link href={href} tabIndex={-1} aria-hidden className="absolute inset-0 hidden can-hover:block">
-          <Image
+        <Link
+          href={href}
+          tabIndex={-1}
+          aria-hidden
+          className="absolute inset-0 hidden can-hover:block"
+          onMouseEnter={() => setHovered(true)}
+        >
+          <StorageImage
+            variant={600}
             src={images[0]}
             alt={product.name}
             fill
@@ -65,8 +80,9 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
             priority={priority}
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           />
-          {hasMultiple && (
-            <Image
+          {hasMultiple && hovered && (
+            <StorageImage
+              variant={600}
               src={images[1]}
               alt=""
               fill
@@ -79,19 +95,20 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
         {/* Touch devices: keep the existing swipe carousel with dots */}
         <div className="absolute inset-0 can-hover:hidden">
           {hasMultiple ? (
-            <Carousel setApi={setApi} className="absolute inset-0">
+            <Carousel setApi={setApi} className="absolute inset-0" onPointerDown={preloadNext}>
               <CarouselContent className="ml-0">
                 {images.map((src, i) => (
                   <CarouselItem key={src + i} className="pl-0 h-full">
                     <Link href={href} tabIndex={-1} className="relative block h-full w-full">
-                      <Image
+                      {i <= loadedUpTo && <StorageImage
+                        variant={600}
                         src={src}
                         alt={i === 0 ? product.name : ''}
                         fill
                         sizes={sizes}
                         priority={priority && i === 0}
                         className="object-cover"
-                      />
+                      />}
                     </Link>
                   </CarouselItem>
                 ))}
@@ -110,7 +127,7 @@ const ProductCard = ({ product, className, style, priority }: ProductCardProps) 
             </Carousel>
           ) : (
             <Link href={href} tabIndex={-1} className="relative block h-full w-full">
-              <Image src={images[0]} alt={product.name} fill sizes={sizes} priority={priority} className="object-cover" />
+              <StorageImage variant={600} src={images[0]} alt={product.name} fill sizes={sizes} priority={priority} className="object-cover" />
             </Link>
           )}
         </div>

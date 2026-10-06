@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Loader2, Plus, X, Upload, Play } from 'lucide-react';
 import type { Product, Category } from '@/types';
+import { uploadPublicImage } from '@/lib/image-upload';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -65,10 +66,7 @@ async function uploadToStorage(file: File): Promise<string> {
   const compressed = await compressImage(file);
   const ext = compressed.name.split('.').pop() ?? 'jpg';
   const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { error } = await supabase.storage.from('product-images').upload(path, compressed, { upsert: false });
-  if (error) throw error;
-  const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-  return data.publicUrl;
+  return uploadPublicImage(path, compressed);
 }
 
 export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) => {

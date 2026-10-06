@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, Upload, X, Camera, Loader2, Info, ShieldCheck } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { StorageImg } from '@/components/ui-kit/StorageImage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -533,7 +534,7 @@ export default function CheckoutPage() {
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {lineItems.map((item) => (
                   <div key={item.productId} className="flex gap-3">
-                    <img src={item.product.image_url} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border" />
+                    <StorageImg variant={600} src={item.product.image_url} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold leading-snug line-clamp-2">{item.product.name}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity} · Handcrafted</p>

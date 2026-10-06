@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import { StorageImage } from '@/components/ui-kit/StorageImage';
 import { ArrowRight, Truck, Sparkles, Ruler, Play, Heart, Minus, Plus } from 'lucide-react';
 import { Container, Section, SectionHeading, Breadcrumbs, Skeleton, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui-kit';
 import Layout from '@/components/layout/Layout';
@@ -185,7 +185,7 @@ export default function ProductDetailPage() {
           <span className="absolute inset-0 flex items-center justify-center bg-ink/20"><Play className="h-5 w-5 text-white" aria-hidden /></span>
         </>
       ) : (
-        <Image src={item.src} alt="" fill sizes="80px" priority={i === 0} className="object-cover" />
+        <StorageImage variant={600} src={item.src} alt="" fill sizes="80px" priority={i === 0} className="object-cover" />
       )}
     </button>
   );
@@ -245,7 +245,8 @@ export default function ProductDetailPage() {
                         )
                       ) : (
                         <div className="relative h-full w-full">
-                          <Image
+                          <StorageImage
+                            variant={1200}
                             src={item.src}
                             alt={i === 0 ? product.name : `${product.name} — view ${i + 1}`}
                             fill
