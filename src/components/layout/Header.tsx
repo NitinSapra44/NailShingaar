@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ShoppingBag, User, Menu, X, Search, Heart, ChevronDown, Grid3X3, Sparkles, ArrowRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,6 +12,7 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import type { Category } from '@/types';
+import { HeaderSearch } from './HeaderSearch';
 
 const NAV_LINK =
   'relative text-sm font-medium text-foreground/80 transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 hover:after:scale-x-100';
@@ -33,9 +32,7 @@ const Header = () => {
   const { isAdmin } = useAdmin();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
-  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
@@ -76,15 +73,6 @@ const Header = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(searchQuery)}`);
-      setIsSearchOpen(false);
-      setSearchQuery('');
-    }
-  };
 
   const logo = (className: string) => (
     <Link href="/" className={cn('flex items-center', className)} aria-label="Nail Shingaar by Reet — home">
@@ -256,22 +244,7 @@ const Header = () => {
       </div>
 
       {/* Search panel */}
-      {isSearchOpen && (
-        <div id="site-search" className="border-t border-border bg-ivory">
-          <form onSubmit={handleSearch} className="container flex items-center gap-3 py-3" role="search">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-            <Input
-              type="search"
-              placeholder="Search nails..."
-              aria-label="Search products"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 flex-1 rounded-full border-border bg-surface"
-              autoFocus
-            />
-          </form>
-        </div>
-      )}
+      {isSearchOpen && <HeaderSearch onClose={() => setIsSearchOpen(false)} />}
     </header>
   );
 };
