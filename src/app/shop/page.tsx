@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/pagination';
 import { supabase } from '@/integrations/supabase/client';
 import { Product, Category } from '@/types';
-import { searchTermGroups } from '@/lib/search';
+import { productSearchClauses } from '@/lib/product-search';
 
 const PAGE_SIZE = 12;
 
@@ -61,33 +61,8 @@ function ShopContent() {
         }
 
         // Each typed word must match the product name or one of its collections.
-        const groups = searchTermGroups(searchQuery);
-        const searchClauses: string[][] = [];
-        if (groups.length > 0) {
-          const matchedCategoryIds = new Set(
-            allCategories
-              .filter((c) => groups.some((terms) => terms.some((t) => c.name.toLowerCase().includes(t))))
-              .map((c) => c.id),
-          );
-          const productsByCategory = new Map<string, string[]>();
-          if (matchedCategoryIds.size > 0) {
-            const { data: rows } = await (supabase as any)
-              .from('product_categories')
-              .select('product_id, category_id')
-              .in('category_id', [...matchedCategoryIds]);
-            for (const r of (rows ?? []) as { product_id: string; category_id: string }[]) {
-              productsByCategory.set(r.category_id, [...(productsByCategory.get(r.category_id) ?? []), r.product_id]);
-            }
-          }
-          for (const terms of groups) {
-            const ids = allCategories
-              .filter((c) => terms.some((t) => c.name.toLowerCase().includes(t)))
-              .flatMap((c) => productsByCategory.get(c.id) ?? []);
-            const clauses = terms.map((t) => `name.ilike.*${t}*`);
-            if (ids.length > 0) clauses.push(`id.in.(${[...new Set(ids)].join(',')})`);
-            searchClauses.push(clauses);
-          }
-        }
+        const searchClauses = await productSearchClauses(searchQuery, allCategories);
+        if (cancelled) return;
 
         const buildQuery = (matchAll: boolean) => {
           let query = supabase.from('products').select('*', { count: 'exact' });
